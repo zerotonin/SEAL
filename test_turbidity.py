@@ -8,7 +8,7 @@ start = time.time()
 C.moveParticles() 
 end = time.time()
 print(end-start)   
-
+# thingi
 
 for po in C.partclObjList: 
    ...:     print(po.position) 
