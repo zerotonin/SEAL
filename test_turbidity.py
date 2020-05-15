@@ -9,6 +9,11 @@ C.moveParticles()
 end = time.time()
 print(end-start)   
 
+
+for po in C.partclObjList: 
+   ...:     print(po.position) 
+ 
+ 
 reload(turbidity)   
 C = turbidity.Cloud('test')  
 C.add_particles()  
