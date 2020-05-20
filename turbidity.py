@@ -15,8 +15,16 @@ class Particle:
        self.trajectory.append(self.position)
        self.position  = self.position+ np.random.uniform(-1*stepSize,stepSize,3)
        self.position  = self.position+ current
- 
- 
+
+   def sphere2cart (self): # attempt to convert spheric coordinates of our pobjects in our self.partclObjList to cartasian coordinates 
+        
+        #take list r = pobject.positison[0],theta = pobject.positison[1],phi = pobject.positison[2]
+       x = self.position[0] * sin( self.position[1] ) * cos( self.position[2] )
+       y = self.position[0] * sin( self.position[1] ) * sin( self.position[2] )
+       z = self.position[0] * cos( self.position[1] )
+       self.position = [x,y,z]
+       return [x,y,z] # this is just giving me one set of changed Coordinates and is not changing the whole list 
+
 class Cloud:
 
     def __init__(self,
@@ -69,10 +77,7 @@ class Cloud:
     #phi = atan2(y,x)
     #theta = acos(z,r)
     
-    def sphere2cart (self): # attempt to convert spheric coordinates of our pobjects in our self.partclObjList to cartasian coordinates 
+    
+    def Cloudsphere2cart (self):
         for pobject in self.partclObjList:
-        #take list r = pobject.positison[0],theta = pobject.positison[1],phi = pobject.positison[2]
-            x = pobject.position[0] * sin( pobject.position[1] ) * cos( pobject.position[2] )
-            y = pobject.position[0] * sin( pobject.position[1] ) * sin( pobject.position[2] )
-            z = pobject.position[0] * cos( pobject.position[1] )
-            return [x,y,z] # this is just giving me one set of changed Coordinates and is not changing the whole list 
+            pobject.sphere2cart()
