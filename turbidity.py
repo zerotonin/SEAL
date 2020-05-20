@@ -24,6 +24,14 @@ class Particle:
        z = self.position[0] * cos( self.position[1] )
        self.position = [x,y,z]
        return [x,y,z] # this is just giving me one set of changed Coordinates and is not changing the whole list 
+   
+   def cart2sphere(self):
+       XsqPlusYsq = self.position[0]**2 + self.position[1]**2
+       r = m.sqrt(XsqPlusYsq + self.position[2]**2)               # r
+       theta = m.atan2(m.sqrt(XsqPlusYsq),self.position[2])     # theta 
+       phi = m.atan2(self.position[1],self.position[0])          # phi not correct 
+       self.position = [r,theta,phi]
+       return [r,theta,phi]
 
 class Cloud:
 
@@ -81,3 +89,7 @@ class Cloud:
     def Cloudsphere2cart (self):
         for pobject in self.partclObjList:
             pobject.sphere2cart()
+
+    def Cloudcart2sphere (self):
+        for pobject in self.partclObjList:
+            pobject.cart2sphere()
