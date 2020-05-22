@@ -57,11 +57,15 @@ class Cloud:
           
     def randomInit(self):
         size = np.random.uniform(self.sizeRange[0], self.sizeRange[1], size=(1))
-        sphereCoord = np.random.rand(3)
-        sphereCoord[0] = sphereCoord[0]*self.radiusMax
-        sphereCoord[1] = sphereCoord[1]*np.pi
-        sphereCoord[2] = sphereCoord[2]*np.pi*2-np.pi
+        sphereCoord = self.multiplyBySphereMax(np.random.rand(3))
         return (sphereCoord,size)
+
+    def multiplyBySphereMax(self,coordinates)
+
+        sphereCoord[0] = coordinates[0]*self.radiusMax
+        sphereCoord[1] = coordinates[1]*np.pi
+        sphereCoord[2] = coordinates[2]*np.pi*2-np.pi
+        return sphereCoord
 
     
     def resetParticles(self):
@@ -70,7 +74,10 @@ class Cloud:
             pobject.position[0] = self.radiusMax -(pobject.position[0]%self.radiusMax) #+/-10% Radius
             pobject.position[1] = (pobject.position[1]+(np.pi/2))%np.pi  #+/-10% Theta
             pobject.position[2] = ((pobject.position[2]+np.pi)%np.pi) -np.pi #+/-10% Phi    
-        
+            # random offset of 5% in each direction
+            offSet = self.multiplyBySphereMax((np.random.rand(3)-0.5)/10.0)
+            pobject.position = pobject.position+offSet
+
 
 
 
