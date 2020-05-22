@@ -16,6 +16,8 @@ class Particle:
        self.position  = self.position+ np.random.uniform(-1*stepSize,stepSize,3)
        self.position  = self.position+ current
 
+   
+
    def sphere2cart (self): # attempt to convert spheric coordinates of our pobjects in our self.partclObjList to cartasian coordinates 
         
         #take list r = pobject.positison[0],theta = pobject.positison[1],phi = pobject.positison[2]
@@ -58,8 +60,17 @@ class Cloud:
         sphereCoord = np.random.rand(3)
         sphereCoord[0] = sphereCoord[0]*self.radiusMax
         sphereCoord[1] = sphereCoord[1]*np.pi
-        sphereCoord[2] = sphereCoord[2]*np.pi*2
+        sphereCoord[2] = sphereCoord[2]*np.pi*2-np.pi
         return (sphereCoord,size)
+
+    
+    def resetParticles(self):
+        for pobject in self.partclObjList:
+
+            pobject.position[0] = self.radiusMax -(pobject.position[0]%self.radiusMax) #+/-10% Radius
+            pobject.position[1] = (pobject.position[1]+(np.pi/2))%np.pi  #+/-10% Theta
+            pobject.position[2] = ((pobject.position[2]+np.pi)%np.pi) -np.pi #+/-10% Phi    
+        
 
 
 
@@ -69,13 +80,12 @@ class Cloud:
             pobject.randomWalk()
             
 
-            if pobject.position[0] >= self.radiusMax:
-                self.partclObjList.remove(pobject)
-                self.add_particles()
+            if pobject.position[0] > self.radiusMax:
+                self.resetParticles()
        
     def deleteParticle(self, pobject):
 #        for Particle in self.partclObjList_drift
-        if pobject.position[0] >= self.radiusMax:
+        if pobject.position[0] > self.radiusMax:
             return True
         else:
             return False 
