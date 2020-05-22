@@ -4,6 +4,17 @@ from sympy import *
 
 class Particle:
    def __init__(self, position,size):
+        """
+        The particle class holds information about the size and position of a particle 
+        inside our turbidity simulation. More information yadiyadiya
+
+        @param size          float default: none
+            size save the particle radius in µm. Particles have no form so far but if
+            plotted spheres or tetrahedron might be best according to the rendering 
+            algorithm.
+        @param position     np.array default: none
+            blah blah what that is
+        """
        self.size = size # number
        self.position = position # tuple consistin of three coordinates radius,theta,phi
        self.trajectory = [] # list of former positions
