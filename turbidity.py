@@ -88,8 +88,9 @@ class Cloud:
  
     def add_particles(self):
         """
-        The add_particle function initializes and adds random sized particles in random position within the Cloud. 
-        This forms the partclObjList.These positions are descriebed with radius, theta and phi.
+        The add_particle function initializes and adds random sized particles in random position 
+        within the Cloud. This forms the partclObjList.These positions are descriebed with
+        radius, theta and phi.
         """
         while len(self.partclObjList)<self.max_particles:
 
@@ -98,7 +99,8 @@ class Cloud:
           
     def randomInit(self):
         """
-        the randomInit function creates random numbers for each coordinate (radius, theta, phi)within their ranges.
+        the randomInit function creates random numbers for each coordinate (radius, theta, phi)
+        within their ranges.
         """  
         size = np.random.uniform(self.sizeRange[0], self.sizeRange[1], size=(1))
         sphereCoord = np.random.rand(3)
@@ -107,8 +109,8 @@ class Cloud:
 
     def multiplyBySphereMax(self,coordinates):
         """
-        The multiplyBySphereMax function is creating the mathematic setting for the coordinats in the spheric coordinate system 
-        (0=radius,1=theta,2=phi). defining 
+        The multiplyBySphereMax function is creating the mathematic setting for the coordinats in 
+        the spheric coordinate system (0=radius,1=theta,2=phi). defining 
             radius by radiusMax
             theta by np.pi describing a range between (0-180°)
             phi by np.pi*2-np.pi describing a range between ((-180°)-180°)
@@ -122,8 +124,9 @@ class Cloud:
     
     def resetParticles(self):
         """
-        The resetParticles function resets those particles that moved out of the sphere (radius higher than the radiusMax)
-        by having them reappear on the opposite site of the sphere. 
+        The resetParticles function resets those particles that moved out of the sphere
+        (radius higher than the radiusMax) by having them reappear on the opposite site 
+        of the sphere. 
         """
         
         for pobject in self.partclObjList:
@@ -140,9 +143,10 @@ class Cloud:
 
     def moveParticles(self):
         """
-        The moveParticles makes all particle object in the cloud move by a random walk for each particle and 
-        an universal current acting on all particles. Thos partiles that leave the sphere by this function 
-        are detected and the resetParticle function makes them reappear on th opposite site of the sphere
+        The moveParticles makes all particle object in the cloud move by a random walk 
+        for each particle and an universal current acting on all particles. 
+        Thos partiles that leave the sphere by this function are detected and the
+        resetParticle function makes them reappear on th opposite site of the sphere
         """    
         for pobject in self.partclObjList:
             pobject.randomWalk()             # for all Particles in List run randomwalk
@@ -165,16 +169,16 @@ class Cloud:
     
     def Cloudsphere2cart (self):
         """
-        The Cloudsphere2cart function converts the postions of each particle from spheric coordinates (radius,theta,phi)
-        to cartasian coordinates (x,y,z)
+        The Cloudsphere2cart function converts the postions of each particle from 
+        spheric coordinates (radius,theta,phi) to cartasian coordinates (x,y,z)
         """
         for pobject in self.partclObjList:
             pobject.sphere2cart()
 
     def Cloudcart2sphere (self):
         """
-        The Cloudcart2sphere function converts the postion of each particle from cartasian coordinates (x,y,z)
-        to spheric coordinates (radius,theta,phi)
+        The Cloudcart2sphere function converts the postion of each particle from 
+        cartasian coordinates (x,y,z) to spheric coordinates (radius,theta,phi)
         """
         for pobject in self.partclObjList:
             pobject.cart2sphere()
