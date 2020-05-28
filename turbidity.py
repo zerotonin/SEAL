@@ -103,11 +103,10 @@ class Cloud:
         within their ranges.
         """  
         size = np.random.uniform(self.sizeRange[0], self.sizeRange[1], size=(1))
-        #sphereCoord = np.random.rand(3)
         sphereCoord = self.multiplyBySphereMax(np.random.rand(3))
         return (sphereCoord,size)
 
-    def multiplyBySphereMax(self,sphereCoord):
+    def multiplyBySphereMax(self,coordinate):
         """
         The multiplyBySphereMax function is creating the mathematic setting for the coordinats in 
         the spheric coordinate system (0=radius,1=theta,2=phi). defining 
@@ -115,10 +114,10 @@ class Cloud:
             theta by np.pi describing a range between (0-180°)
             phi by np.pi*2-np.pi describing a range between ((-180°)-180°)
         """
-        
-        sphereCoord[0] = sphereCoord[0]*self.radiusMax
-        sphereCoord[1] = sphereCoord[1]*np.pi
-        sphereCoord[2] = sphereCoord[2]*np.pi*2-np.pi
+        sphereCoord = np.empty(3)
+        sphereCoord[0] = coordinate[0]*self.radiusMax
+        sphereCoord[1] = coordinate[1]*np.pi
+        sphereCoord[2] = coordinate[2]*np.pi*2-np.pi
         return sphereCoord
 
     

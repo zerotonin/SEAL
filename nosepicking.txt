@@ -1,0 +1,14 @@
+How many people in the world pick their noses at the same time? 
+
+There are 7.800.000.000 people in the world.
+
+- 80% of the population is picking their nose in general 
+--> 6.240.000.000 people 
+- these people are 35% children and 45% adultd
+   - children pick their nose 30 times a day 
+   - adult 5 times a day 
+   - each time takes about 30 sec 
+     --> 16(hours)*60 (minutes) * 2 (30sec) = 1920 chances to pick your nose in 24 hours ? 
+   - for children 30/1920
+   - for adults 5/1920
+
