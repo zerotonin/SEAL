@@ -28,7 +28,24 @@ class Particle:
         self.position  = self.position+ current
     
     def temperatureFromZ(self,z):
-        return 3.1643818163582185+5.289978692454068* np.exp(-(z--2.854807838826537)**2/(2*13.943640614002176**2))
+        """
+        The temperature of the water environment is modelled based on f1. The data represented by
+        a Gaussian function is temperature data from the Gulf of Finland (Figure 2). Fitting was
+        done via plotly @ 29th May 2020
+        
+        Gaussian function: 
+
+        A  = 3.1643818163582185
+        H  = 5.289978692454068
+        xo = -2.854807838826537
+        w  = 13.943640614002176
+
+        temperatue(z) = A+H*exp(-(z-xo)²/(2*w²))
+
+        f1: Placke, Manja, et al. "Long-term mean circulation of the Baltic Sea as represented by various ocean circulation models." 
+            Frontiers in Marine Science 5 (2018): 287.
+        """
+        return 3.1643818163582185+5.289978692454068* np.exp(-(z+2.854807838826537)**2/(2*13.943640614002176**2))
 
    
 
