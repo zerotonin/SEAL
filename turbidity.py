@@ -27,12 +27,12 @@ class Particle:
         self.position  = self.position+ np.random.uniform(-1*stepSize,stepSize,3)
         self.position  = self.position+ current
     
-    def temperatureFromZ(self,z):
+    def depth2Temperature(self,z):
         """
         The temperature of the water environment is modelled based on f1. The data represented by
         a Gaussian function is temperature data from the Gulf of Finland (Figure 2). Fitting was
         done via plotly @ 29th May 2020
-        
+
         Gaussian function: 
 
         A  = 3.1643818163582185
