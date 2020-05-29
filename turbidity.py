@@ -47,6 +47,8 @@ class Particle:
         """
         return 3.1643818163582185+5.289978692454068* np.exp(-(z+2.854807838826537)**2/(2*13.943640614002176**2))
 
+    def temperature2StepSize(self,temperature):
+        pass
    
 
    def sphere2cart (self): # attempt to convert spheric coordinates of our pobjects in our self.partclObjList to cartasian coordinates 
