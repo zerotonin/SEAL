@@ -184,7 +184,8 @@ class Particle:
             self.position += waterCurrent
     
     def sealMovement(self,sealTrajectory):
-        self.position += -1*sealTrajectory
+        self.position += -1*sealTrajectory # translational change
+        # here we would need to employ a Fick rotation matrix for the rotation of our animal
         self.cart2sphere()
     
     def combinedMovement(self,waterCurrent,sealTrajectory):
