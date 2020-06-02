@@ -3,7 +3,7 @@ import math as m
 #from sympy import *
 
 class Particle:
-    def __init__(self, position,size,samplesPerSec =10):
+    def __init__(self, position,size, groundLevel = -70.0,samplesPerSec =10.0):
         """
         Creates a list of particles. Particles are in spherical space with defined 3 positions, 
         consisted of Radius, Theta and Phi values. The particle class holds information about the size 
@@ -17,19 +17,24 @@ class Particle:
             tuple consistin of three coordinates radius,theta,phi
         @param trajectory 
             list of former position of particle
-        @param groundLevel
+        @param groundLevel  float  default: -70.0
             the depth of an ocean in metres
-        @param temperature 
-            default value of temperature in C, which is updated by depth2Temperature function 
+        @param samplesPerSec float default: 10.0 
+            The models basic frequency. How often it updates in one second.
         """
         self.size = size
-        self.position = position # tuple consistin of three coordinates radius,theta,phi
-        self.trajectory = [] # list of former positions
+        self.position       = position # tuple consistin of three coordinates radius,theta,phi
+        self.trajectory     = [] # list of former positions
         self.activeMovement = True 
-        self.visible = True 
-        self.groundLevel = -70.0 # depth in meter
-        self.samplesPerSec = samplesPerSec
-        self.temperature = 100.0 # temperature in °C
+        self.visible        = True 
+        self.groundLevel    = -70.0 # depth in meter
+        self.samplesPerSec  = samplesPerSec
+        self.temperature    = float("NAN")
+        self.viscosity      = float("NAN")
+        
+
+
+        
 
     def checkVisibility(self):
        """
@@ -128,7 +133,7 @@ class Particle:
         '''
         self.viscosity = 6.432652442106597*10**-7*self.temperature**2+-0.00005261247345535204*self.temperature+0.0018733137829911907
 
-    def temperature2StepSize(self,temperature):
+    def temperature2StepSize(self):
         """
         the temperature2SteoSize function runs a temperature dependent brownian motion for each particle.
 
@@ -144,10 +149,12 @@ class Particle:
         T = temperature in Kelvin
         N = 6.022*10²³ | Avogadro's number
         """
-        stepSize = np.sqrt((8.314462 * self.temperature+273.15 )/ (3* (6.022*10**23))*np.pi*self.viscosity*self.size* (1/self.samplesPerSec))
+        self.particleStateCheck()
+        self.depth2Temperature()
+        self.temperature2viscosity()
 
+        return np.sqrt((8.314462 * self.temperature+273.15 )/ (3* (6.022*10**23))*np.pi*self.viscosity*self.size* (1/self.samplesPerSec))
 
-        pass
 
     def cart2sphere(self):
        """
