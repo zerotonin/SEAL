@@ -1,7 +1,7 @@
 import numpy as np
 import time, turbidity
 from importlib import reload 
-from sympy import *
+#from sympy import *
 
 
 reload(turbidity)   
@@ -26,7 +26,7 @@ C.CloudDepth2Temperature()
 for po in C.partclObjList: 
    print(po.position,po.visible,po.activeMovement,po.temperature) 
    po.position[2] = po.position[2] -np.random.rand()*20
-   po.depth2Temperature(po.position[2])
+   po.depth2Temperature()
    print(po.position,po.visible,po.activeMovement,po.temperature) 
    print("=====================================================")
  
