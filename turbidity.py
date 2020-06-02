@@ -3,7 +3,7 @@ import math as m
 #from sympy import *
 
 class Particle:
-    def __init__(self, position,size):
+    def __init__(self, position,size,samplesPerSec =10):
         """
         Creates a list of particles. Particles are in spherical space with defined 3 positions, 
         consisted of Radius, Theta and Phi values. The particle class holds information about the size 
@@ -28,6 +28,7 @@ class Particle:
         self.activeMovement = True 
         self.visible = True 
         self.groundLevel = -70.0 # depth in meter
+        self.samplesPerSec = samplesPerSec
         self.temperature = 100.0 # temperature in °C
 
     def checkVisibility(self):
@@ -128,10 +129,25 @@ class Particle:
         self.viscosity = 6.432652442106597*10**-7*self.temperature**2+-0.00005261247345535204*self.temperature+0.0018733137829911907
 
     def temperature2StepSize(self,temperature):
-       """
-       the temperature2SteoSize function runs a temperature dependent brownian motion for each particle.
-       """
-       pass
+        """
+        the temperature2SteoSize function runs a temperature dependent brownian motion for each particle.
+
+        In a three dimensional space we cand describe the velocity in each direction by the Einstein-Smoluchowski (E-S) equation
+        for observation duration approaching 0 sec. As we will describe motion behaviour in high temporal resolution. We
+        can use discrete formulae instead of differential equations.
+
+        Displacement formula (E-S): |Δx2| = 2Dt       |Δy2| = 2Dt       |Δz2| = 2Dt
+
+        v = x/t = np.sqrt(2D)/t = (2D/t)^(1/2) = np.sqrt((RT)/(3*N*pi*eta*r*t))
+
+        R = 8.314462 | general gas constant
+        T = temperature in Kelvin
+        N = 6.022*10²³ | Avogadro's number
+        """
+        stepSize = np.sqrt((8.314462 * self.temperature+273.15 )/ (3* (6.022*10**23))*np.pi*self.viscosity*self.size* (1/self.samplesPerSec))
+
+
+        pass
 
     def cart2sphere(self):
        """
