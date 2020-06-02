@@ -226,8 +226,10 @@ class Cloud:
         """
         the randomInit function creates random numbers for each coordinate (radius, theta, phi)
         within their ranges.
+
+        Sizes of the particles are between 20µm and 160µm
         """  
-        size = np.random.uniform(self.sizeRange[0], self.sizeRange[1], size=(1))
+        size = np.random.uniform(self.sizeRange[0], self.sizeRange[1], size=(1))*0.00016 + *0.00002
         sphereCoord = self.multiplyBySphereMax(np.random.rand(3))
         return (sphereCoord,size)
 
