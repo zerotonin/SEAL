@@ -18,10 +18,10 @@ class Particle:
         self.size = size
         self.position = position # tuple consistin of three coordinates radius,theta,phi
         self.trajectory = [] # list of former positions
-        self.activeMovement = True
+        self.activeMovement = True 
         self.visible = True 
-        self.groundLevel = -70.0
-        self.temperature = 100.0
+        self.groundLevel = -70.0 # depth in meter
+        self.temperature = 100.0 # temperature in °C
 
    def checkVisibility(self):
        if self.position[2] >= 0. or self.position[2] <= self.groundLevel-0.1:
@@ -30,6 +30,11 @@ class Particle:
            self.visible = True
    
    def checkActiveMovement(self):
+       """
+       The checkActiveMovement function defines which particles are moveing and which are stationarry.
+       Those particles with a self.position[2](z value) between -70m and -70.1m are stationary. 
+       Those that are between 0 and -70m are moving according to the randomWalk function. 
+       """
        if self.visible == True:
            if self.position[2]<= self.groundLevel:
                self.activeMovement = False
@@ -37,9 +42,15 @@ class Particle:
                self.activeMovement = True
        else:
            self.activeMovement = False  
+           
    def particleStateCheck(self):
+       """
+       The particlStateCheck function calls the information for the visibility and active movement
+       state of the particle
+       """
        self.checkVisibility()
        self.checkActiveMovement()
+
    def randomWalk(self,
                   stepSize = 1,
                   current = np.array([1,1,1])): # moving vector 
@@ -47,15 +58,8 @@ class Particle:
         self.trajectory.append(self.position)
         self.position  = self.position+ np.random.uniform(-1*stepSize,stepSize,3)
         self.position  = self.position+ current
-    
-  
-
-   def temperature2StepSize(self,temperature):
-        pass
-   
 
    def sphere2cart (self): # attempt to convert spheric coordinates of our pobjects in our self.partclObjList to cartasian coordinates 
-        
         #take list r = pobject.positison[0],theta = pobject.positison[1],phi = pobject.positison[2]
         x = self.position[0] * np.sin( self.position[1] ) * np.cos( self.position[2] )
         y = self.position[0] * np.sin( self.position[1] ) * np.sin( self.position[2] )
@@ -65,8 +69,6 @@ class Particle:
         return [x,y,z] # this is just giving me one set of changed Coordinates and is not changing the whole list 
   
    def depth2Temperature(self):
-
-
         """
         The temperature of the water environment is modelled based on f1. The data represented by
         a Gaussian function is temperature data from the Gulf of Finland (Figure 2). Fitting was
@@ -81,22 +83,29 @@ class Particle:
 
         temperatue(z) = A+H*exp(-(z-xo)²/(2*w²))
 
-        f1: Placke, Manja, et al. "Long-term mean circulation of the Baltic Sea as represented by various ocean circulation models." 
-            Frontiers in Marine Science 5 (2018): 287.
+        f1: Placke, Manja, et al. "Long-term mean circulation of the Baltic Sea as represented by 
+        various ocean circulation models." Frontiers in Marine Science 5 (2018): 287.
         """
-       
         self.temperature = 3.1643818163582185+5.289978692454068*np.exp(-1*(self.position[2]+2.854807838826537)**2/(2*13.943640614002176**2))
-   def temperature2StepSize(self,temperature):
-        pass
 
+   def temperature2StepSize(self,temperature):
+       """
+       the temperature2SteoSize function runs a temperature dependent brownian motion for each particle
+       """
+       pass
 
    def cart2sphere(self):
-        XsqPlusYsq = self.position[0]**2 + self.position[1]**2
-        r = m.sqrt(XsqPlusYsq + self.position[2]**2)               # r
-        theta = m.atan2(m.sqrt(XsqPlusYsq),self.position[2])     # theta 
-        phi = m.atan2(self.position[1],self.position[0])          # phi not correct 
-        self.position = [r,theta,phi]
-        return [r,theta,phi]
+       """
+       r = sqrt(x*x + y*y + z*z)
+       phi = atan2(y,x)
+       theta = acos(z,r)
+       """
+       XsqPlusYsq = self.position[0]**2 + self.position[1]**2
+       r = m.sqrt(XsqPlusYsq + self.position[2]**2)               # r
+       theta = m.atan2(m.sqrt(XsqPlusYsq),self.position[2])     # theta 
+       phi = m.atan2(self.position[1],self.position[0])          # phi not correct 
+       self.position = [r,theta,phi]
+       return [r,theta,phi]
 
 class Cloud:
     """
@@ -130,7 +139,6 @@ class Cloud:
             list of particle objects within the turbidity cloud. length of the list defined by 
             max_particles 
         """
-        
         self.name = name # string name
         self.max_particles = max_particles # integer number of particles of the same size and position range
         self.partclObjList = [] # list of particle objects
@@ -172,7 +180,6 @@ class Cloud:
         sphereCoord[2] = coordinate[2]*np.pi*2-np.pi
         return sphereCoord
 
-    
     def resetParticles(self):
         """
         The resetParticles function resets those particles that moved out of the sphere
@@ -188,9 +195,6 @@ class Cloud:
             # random offset of 5% in each direction
             offSet = self.multiplyBySphereMax((np.random.rand(3)-0.5)/10.0)
             pobject.position = pobject.position+offSet
-
-
-
 
     def moveParticles(self):
         """
@@ -212,17 +216,17 @@ class Cloud:
         else:
             return False 
 
-
-    # r = sqrt(x*x + y*y + z*z)
-    #phi = atan2(y,x)
-    #theta = acos(z,r)
-
     def CloudDepth2Temperature(self):
+        """
+        The CloudDepth2Temperature function calls all particle objects in the Cloud 
+        which are between surface and seafloor and calculates the temperature for
+        every particle. This information will be needed for the temperature dependent
+        brownian motion of the particles.
+        """
         for pobject in self.partclObjList:
             if pobject.activeMovement == True:
 
                 pobject.depth2Temperature()
-    
     
     def Cloudsphere2cart (self):
         """
