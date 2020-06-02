@@ -113,6 +113,7 @@ class Particle:
         various ocean circulation models." Frontiers in Marine Science 5 (2018): 287.
         """
         self.temperature = 3.1643818163582185+5.289978692454068*np.exp(-1*(self.position[2]+2.854807838826537)**2/(2*13.943640614002176**2))
+    
     def temperature2viscosity(self):
         '''
         The viscosity of saltwater was modeled based on data from https://www.engineeringtoolbox.com/sea-water-properties-d_840.html
