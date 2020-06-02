@@ -12,10 +12,23 @@ start = time.time()
 C.moveParticles() 
 end = time.time()
 print(end-start)   
+
+
+
+reload(turbidity)   
+C = turbidity.Cloud('test')  
+C.add_particles()   
+C.Cloudsphere2cart()
+C.CloudDepth2Temperature()
+
 # thingi
 
 for po in C.partclObjList: 
-   ...:     print(po.position) 
+   print(po.position,po.visible,po.activeMovement,po.temperature) 
+   po.position[2] = po.position[2] -np.random.rand()*20
+   po.depth2Temperature(po.position[2])
+   print(po.position,po.visible,po.activeMovement,po.temperature) 
+   print("=====================================================")
  
 
 reload(turbidity)   

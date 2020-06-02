@@ -1,6 +1,6 @@
 import numpy as np
 import math as m 
-from sympy import *
+#from sympy import *
 
 class Particle:
    def __init__(self, position,size):
@@ -20,12 +20,15 @@ class Particle:
         self.trajectory = [] # list of former positions
         self.activeMovement = True
         self.visible = True 
-        self.groundLevel = -70.
+        self.groundLevel = -70.0
+        self.temperature = 100.0
+
    def checkVisibility(self):
        if self.position[2] >= 0. or self.position[2] <= self.groundLevel-0.1:
            self.visible = False
        else: 
            self.visible = True
+   
    def checkActiveMovement(self):
        if self.visible == True:
            if self.position[2]<= self.groundLevel:
@@ -54,14 +57,14 @@ class Particle:
    def sphere2cart (self): # attempt to convert spheric coordinates of our pobjects in our self.partclObjList to cartasian coordinates 
         
         #take list r = pobject.positison[0],theta = pobject.positison[1],phi = pobject.positison[2]
-        x = self.position[0] * sin( self.position[1] ) * cos( self.position[2] )
-        y = self.position[0] * sin( self.position[1] ) * sin( self.position[2] )
-        z = self.position[0] * cos( self.position[1] )
+        x = self.position[0] * np.sin( self.position[1] ) * np.cos( self.position[2] )
+        y = self.position[0] * np.sin( self.position[1] ) * np.sin( self.position[2] )
+        z = self.position[0] * np.cos( self.position[1] )
         self.position = [x,y,z]
         self.particleStateCheck()
         return [x,y,z] # this is just giving me one set of changed Coordinates and is not changing the whole list 
   
-   def depth2Temperature(self,z):
+   def depth2Temperature(self):
 
 
         """
@@ -81,7 +84,8 @@ class Particle:
         f1: Placke, Manja, et al. "Long-term mean circulation of the Baltic Sea as represented by various ocean circulation models." 
             Frontiers in Marine Science 5 (2018): 287.
         """
-        return 3.1643818163582185+5.289978692454068* np.exp(-(z+2.854807838826537)**2/(2*13.943640614002176**2))
+       
+        self.temperature = 3.1643818163582185+5.289978692454068*np.exp(-1*(self.position[2]+2.854807838826537)**2/(2*13.943640614002176**2))
    def temperature2StepSize(self,temperature):
         pass
 
@@ -217,7 +221,7 @@ class Cloud:
         for pobject in self.partclObjList:
             if pobject.activeMovement == True:
 
-                pobject.depth2Temperature(pobject.position[2])
+                pobject.depth2Temperature()
     
     
     def Cloudsphere2cart (self):
