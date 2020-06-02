@@ -82,7 +82,7 @@ class Particle:
         
         stepSize = self.getBrownianMotionStepSize()
  
-        self.position  = self.position+ (np.random.choice((-1,1),3)*stepSize))
+        self.position  = self.position+ (np.random.choice((-1,1),3)*stepSize)
 
     def sphere2cart (self): 
         """
@@ -184,10 +184,10 @@ class Particle:
             self.position += waterCurrent
     
     def sealMovement(self,sealTrajectory):
-        self.position += -1*sealMovement
+        self.position += -1*sealTrajectory
         self.cart2sphere()
     
-    def combinedMovement(self,waterCurrent,sealTrajectory)
+    def combinedMovement(self,waterCurrent,sealTrajectory):
         self.particleMovement(waterCurrent)
         self.sealMovement(sealTrajectory)
 
