@@ -113,6 +113,18 @@ class Particle:
         various ocean circulation models." Frontiers in Marine Science 5 (2018): 287.
         """
         self.temperature = 3.1643818163582185+5.289978692454068*np.exp(-1*(self.position[2]+2.854807838826537)**2/(2*13.943640614002176**2))
+    def temperature2viscosity(self):
+        '''
+        The viscosity of saltwater was modeled based on data from https://www.engineeringtoolbox.com/sea-water-properties-d_840.html
+        Where the absolute dynamic viscosity is given in (Ns/m²,Pa*s). The data was fitted with plot.ly and a quadratic fit model resulting
+        in the following formula and coefficients:
+
+        self.viscosity = A*self.temperature**2+B*x+C
+        A = 6.432652442106597e-7
+        B = -0.00005261247345535204
+        C = 0.0018733137829911907
+        '''
+        self.viscosity = 6.432652442106597*10**-7*self.temperature**2+-0.00005261247345535204*x+0.0018733137829911907
 
     def temperature2StepSize(self,temperature):
        """
