@@ -5,15 +5,22 @@ import math as m
 class Particle:
    def __init__(self, position,size):
         """
-        The particle class holds information about the size and position of a particle 
-        inside our turbidity simulation. More information yadiyadiya
+        Creates a list of particles. Particles are in spherical space with defined 3 positions, 
+        consisted of Radius, Theta and Phi values. The particle class holds information about the size 
+        and position of a particle inside our turbidity simulation. 
 
         @param size          float default: none
             size save the particle radius in µm. Particles have no form so far but if
             plotted spheres or tetrahedron might be best according to the rendering 
             algorithm.
         @param position     np.array default: none
-            blah blah what that is
+            tuple consistin of three coordinates radius,theta,phi
+        @param trajectory 
+            list of former position of particle
+        @param groundLevel
+            the depth of an ocean in metres
+        @param temperature 
+            default value of temperature in C, which is updated by depth2Temperature function 
         """
         self.size = size
         self.position = position # tuple consistin of three coordinates radius,theta,phi
@@ -24,6 +31,10 @@ class Particle:
         self.temperature = 100.0 # temperature in °C
 
    def checkVisibility(self):
+       """
+       Function checks if coordinates of particles are inside of a sphere and visible. 
+       Particle is not visible if it's above the surface level and if it's below ground level. 
+       """
        if self.position[2] >= 0. or self.position[2] <= self.groundLevel-0.1:
            self.visible = False
        else: 
@@ -31,7 +42,7 @@ class Particle:
    
    def checkActiveMovement(self):
        """
-       The checkActiveMovement function defines which particles are moveing and which are stationarry.
+       The checkActiveMovement function defines which particles are moving and which are stationary.
        Those particles with a self.position[2](z value) between -70m and -70.1m are stationary. 
        Those that are between 0 and -70m are moving according to the randomWalk function. 
        """
@@ -53,14 +64,29 @@ class Particle:
 
    def randomWalk(self,
                   stepSize = 1,
-                  current = np.array([1,1,1])): # moving vector 
-       # current should be an numpy array of three values containing radius,theta,phi
+                  current = np.array([1,1,1])):
+        """
+        Creates a random walk trajectory for particles, that move in the direction of currents in a 
+        spherical space.
+        
+        @param current 
+        is a moving vector of current, where numpy array is three values containing radius,theta,phi
+        @param position
+        coordinates of particle in spherical space, that are updated by random walk coordinates with 
+        defined step size in the current's vectors direction.
+        """
         self.trajectory.append(self.position)
         self.position  = self.position+ np.random.uniform(-1*stepSize,stepSize,3)
         self.position  = self.position+ current
 
-   def sphere2cart (self): # attempt to convert spheric coordinates of our pobjects in our self.partclObjList to cartasian coordinates 
-        #take list r = pobject.positison[0],theta = pobject.positison[1],phi = pobject.positison[2]
+   def sphere2cart (self): 
+        """
+        Converts spheric coordinates(r = pobject.positison[0],theta = pobject.positison[1],
+        phi = pobject.positison[2]) of pobjects in self.partclObjList to cartasian coordinates
+        and returns x,y,z coordinates as a list
+        """
+        # attempt to convert spheric coordinates of our pobjects in our self.partclObjList to cartasian coordinates 
+        #take list
         x = self.position[0] * np.sin( self.position[1] ) * np.cos( self.position[2] )
         y = self.position[0] * np.sin( self.position[1] ) * np.sin( self.position[2] )
         z = self.position[0] * np.cos( self.position[1] )
@@ -90,15 +116,18 @@ class Particle:
 
    def temperature2StepSize(self,temperature):
        """
-       the temperature2SteoSize function runs a temperature dependent brownian motion for each particle
+       the temperature2SteoSize function runs a temperature dependent brownian motion for each particle.
        """
        pass
 
    def cart2sphere(self):
        """
+       Converts cartasian coordinates (x = pobject.positison[0],y = pobject.positison[1],
+       z = pobject.positison[2]) of pobjects in self.partclObjList to sperical coordinates
+       and returns radius, theta, phi coordinates as list of floats.
        r = sqrt(x*x + y*y + z*z)
+       theta = atan2((x*x +y*y),z)
        phi = atan2(y,x)
-       theta = acos(z,r)
        """
        XsqPlusYsq = self.position[0]**2 + self.position[1]**2
        r = m.sqrt(XsqPlusYsq + self.position[2]**2)               # r
