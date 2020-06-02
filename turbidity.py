@@ -3,7 +3,7 @@ import math as m
 #from sympy import *
 
 class Particle:
-   def __init__(self, position,size):
+    def __init__(self, position,size):
         """
         Creates a list of particles. Particles are in spherical space with defined 3 positions, 
         consisted of Radius, Theta and Phi values. The particle class holds information about the size 
@@ -30,7 +30,7 @@ class Particle:
         self.groundLevel = -70.0 # depth in meter
         self.temperature = 100.0 # temperature in °C
 
-   def checkVisibility(self):
+    def checkVisibility(self):
        """
        Function checks if coordinates of particles are inside of a sphere and visible. 
        Particle is not visible if it's above the surface level and if it's below ground level. 
@@ -40,7 +40,7 @@ class Particle:
        else: 
            self.visible = True
    
-   def checkActiveMovement(self):
+    def checkActiveMovement(self):
        """
        The checkActiveMovement function defines which particles are moving and which are stationary.
        Those particles with a self.position[2](z value) between -70m and -70.1m are stationary. 
@@ -54,7 +54,7 @@ class Particle:
        else:
            self.activeMovement = False  
            
-   def particleStateCheck(self):
+    def particleStateCheck(self):
        """
        The particlStateCheck function calls the information for the visibility and active movement
        state of the particle
@@ -62,7 +62,7 @@ class Particle:
        self.checkVisibility()
        self.checkActiveMovement()
 
-   def randomWalk(self,
+    def randomWalk(self,
                   stepSize = 1,
                   current = np.array([1,1,1])):
         """
@@ -79,7 +79,7 @@ class Particle:
         self.position  = self.position+ np.random.uniform(-1*stepSize,stepSize,3)
         self.position  = self.position+ current
 
-   def sphere2cart (self): 
+    def sphere2cart (self): 
         """
         Converts spheric coordinates(r = pobject.positison[0],theta = pobject.positison[1],
         phi = pobject.positison[2]) of pobjects in self.partclObjList to cartasian coordinates
@@ -94,7 +94,7 @@ class Particle:
         self.particleStateCheck()
         return [x,y,z] # this is just giving me one set of changed Coordinates and is not changing the whole list 
   
-   def depth2Temperature(self):
+    def depth2Temperature(self):
         """
         The temperature of the water environment is modelled based on f1. The data represented by
         a Gaussian function is temperature data from the Gulf of Finland (Figure 2). Fitting was
@@ -114,13 +114,13 @@ class Particle:
         """
         self.temperature = 3.1643818163582185+5.289978692454068*np.exp(-1*(self.position[2]+2.854807838826537)**2/(2*13.943640614002176**2))
 
-   def temperature2StepSize(self,temperature):
+    def temperature2StepSize(self,temperature):
        """
        the temperature2SteoSize function runs a temperature dependent brownian motion for each particle.
        """
        pass
 
-   def cart2sphere(self):
+    def cart2sphere(self):
        """
        Converts cartasian coordinates (x = pobject.positison[0],y = pobject.positison[1],
        z = pobject.positison[2]) of pobjects in self.partclObjList to sperical coordinates
