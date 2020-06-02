@@ -125,7 +125,7 @@ class Particle:
         B = -0.00005261247345535204
         C = 0.0018733137829911907
         '''
-        self.viscosity = 6.432652442106597*10**-7*self.temperature**2+-0.00005261247345535204*x+0.0018733137829911907
+        self.viscosity = 6.432652442106597*10**-7*self.temperature**2+-0.00005261247345535204*self.temperature+0.0018733137829911907
 
     def temperature2StepSize(self,temperature):
        """
