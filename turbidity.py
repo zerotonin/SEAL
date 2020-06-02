@@ -68,9 +68,7 @@ class Particle:
        self.checkVisibility()
        self.checkActiveMovement()
 
-    def randomWalk(self,
-                  stepSize = 1,
-                  current = np.array([1,1,1])):
+    def randomWalk(self):
         """
         Creates a random walk trajectory for particles, that move in the direction of currents in a 
         spherical space.
@@ -81,9 +79,10 @@ class Particle:
         coordinates of particle in spherical space, that are updated by random walk coordinates with 
         defined step size in the current's vectors direction.
         """
-        self.trajectory.append(self.position)
-        self.position  = self.position+ np.random.uniform(-1*stepSize,stepSize,3)
-        self.position  = self.position+ current
+        
+        stepSize = self.getBrownianMotionStepSize()
+ 
+        self.position  = self.position+ (np.random.choice((-1,1),3)*stepSize))
 
     def sphere2cart (self): 
         """
@@ -149,7 +148,6 @@ class Particle:
         T = temperature in Kelvin
         N = 6.022*10²³ | Avogadro's number
         """
-        self.particleStateCheck()
         self.depth2Temperature()
         self.temperature2viscosity()
 
@@ -171,6 +169,30 @@ class Particle:
        phi = m.atan2(self.position[1],self.position[0])          # phi not correct 
        self.position = [r,theta,phi]
        return [r,theta,phi]
+
+    def particleMovement(self,waterCurrent):
+        # converting from spherical to cartesian
+        self.sphere2cart()
+        #saving the old position
+        self.trajectory.append(self.position)
+        # checking if the particle is moving
+        self.particleStateCheck()
+        if self.activeMovement == True:
+            # perform Brownian motion
+            self.randomWalk()
+            # perform current motion
+            self.position += waterCurrent
+    
+    def sealMovement(self,sealTrajectory):
+        self.position += -1*sealMovement
+        self.cart2sphere()
+    
+    def combinedMovement(self,waterCurrent,sealTrajectory)
+        self.particleMovement(waterCurrent)
+        self.sealMovement(sealTrajectory)
+
+
+
 
 class Cloud:
     """
