@@ -18,7 +18,25 @@ class Particle:
         self.size = size
         self.position = position # tuple consistin of three coordinates radius,theta,phi
         self.trajectory = [] # list of former positions
-  
+        self.activeMovement = True
+        self.visible = True 
+        self.groundLevel = -70.
+   def checkVisibility(self):
+       if self.position[2] >= 0. or self.position[2] <= self.groundLevel-0.1:
+           self.visible = False
+       else: 
+           self.visible = True
+   def checkActiveMovement(self):
+       if self.visible == True:
+           if self.position[2]<= self.groundLevel:
+               self.activeMovement = False
+           else: 
+               self.activeMovement = True
+       else:
+           self.activeMovement = False  
+   def particleStateCheck(self):
+       self.checkVisibility()
+       self.checkActiveMovement()
    def randomWalk(self,
                   stepSize = 1,
                   current = np.array([1,1,1])): # moving vector 
@@ -27,7 +45,25 @@ class Particle:
         self.position  = self.position+ np.random.uniform(-1*stepSize,stepSize,3)
         self.position  = self.position+ current
     
-    def depth2Temperature(self,z):
+  
+
+   def temperature2StepSize(self,temperature):
+        pass
+   
+
+   def sphere2cart (self): # attempt to convert spheric coordinates of our pobjects in our self.partclObjList to cartasian coordinates 
+        
+        #take list r = pobject.positison[0],theta = pobject.positison[1],phi = pobject.positison[2]
+        x = self.position[0] * sin( self.position[1] ) * cos( self.position[2] )
+        y = self.position[0] * sin( self.position[1] ) * sin( self.position[2] )
+        z = self.position[0] * cos( self.position[1] )
+        self.position = [x,y,z]
+        self.particleStateCheck()
+        return [x,y,z] # this is just giving me one set of changed Coordinates and is not changing the whole list 
+  
+   def depth2Temperature(self,z):
+
+
         """
         The temperature of the water environment is modelled based on f1. The data represented by
         a Gaussian function is temperature data from the Gulf of Finland (Figure 2). Fitting was
@@ -46,20 +82,10 @@ class Particle:
             Frontiers in Marine Science 5 (2018): 287.
         """
         return 3.1643818163582185+5.289978692454068* np.exp(-(z+2.854807838826537)**2/(2*13.943640614002176**2))
-
-    def temperature2StepSize(self,temperature):
+   def temperature2StepSize(self,temperature):
         pass
-   
 
-   def sphere2cart (self): # attempt to convert spheric coordinates of our pobjects in our self.partclObjList to cartasian coordinates 
-        
-        #take list r = pobject.positison[0],theta = pobject.positison[1],phi = pobject.positison[2]
-        x = self.position[0] * sin( self.position[1] ) * cos( self.position[2] )
-        y = self.position[0] * sin( self.position[1] ) * sin( self.position[2] )
-        z = self.position[0] * cos( self.position[1] )
-        self.position = [x,y,z]
-        return [x,y,z] # this is just giving me one set of changed Coordinates and is not changing the whole list 
-   
+
    def cart2sphere(self):
         XsqPlusYsq = self.position[0]**2 + self.position[1]**2
         r = m.sqrt(XsqPlusYsq + self.position[2]**2)               # r
@@ -186,6 +212,12 @@ class Cloud:
     # r = sqrt(x*x + y*y + z*z)
     #phi = atan2(y,x)
     #theta = acos(z,r)
+
+    def CloudDepth2Temperature(self):
+        for pobject in self.partclObjList:
+            if pobject.activeMovement == True:
+
+                pobject.depth2Temperature(pobject.position[2])
     
     
     def Cloudsphere2cart (self):
