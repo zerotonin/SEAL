@@ -171,8 +171,6 @@ class Particle:
        return [r,theta,phi]
 
     def particleMovement(self,waterCurrent):
-        # converting from spherical to cartesian
-        self.sphere2cart()
         #saving the old position
         self.trajectory.append(self.position)
         # checking if the particle is moving
@@ -183,43 +181,44 @@ class Particle:
             # perform current motion
             self.position += waterCurrent
     
-    def sealMovement(self,sealTrajectory):
-        self.position += -1*sealTrajectory # translational change
-        # here we would need to employ a Fick rotation matrix for the rotation of our animal
-        self.cart2sphere()
+    #def sealMovement(self,sealTrajectory):
+        #function rot_mat = getFickmatrix(y,p,r,modus)
+        #This function calculates the passive or active rotationmatrix with Euler angles in the Fick
+        #coordination
+        #GETS y = yaw (radians)
+        #p = pitch
+        #r = roll
+        #modus = "a" for an active rotation matrix or "p" for a passive
+        #matrix
+        #
+        #SYNTAX rot_mat = getFickmatrix(yaw,pitch,roll, modus)
+        #
+        #Author: B. Geurten
+        #
+        #see also calcRotAxisFromFickAngles,getFickMatrix2D
+        
+        #if (modus == 'p') = True:
+        #    rot_mat = np.matrix([[m.cos(y)*m.cos(p), m.cos(y)*m.sin(p)*m.sin(r)-m.sin(y)*m.cos(r), m.cos(y)*m.sin(p)*m.cos(r)+m.sin(y)*m.sin(r)],
+        #                        [m.sin(y)*m.cos(p), m.sin(y)*m.sin(p)*m.sin(r)+m.cos(y)*m.cos(r), m.sin(y)*m.sin(p)*m.cos(r)-m.cos(y)*m.sin(r)],
+        #                        [-m.sin(p), m.cos(p)*m.sin(r), m.cos(p)*m.cos(r)]])
+        #elif (modus == 'a') = True:
+        #    rot_mat = np.matrix([[m.cos(y)*m.cos(p), -m.sin(y)*m.cos(p), m.sin(p)],
+        #                        [m.cos(y)*m.sin(p)*m.sin(r)+m.sin(y)*m.cos(r), -m.sin(y)*m.sin(p)*m.sin(r)+m.cos(y)*m.cos(r), -m.cos(p)*m.sin(r)],
+        #                        [-m.cos(y)*m.sin(p)*m.cos(r)+m.sin(y)*m.sin(r), m.sin(y)*m.sin(p)*m.cos(r)+m.cos(y)*m.sin(r), m.cos(p)*m.cos(r)]])
+        #else
+        #    error('`This is no valid modus either use "a" for an active rotation matrix or "p" for a passive matrix ')
+#
+        #self.position += -1*sealTrajectory # translational change
+        ## here we would need to employ a Fick rotation matrix for the rotation of our animal
+ #
     
     def combinedMovement(self,waterCurrent,sealTrajectory):
         self.particleMovement(waterCurrent)
         self.sealMovement(sealTrajectory)
-#
-#
-#function rot_mat = getFickmatrix(y,p,r,modus)
-#% This function calculates the passive or acrtive rotationmatrix with Euler angles in the Fick
-#% coordination
-#% GETS y     = yaw (radians)
-#%      p     = pitch
-#%      r     = roll
-#%      modus = "a" for an active rotation matrix or "p" for a passive
-#%              matrix
-#%
-#% SYNTAX rot_mat = getFickmatrix(yaw,pitch,roll, modus)
-#%
-#% Author: B. Geurten
-#%
-#% see also calcRotAxisFromFickAngles,getFickMatrix2D
-#
-#if strcmp(modus, 'p'),
-#    rot_mat =[cos(y)*cos(p)     cos(y)*sin(p)*sin(r)-sin(y)*cos(r)      cos(y)*sin(p)*cos(r)+sin(y)*sin(r);...
-#              sin(y)*cos(p)     sin(y)*sin(p)*sin(r)+cos(y)*cos(r)      sin(y)*sin(p)*cos(r)-cos(y)*sin(r);...
-#             -sin(p)                   cos(p)*sin(r)                             cos(p)*cos(r)      ];
-#elseif strcmp(modus, 'a'),
-#    rot_mat =[cos(y)*cos(p)                        -sin(y)*cos(p)                        sin(p)        ;...
-#              cos(y)*sin(p)*sin(r)+sin(y)*cos(r)   -sin(y)*sin(p)*sin(r)+cos(y)*cos(r)  -cos(p)*sin(r) ;...
-#             -cos(y)*sin(p)*cos(r)+sin(y)*sin(r)    sin(y)*sin(p)*cos(r)+cos(y)*sin(r)   cos(p)*cos(r)];
-#else
-#    error('`This is no valid modus either use "a" for an active rotation matrix or "p" for a passive matrix ')
-#end        
-#
+
+
+
+
 class Cloud:
     """
     The Cloud class holds information about the name and the size of the turbidity Sphere/Cloud
@@ -235,7 +234,7 @@ class Cloud:
                 name,
                 max_particles = 400,
                 sizeRange = (0.001,1.0),
-                radiusMax= 10):
+                maxVectorMagnitue= 10): # needs to be vector magnitute , discribing the length of a vector
         """ 
         @param name            float default: none
             a individual name should be given to each new version of the turbidity sphere
@@ -256,7 +255,9 @@ class Cloud:
         self.max_particles = max_particles # integer number of particles of the same size and position range
         self.partclObjList = [] # list of particle objects
         self.sizeRange = sizeRange # tuple with the minim and maximum size / radius of our tetrahedron
-        self.radiusMax = radiusMax # 6 item wide tuple with the minimum and maximum values of the
+        self.maxVectorMagnitue = maxVectorMagnitue # 6 item wide tuple with the minimum and maximum values of the
+        self.sealPosition = np.zeros(size = 3)
+        self.sealOrientation = np.zeros(size = 3)
        # positions in order: xmin xmax ymin ymax zmin zmax
  
     def add_particles(self):
@@ -278,8 +279,9 @@ class Cloud:
         Sizes of the particles are between 20µm and 160µm
         """  
         size = np.random.uniform(self.sizeRange[0], self.sizeRange[1], size=(1))*0.00016 + 0.00002
-        sphereCoord = self.multiplyBySphereMax(np.random.rand(3))
-        return (sphereCoord,size)
+        initialCoord = np.random.uniform(-1,1,size = (3))
+        initialCoord = self.getRandomVectorMagnitude(initialCoord)
+        return (initialCoord,size)
 
     def multiplyBySphereMax(self,coordinate):
         """
@@ -295,34 +297,38 @@ class Cloud:
         sphereCoord[2] = coordinate[2]*np.pi*2-np.pi
         return sphereCoord
 
-    def resetParticles(self):
+    def getRandomVectorMagnitude(self,coordinate):
+        normCoord = np.empty(3)
+        normCoord = coordinate*(np.random.rand(1)*self.maxVectorMagnitue/np.linalg.norm(coordinate))
+        return normCoord
+        
+
+
+    def resetParticles(self,relPariclePos,relPariclePosNorm):
         """
         The resetParticles function resets those particles that moved out of the sphere
         (radius higher than the radiusMax) by having them reappear on the opposite site 
         of the sphere. 
         """
-        
-        for pobject in self.partclObjList:
-
-            pobject.position[0] = self.radiusMax -(pobject.position[0]%self.radiusMax) #+/-10% Radius
-            pobject.position[1] = (pobject.position[1]+(np.pi/2))%np.pi  #+/-10% Theta
-            pobject.position[2] = ((pobject.position[2]+np.pi)%np.pi) -np.pi #+/-10% Phi    
-            # random offset of 5% in each direction
-            offSet = self.multiplyBySphereMax((np.random.rand(3)-0.5)/10.0)
-            pobject.position = pobject.position+offSet
+        newMagnitude = self.maxVectorMagnitue-(relPariclePosNorm%self.maxVectorMagnitue)
+        offSet = (np.random.rand(3)-0.5)*(self.maxVectorMagnitue/10)/self.maxVectorMagnitue
+        newVector = (relPariclePos+offSet)*-1*newMagnitude/relPariclePosNorm
+        return newVector
 
     def moveParticles(self):
         """
         The moveParticles makes all particle object in the cloud move by a random walk 
         for each particle and an universal current acting on all particles. 
-        Thos partiles that leave the sphere by this function are detected and the
-        resetParticle function makes them reappear on th opposite site of the sphere
+        Those partiles that leave the sphere by this function are detected and the
+        resetParticle function makes them on th opposite site of the sphere
         """    
         for pobject in self.partclObjList:
             pobject.randomWalk()             # for all Particles in List run randomwalk
-            
-            if pobject.position[0] > self.radiusMax:
-                self.resetParticles()
+            relPariclePos = pobject.position-self.sealPosition
+            relPariclePosNorm = np.linalg.norm(relPariclePos)
+            if  relPariclePosNorm > self.maxVectorMagnitue: # if the magnitude of the particle vector is bigger than 10, 
+                newPosition = self.resetParticles(relPariclePos,relPariclePosNorm)
+                pobject.position = newPosition + self.sealPosition 
        
     def deleteParticle(self, pobject):
         """NOT NEEDED ANYMORE ?"""
