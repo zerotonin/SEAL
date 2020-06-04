@@ -27,6 +27,7 @@ class Particle:
         self.trajectory     = [] # list of former positions
         self.activeMovement = True 
         self.visible        = True 
+        self.OFavailable    = list()
         self.groundLevel    = -70.0 # depth in meter
         self.samplesPerSec  = samplesPerSec
         self.temperature    = float("NAN")
@@ -180,7 +181,8 @@ class Particle:
             self.randomWalk()
             # perform current motion
             self.position += waterCurrent
-    
+        else:
+            self.OFavailable.append(False)   
     #def sealMovement(self,sealTrajectory):
         #function rot_mat = getFickmatrix(y,p,r,modus)
         #This function calculates the passive or active rotationmatrix with Euler angles in the Fick
@@ -256,7 +258,7 @@ class Cloud:
         self.partclObjList = [] # list of particle objects
         self.sizeRange = sizeRange # tuple with the minim and maximum size / radius of our tetrahedron
         self.maxVectorMagnitue = maxVectorMagnitue # 6 item wide tuple with the minimum and maximum values of the
-        self.sealPosition = np.zeros(size = 3)
+        self.sealPosition = np.zeros(size = 3) #centre of the coordinate system of the Seal in disctance to (0,0,0) of world
         self.sealOrientation = np.zeros(size = 3)
        # positions in order: xmin xmax ymin ymax zmin zmax
  
@@ -279,25 +281,31 @@ class Cloud:
         Sizes of the particles are between 20µm and 160µm
         """  
         size = np.random.uniform(self.sizeRange[0], self.sizeRange[1], size=(1))*0.00016 + 0.00002
-        initialCoord = np.random.uniform(-1,1,size = (3))
+        initialCoord = np.random.uniform(-1,1,size = (3)) # rancom vector (x,y,z) from -1 to 1
         initialCoord = self.getRandomVectorMagnitude(initialCoord)
         return (initialCoord,size)
 
-    def multiplyBySphereMax(self,coordinate):
-        """
-        The multiplyBySphereMax function is creating the mathematic setting for the coordinats in 
-        the spheric coordinate system (0=radius,1=theta,2=phi). defining 
-            radius by radiusMax
-            theta by np.pi describing a range between (0-180°)
-            phi by np.pi*2-np.pi describing a range between ((-180°)-180°)
-        """
-        sphereCoord = np.empty(3)
-        sphereCoord[0] = coordinate[0]*self.radiusMax
-        sphereCoord[1] = coordinate[1]*np.pi
-        sphereCoord[2] = coordinate[2]*np.pi*2-np.pi
-        return sphereCoord
+    #def multiplyBySphereMax(self,coordinate):
+    #    """
+    #    The multiplyBySphereMax function is creating the mathematic setting for the coordinats in 
+    #    the spheric coordinate system (0=radius,1=theta,2=phi). defining 
+    #        radius by radiusMax
+    #        theta by np.pi describing a range between (0-180°)
+    #        phi by np.pi*2-np.pi describing a range between ((-180°)-180°)
+    #    """
+    #    sphereCoord = np.empty(3)
+    #    sphereCoord[0] = coordinate[0]*self.radiusMax
+    #    sphereCoord[1] = coordinate[1]*np.pi
+    #    sphereCoord[2] = coordinate[2]*np.pi*2-np.pi
+    #    return sphereCoord
 
     def getRandomVectorMagnitude(self,coordinate):
+        """
+        Creats a vector with a random magnitute from 0 to maxVectorMagnitue(10), Thereby
+        randomly choosen positions with a distance of less than 10m for each particle 
+        sorrounding the center of the seals coordinate system is choosen starting at postion 
+        (0,0,0) in the world coordinate system, representing a position at the ocean surface
+        """
         normCoord = np.empty(3)
         normCoord = coordinate*(np.random.rand(1)*self.maxVectorMagnitue/np.linalg.norm(coordinate))
         return normCoord
@@ -307,20 +315,26 @@ class Cloud:
     def resetParticles(self,relPariclePos,relPariclePosNorm):
         """
         The resetParticles function resets those particles that moved out of the sphere
-        (radius higher than the radiusMax) by having them reappear on the opposite site 
-        of the sphere. 
+        (MaxVectorMagnitute) by having them reappear on the opposite site 
+        of the sphere, with a offset of 5 percent
         """
-        newMagnitude = self.maxVectorMagnitue-(relPariclePosNorm%self.maxVectorMagnitue)
-        offSet = (np.random.rand(3)-0.5)*(self.maxVectorMagnitue/10)/self.maxVectorMagnitue
-        newVector = (relPariclePos+offSet)*-1*newMagnitude/relPariclePosNorm
+        newMagnitude = self.maxVectorMagnitue-(relPariclePosNorm%self.maxVectorMagnitue) # new magnitute of reset position for the particle
+        offSet = (np.random.rand(3)-0.5)*(self.maxVectorMagnitue/10)/self.maxVectorMagnitue # offset by 5 % 
+        newVector = (relPariclePos+offSet)*-1*newMagnitude/relPariclePosNorm # new vector discribing the opposite position of the particle to the seal
         return newVector
 
     def moveParticles(self):
         """
-        The moveParticles makes all particle object in the cloud move by a random walk 
-        for each particle and an universal current acting on all particles. 
-        Those partiles that leave the sphere by this function are detected and the
-        resetParticle function makes them on th opposite site of the sphere
+        this function lets all particles move activly by a browninan motion 
+        and a current. Those particle who get a higher vector magnitute than the 
+        MaxVectorMagnitute(10), need to reset to opposite side of the seals 
+        visual sphere. Therefore relPariclePos calculates the vector between the 
+        particle postion and the seals position within the world coordinate system
+        The relPariclePosNorm calculates the magnitude of this vector. 
+        Those particles that have a higher magnitude from the seal than the MaxVectorMagnitude
+        need to set to a new postion which is defined by the resetParticle function. 
+        Afterwards the sealPostionVector needs to be added again to those particles to 
+        end up with the Coordinate values in the world Coordinate System 
         """    
         for pobject in self.partclObjList:
             pobject.randomWalk()             # for all Particles in List run randomwalk
