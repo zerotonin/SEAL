@@ -1,5 +1,7 @@
 import numpy as np
-import time, turbidity
+import time, turbidity 
+import matplotlib.pyplot  as plt
+from mpl_toolkits.mplot3d import Axes3D
 from importlib import reload 
 #from sympy import *
 
@@ -18,6 +20,19 @@ print(end-start)
 reload(turbidity)   
 C = turbidity.Cloud('test')  
 C.add_particles()   
+
+# openening a figure object
+fig = plt.figure()
+# adding a axis object with 3D axis
+ax = fig.add_subplot(111, projection='3d')
+# create test data
+xdata = np.array([ 1 , 2   ,3.69,-1.4 ,-3  ])
+ydata = np.array([-.5, 6.6 ,-3.6,-9.2,0])
+zdata = np.random.rand(5)*10 -5
+#plot
+ax.scatter3D(xdata, ydata, zdata, c=xdata, cmap='brg')
+# update and plot
+fig.show()
 
 # thingi
 
