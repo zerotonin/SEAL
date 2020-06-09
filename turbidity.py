@@ -258,8 +258,8 @@ class Cloud:
         self.partclObjList = [] # list of particle objects
         self.sizeRange = sizeRange # tuple with the minim and maximum size / radius of our tetrahedron
         self.maxVectorMagnitue = maxVectorMagnitue # 6 item wide tuple with the minimum and maximum values of the
-        self.sealPosition = np.zeros(size = 3) #centre of the coordinate system of the Seal in disctance to (0,0,0) of world
-        self.sealOrientation = np.zeros(size = 3)
+        self.sealPosition = np.zeros(shape = 3) #centre of the coordinate system of the Seal in disctance to (0,0,0) of world
+        self.sealOrientation = np.zeros(shape = 3)
        # positions in order: xmin xmax ymin ymax zmin zmax
  
     def add_particles(self):
