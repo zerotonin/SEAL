@@ -4,7 +4,11 @@ import matplotlib.pyplot  as plt
 from mpl_toolkits.mplot3d import Axes3D
 from importlib import reload 
 #from sympy import *
+<<<<<<< HEAD
 #test
+=======
+#test anna
+>>>>>>> 4084c7e66dcd767d20f1eeffe4bfb83c1e4a8158
 
 reload(turbidity)   
 C = turbidity.Cloud('test')  
