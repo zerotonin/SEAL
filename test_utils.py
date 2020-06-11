@@ -9,3 +9,4 @@ C.randomInit()
 
 pU = util.plotUtils()
 pU.plot3D_positionSizeColorCoded(C.partclObjList)
+pU.plot3D_positionRelSize(C.partclObjList)

@@ -8,7 +8,6 @@ class plotUtils:
     def __init__(self):
         # maybe later on we want to keep our particle object list here
         self.name = 'plotting utilities for turbidity model'
-
     def particleObjList2CoordList(self,partclObjList):
         xdata = list()
         ydata = list()
@@ -23,13 +22,34 @@ class plotUtils:
             sdata.append(particle.size[0])
         
         return (xdata,ydata,zdata,sdata)
+    
+    def makeSquare3DAxis(self):
+        fig = plt.figure()
+        ax = Axes3D(fig)
+        #ax.set_aspect('equal')
+        ax.set_xlim(-10,10)
+        ax.set_ylim(-10,10)
+        ax.set_zlim(-10,10)
+        return fig,ax
+        
 
     def plot3D_positionSizeColorCoded(self,partclObjList):
         
         coordinates = self.particleObjList2CoordList(partclObjList)
-        
-        fig = plt.figure()
-        ax = Axes3D(fig)
+        fig,ax = self.makeSquare3DAxis()
         h = ax.scatter3D(coordinates[0], coordinates[1], coordinates[2], c=coordinates[3], cmap='brg')
         fig.colorbar(h)
+        fig.show()
+    
+    def plot3D_positionRelSize(self,partclObjList):
+
+        fig,ax = self.makeSquare3DAxis()
+
+        for particle in partclObjList :
+            ax.plot([particle.position[0]],[particle.position[1]],
+                    [particle.position[2]], 
+                    markerfacecolor='k', markeredgecolor='b', 
+                    marker='o', 
+                    markersize=particle.size*10000, 
+                    alpha=0.85)
         fig.show()
