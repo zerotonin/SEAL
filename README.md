@@ -7,3 +7,15 @@ This is a python project designed to simulate hydrodynamic and optic sensation o
 
 - particles are not evenly distributed
 - - check vector length histogram
+
+# Windows: batch to start from GitBash 
+
+Filenname: startCodeSeal.bat
+Contents: 
+cd /c/Users/you/yourProjectPath/project
+eval `ssh-agent -s`
+ssh-add ~/.ssh/id_rsa
+
+code
+
+Than run from gitbash: bash startCodeSeal.bat
