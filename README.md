@@ -6,4 +6,4 @@ This is a python project designed to simulate hydrodynamic and optic sensation o
 # Known issues
 
 - particles are not evenly distributed
--- check vector length histogram
+- - check vector length histogram
