@@ -8,6 +8,11 @@ class plotUtils:
     def __init__(self):
         # maybe later on we want to keep our particle object list here
         self.name = 'plotting utilities for turbidity model'
+
+        ''' 
+        This class creates a list of position values (x,y,z) and size values (s) of each particle of the Cloud to plot
+        each particle in respective size into a squared coordinate system.
+         '''
     def particleObjList2CoordList(self,partclObjList):
         xdata = list()
         ydata = list()
