@@ -55,10 +55,16 @@ class plotUtils:
         coordinates = self.particleObjList2CoordList(partclObjList)
         fig,ax = self.makeSquare3DAxis()
         h = ax.scatter3D(coordinates[0], coordinates[1], coordinates[2], c=coordinates[3], cmap='brg')
+        ax.set_xlabel('X')
+        ax.set_ylabel('Y')
+        ax.set_zlabel('Depth (m)')
         fig.colorbar(h)
         fig.show()
     
     def plot3D_positionRelSize(self,partclObjList):
+        '''
+        Function that builds 3d graph with zoomed * 10^3 particles sizes.
+        '''
 
         fig,ax = self.makeSquare3DAxis()
 
@@ -91,14 +97,15 @@ class plotUtils:
         plt.title('Distribution of vectors magnitude')
         plt.show()
 
+    def PartclePositionVSseal ():
         #2 function for vector magnitude
         '''
         This function might return the magnitude of vectors between the particle 
         position and seal after a random walk
         '''
-         for pobject in self.partclObjList:
-            pobject.randomWalk()             # for all Particles in List run randomwalk
-            relPariclePos = pobject.position-self.sealPosition
-            relPariclePosNorm = np.linalg.norm(relPariclePos)
-            return realPariclePosNorm
+        for pobject in self.partclObjList:
+                pobject.randomWalk()             # for all Particles in List run randomwalk
+                relPariclePos = pobject.position-self.sealPosition
+                relPariclePosNorm = np.linalg.norm(relPariclePos)
+                return realPariclePosNorm
 
