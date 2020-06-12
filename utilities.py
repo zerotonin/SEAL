@@ -77,7 +77,7 @@ class plotUtils:
                     alpha=0.85)
         fig.show()
 
-    def VectorMagnitude(partclObjList):
+    def VectorMagnitude(self,partclObjList):
         '''
         This function might take coordinates for x,y,z of particle and
         return the list of values of vector magnitude
@@ -89,7 +89,7 @@ class plotUtils:
 
             return VctMgn 
 
-    def VectorHistogram():
+    def VectorHistogram(self):
         n, bins, patches = plt.hist(x=VctMgn, bins='auto', color='#0504aa',
                                     alpha=0.7, rwidth=0.85)
         plt.grid(axis='y', alpha=0.75)
@@ -98,7 +98,7 @@ class plotUtils:
         plt.title('Distribution of vectors magnitude')
         plt.show()
 
-    def PartclePositionVSseal():
+    def PartclePositionVSseal(self):
         #2 function for vector magnitude
         '''
         This function might return the magnitude of vectors between the particle 
