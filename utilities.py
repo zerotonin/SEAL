@@ -93,6 +93,7 @@ class plotUtils:
 
         VctMgn = self.VectorMagnitude(partclObjList)
 
+        fig = plt.figure()# open fig space
         n, bins, patches = plt.hist(x=VctMgn, bins='auto', color='#0504aa',
                                     alpha=0.7, rwidth=0.85)
         plt.grid(axis='y', alpha=0.75)
