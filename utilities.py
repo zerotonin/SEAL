@@ -87,7 +87,7 @@ class plotUtils:
         for particle in partclObjList:
             VctMgn.append(np.linalg.norm(particle.position))
 
-            return VctMgn 
+        return VctMgn 
 
     def VectorHistogram(self):
         n, bins, patches = plt.hist(x=VctMgn, bins='auto', color='#0504aa',
