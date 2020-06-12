@@ -1,7 +1,7 @@
 import matplotlib as mpl
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
-import numpy as numpy
+import numpy as np
 
 
 class plotUtils:
@@ -58,3 +58,21 @@ class plotUtils:
                     markersize=particle.size*10000, 
                     alpha=0.85)
         fig.show()
+
+    def VectorMagnitude (VctMgn):
+        for particle in partclObjList:
+            VctMgn = list()
+            VctMgn.append(np.linalg.norm(xdata, ydata, zdata))
+
+            return VctMgn 
+
+    def VectorHistogram ():
+        n, bins, patches = plt.hist(x=VctMgn, bins='auto', color='#0504aa',
+                                    alpha=0.7, rwidth=0.85)
+        plt.grid(axis='y', alpha=0.75)
+        plt.xlabel('Vectors magnitude')
+        plt.ylabel('# of Vectors')
+        plt.title('Distribution of vectors magnitude')
+        plt.show()
+
+        
