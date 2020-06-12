@@ -89,10 +89,10 @@ class plotUtils:
 
         return VctMgn 
 
-    def VectorHistogram(self,partclObjList):
+    def plot_vectorHistogram(self,partclObjList):
 
         VctMgn = self.VectorMagnitude(partclObjList)
-        
+
         n, bins, patches = plt.hist(x=VctMgn, bins='auto', color='#0504aa',
                                     alpha=0.7, rwidth=0.85)
         plt.grid(axis='y', alpha=0.75)
