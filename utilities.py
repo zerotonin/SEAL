@@ -12,16 +12,22 @@ class plotUtils:
         ''' 
         This class creates a list of position values (x,y,z) and size values (s) of each particle of the Cloud to plot
         each particle in respective size into a squared coordinate system.
+
+
          '''
+
     def particleObjList2CoordList(self,partclObjList):
-        xdata = list()
+        '''
+        This function returns lists of position values x,y,z and size value s of all particles .
+        '''
+        xdata = list()#create list 
         ydata = list()
         zdata = list()
         sdata = list()
 
 
-        for particle in partclObjList :
-            xdata.append(particle.position[0])
+        for particle in partclObjList :# for each particle take certain value and make...
+            xdata.append(particle.position[0])# list containing x position 
             ydata.append(particle.position[1])
             zdata.append(particle.position[2])
             sdata.append(particle.size[0])
@@ -29,16 +35,22 @@ class plotUtils:
         return (xdata,ydata,zdata,sdata)
     
     def makeSquare3DAxis(self):
-        fig = plt.figure()
-        ax = Axes3D(fig)
+        '''
+        This function equals axes by giving same limits.
+        '''
+        fig = plt.figure()# open fig space
+        ax = Axes3D(fig)#make 3D plot
         #ax.set_aspect('equal')
-        ax.set_xlim(-10,10)
-        ax.set_ylim(-10,10)
+        ax.set_xlim(-10,10)# x axes goes from -10 to 10 since Cloudsphere is 10
+        ax.set_ylim(-10,10)# same here
         ax.set_zlim(-10,10)
-        return fig,ax
+        return fig,ax # returns a 3D coordinate system with equal axes, ready to plot data
         
 
     def plot3D_positionSizeColorCoded(self,partclObjList):
+        '''
+        This function finally returns particles plotted in a 3D coordinate system according to their position and size
+        '''
         
         coordinates = self.particleObjList2CoordList(partclObjList)
         fig,ax = self.makeSquare3DAxis()
