@@ -102,15 +102,5 @@ class plotUtils:
         plt.title('Distribution of vectors magnitude')
         plt.show()
 
-    def PartclePositionVSseal(self):
-        #2 function for vector magnitude
-        '''
-        This function might return the magnitude of vectors between the particle 
-        position and seal after a random walk.
-        '''
-        for pobject in self.partclObjList:
-                pobject.randomWalk()             # for all Particles in List run randomwalk
-                relPariclePos = pobject.position-self.sealPosition
-                relPariclePosNorm = np.linalg.norm(relPariclePos)
-                return realPariclePosNorm 
+    
 
