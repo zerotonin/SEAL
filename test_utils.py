@@ -8,7 +8,7 @@ C.add_particles()
 C.randomInit()
 
 pU = util.plotUtils()
-pU.VectorHistogram(C.partclObjList)
+pU.plot_vectorHistogram(C.partclObjList)
   
 
 pU.plot3D_positionSizeColorCoded(C.partclObjList)
