@@ -1,5 +1,6 @@
 import numpy as np
 import math as m 
+import copy 
 #from sympy import *
 
 class Particle:
@@ -153,14 +154,20 @@ class Particle:
         
         if self.activeMovement == True and self.visible == True:
             # perform Brownian motion
-            step  = self.randomWalk() + waterCurrent -sealStep
+            step  = self.randomWalk() + waterCurrent - sealStep[0:3]
         elif self.activeMovement == False and self.visible == True:
-            step  = -1*sealStep
+            step  = -1*sealStep[0:3]
         else:
-            step  = 0.0
+            step  = np.zeros(shape = 3)
         
-        self.trajectory.append((self.position,self.position+step,self.visible))
+        oldPosition = copy.deepcopy(self.position)
         self.position += step
+        newPosition =copy.deepcopy(self.position)
+        status = copy.deepcopy(self.visible)
+        print(step,oldPosition,newPosition,status)
+        print("=======================================================")
+
+        self.trajectory.append((oldPosition,newPosition,status))
 
    
     
@@ -209,7 +216,7 @@ class Cloud:
         self.sealOrientation = np.zeros(shape = 3)  # orientation as yaw pitch roll
         self.sealStep = np.zeros(shape =6) # change of position and orientation
         self.sealTrajectory = list()
-        self.watercurrent = np.zeros(shape = 3) # force of the water current 
+        self.waterCurrent = np.zeros(shape = 3) # force of the water current 
  
     def add_particles(self):
         """
@@ -271,11 +278,11 @@ class Cloud:
         Afterwards the sealPostionVector needs to be added again to those particles to 
         end up with the Coordinate values in the world Coordinate System 
         """    
-        for pobject in self.partclObjList:
-            pobject.particleMovement(self.sealPosition,self.waterCurrent)             # for all Particles in List run randomwalk
-            relPariclePosNorm = np.linalg.norm(pObject.position)
-            if  relPariclePosNorm > self.maxVectorMagnitue: # if the magnitude of the particle vector is bigger than 10, 
-                newPosition = self.resetParticles(relPariclePos,relPariclePosNorm)
+        for pObject in self.partclObjList:
+            pObject.particleMovement(self.sealPosition,self.waterCurrent,self.sealStep)             # for all Particles in List run randomwalk
+            relParticlePosNorm = np.linalg.norm(pObject.position)
+            if  relParticlePosNorm > self.maxVectorMagnitue: # if the magnitude of the particle vector is bigger than 10, 
+                newPosition = self.resetParticles(pObject.position,relParticlePosNorm)
                
        
 
