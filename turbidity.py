@@ -42,7 +42,7 @@ class Particle:
        Function checks if coordinates of particles are inside of a sphere and visible. 
        Particle is not visible if it's above the surface level and if it's below ground level. 
        """
-       if self.position[2] >= 0. or self.position[2] <= self.groundLevel-0.1:
+       if self.absPosition[2] >= 0. or self.absPosition[2] <= self.groundLevel-0.1:
            self.visible = False
        else: 
            self.visible = True
@@ -54,7 +54,7 @@ class Particle:
        Those that are between 0 and -70m are moving according to the randomWalk function. 
        """
        if self.visible == True:
-           if self.position[2]<= self.groundLevel:
+           if self.absPosition[2]<= self.groundLevel:
                self.activeMovement = False
            else: 
                self.activeMovement = True
@@ -83,7 +83,7 @@ class Particle:
         
         stepSize = self.getBrownianMotionStepSize()
  
-        self.position  = self.position+ (np.random.choice((-1,1),3)*stepSize)
+        return np.random.choice((-1,1),3)*stepSize
 
     def sphere2cart (self): 
         """
@@ -118,7 +118,7 @@ class Particle:
         f1: Placke, Manja, et al. "Long-term mean circulation of the Baltic Sea as represented by 
         various ocean circulation models." Frontiers in Marine Science 5 (2018): 287.
         """
-        self.temperature = 3.1643818163582185+5.289978692454068*np.exp(-1*(self.position[2]+2.854807838826537)**2/(2*13.943640614002176**2))
+        self.temperature = 3.1643818163582185+5.289978692454068*np.exp(-1*(self.absPosition[2]+2.854807838826537)**2/(2*13.943640614002176**2))
     
     def temperature2viscosity(self):
         '''
@@ -171,23 +171,27 @@ class Particle:
        self.position = [r,theta,phi]
        return [r,theta,phi]
 
-    def particleMovement(self,waterCurrent):
+    def particleMovement(self,sealPosition,waterCurrent,sealStep):
         #saving the old position
-        self.trajectory.append(self.position)
+        #self.trajectory.append(self.position)
         # checking if the particle is moving
+        
+        self.absPosition = self.position + sealPosition
         self.particleStateCheck()
-        if self.activeMovement == True:
+        
+        if self.activeMovement == True and self.visible == True:
             # perform Brownian motion
-            self.randomWalk()
-            # perform current motion
-            self.position += waterCurrent
+            step  = self.randomWalk() + waterCurrent -sealStep
+        elif self.activeMovement == False and self.visible == True:
+            step  = -1*sealStep
         else:
-            self.OFavailable.append(False)   
+            step  = 0.0
+        
+        self.trajectory.append((self.position,self.position+step,self.visible))
+        self.position += step
+
    
     
-    def combinedMovement(self,waterCurrent,sealTrajectory):
-        self.particleMovement(waterCurrent)
-        self.sealMovement(sealTrajectory)
 
 
 
