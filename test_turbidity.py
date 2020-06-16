@@ -6,7 +6,8 @@ from importlib import reload
 
 reload(turbidity)   
 C = turbidity.Cloud('test')  
-C.add_particles()   
+C.add_particles()
+C.sealStep = np.array([2,0.,-4.,0.0,-45,0.])   
 C.moveParticles() 
 
 start = time.time() 

@@ -286,15 +286,6 @@ class Cloud:
                
        
 
-    def CloudDepth2Temperature(self):
-        """
-        The CloudDepth2Temperature function calls all particle objects in the Cloud 
-        which are between surface and seafloor and calculates the temperature for
-        every particle. This information will be needed for the temperature dependent
-        brownian motion of the particles.
-        """
-        for pobject in self.partclObjList:
-            if pobject.activeMovement == True:
-                pobject.depth2Temperature()
+
     
 
