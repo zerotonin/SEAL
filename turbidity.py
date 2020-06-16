@@ -183,36 +183,7 @@ class Particle:
             self.position += waterCurrent
         else:
             self.OFavailable.append(False)   
-    #def sealMovement(self,sealTrajectory):
-        #function rot_mat = getFickmatrix(y,p,r,modus)
-        #This function calculates the passive or active rotationmatrix with Euler angles in the Fick
-        #coordination
-        #GETS y = yaw (radians)
-        #p = pitch
-        #r = roll
-        #modus = "a" for an active rotation matrix or "p" for a passive
-        #matrix
-        #
-        #SYNTAX rot_mat = getFickmatrix(yaw,pitch,roll, modus)
-        #
-        #Author: B. Geurten
-        #
-        #see also calcRotAxisFromFickAngles,getFickMatrix2D
-        
-        #if (modus == 'p') = True:
-        #    rot_mat = np.matrix([[m.cos(y)*m.cos(p), m.cos(y)*m.sin(p)*m.sin(r)-m.sin(y)*m.cos(r), m.cos(y)*m.sin(p)*m.cos(r)+m.sin(y)*m.sin(r)],
-        #                        [m.sin(y)*m.cos(p), m.sin(y)*m.sin(p)*m.sin(r)+m.cos(y)*m.cos(r), m.sin(y)*m.sin(p)*m.cos(r)-m.cos(y)*m.sin(r)],
-        #                        [-m.sin(p), m.cos(p)*m.sin(r), m.cos(p)*m.cos(r)]])
-        #elif (modus == 'a') = True:
-        #    rot_mat = np.matrix([[m.cos(y)*m.cos(p), -m.sin(y)*m.cos(p), m.sin(p)],
-        #                        [m.cos(y)*m.sin(p)*m.sin(r)+m.sin(y)*m.cos(r), -m.sin(y)*m.sin(p)*m.sin(r)+m.cos(y)*m.cos(r), -m.cos(p)*m.sin(r)],
-        #                        [-m.cos(y)*m.sin(p)*m.cos(r)+m.sin(y)*m.sin(r), m.sin(y)*m.sin(p)*m.cos(r)+m.cos(y)*m.sin(r), m.cos(p)*m.cos(r)]])
-        #else
-        #    error('`This is no valid modus either use "a" for an active rotation matrix or "p" for a passive matrix ')
-#
-        #self.position += -1*sealTrajectory # translational change
-        ## here we would need to employ a Fick rotation matrix for the rotation of our animal
- #
+   
     
     def combinedMovement(self,waterCurrent,sealTrajectory):
         self.particleMovement(waterCurrent)
@@ -337,7 +308,7 @@ class Cloud:
         end up with the Coordinate values in the world Coordinate System 
         """    
         for pobject in self.partclObjList:
-            pobject.randomWalk()             # for all Particles in List run randomwalk
+            pobject.randomWalk(self.sealPosition)             # for all Particles in List run randomwalk
             relPariclePos = pobject.position-self.sealPosition
             relPariclePosNorm = np.linalg.norm(relPariclePos)
             if  relPariclePosNorm > self.maxVectorMagnitue: # if the magnitude of the particle vector is bigger than 10, 
