@@ -85,21 +85,7 @@ class Particle:
  
         return np.random.choice((-1,1),3)*stepSize
 
-    def sphere2cart (self): 
-        """
-        Converts spheric coordinates(r = pobject.positison[0],theta = pobject.positison[1],
-        phi = pobject.positison[2]) of pobjects in self.partclObjList to cartasian coordinates
-        and returns x,y,z coordinates as a list
-        """
-        # attempt to convert spheric coordinates of our pobjects in our self.partclObjList to cartasian coordinates 
-        #take list
-        x = self.position[0] * np.sin( self.position[1] ) * np.cos( self.position[2] )
-        y = self.position[0] * np.sin( self.position[1] ) * np.sin( self.position[2] )
-        z = self.position[0] * np.cos( self.position[1] )
-        self.position = [x,y,z]
-        self.particleStateCheck()
-        return [x,y,z] # this is just giving me one set of changed Coordinates and is not changing the whole list 
-  
+    
     def depth2Temperature(self):
         """
         The temperature of the water environment is modelled based on f1. The data represented by
@@ -155,21 +141,7 @@ class Particle:
         return np.sqrt((8.314462 * self.temperature+273.15 )/ (3* (6.022*10**23))*np.pi*self.viscosity*self.size* (1/self.samplesPerSec))
 
 
-    def cart2sphere(self):
-       """
-       Converts cartasian coordinates (x = pobject.positison[0],y = pobject.positison[1],
-       z = pobject.positison[2]) of pobjects in self.partclObjList to sperical coordinates
-       and returns radius, theta, phi coordinates as list of floats.
-       r = sqrt(x*x + y*y + z*z)
-       theta = atan2((x*x +y*y),z)
-       phi = atan2(y,x)
-       """
-       XsqPlusYsq = self.position[0]**2 + self.position[1]**2
-       r = m.sqrt(XsqPlusYsq + self.position[2]**2)               # r
-       theta = m.atan2(m.sqrt(XsqPlusYsq),self.position[2])     # theta 
-       phi = m.atan2(self.position[1],self.position[0])          # phi not correct 
-       self.position = [r,theta,phi]
-       return [r,theta,phi]
+
 
     def particleMovement(self,sealPosition,waterCurrent,sealStep):
         #saving the old position
@@ -260,20 +232,6 @@ class Cloud:
         initialCoord = self.getRandomVectorMagnitude(initialCoord)
         return (initialCoord,size)
 
-    #def multiplyBySphereMax(self,coordinate):
-    #    """
-    #    The multiplyBySphereMax function is creating the mathematic setting for the coordinats in 
-    #    the spheric coordinate system (0=radius,1=theta,2=phi). defining 
-    #        radius by radiusMax
-    #        theta by np.pi describing a range between (0-180°)
-    #        phi by np.pi*2-np.pi describing a range between ((-180°)-180°)
-    #    """
-    #    sphereCoord = np.empty(3)
-    #    sphereCoord[0] = coordinate[0]*self.radiusMax
-    #    sphereCoord[1] = coordinate[1]*np.pi
-    #    sphereCoord[2] = coordinate[2]*np.pi*2-np.pi
-    #    return sphereCoord
-
     def getRandomVectorMagnitude(self,coordinate):
         """
         Creats a vector with a random magnitute from 0 to maxVectorMagnitue(10), Thereby
@@ -319,12 +277,6 @@ class Cloud:
                 newPosition = self.resetParticles(relPariclePos,relPariclePosNorm)
                 pobject.position = newPosition + self.sealPosition 
        
-    def deleteParticle(self, pobject):
-        """NOT NEEDED ANYMORE ?"""
-        if pobject.position[0] > self.radiusMax:
-            return True
-        else:
-            return False 
 
     def CloudDepth2Temperature(self):
         """
@@ -338,18 +290,4 @@ class Cloud:
 
                 pobject.depth2Temperature()
     
-    def Cloudsphere2cart (self):
-        """
-        The Cloudsphere2cart function converts the postions of each particle from 
-        spheric coordinates (radius,theta,phi) to cartasian coordinates (x,y,z)
-        """
-        for pobject in self.partclObjList:
-            pobject.sphere2cart()
 
-    def Cloudcart2sphere (self):
-        """
-        The Cloudcart2sphere function converts the postion of each particle from 
-        cartasian coordinates (x,y,z) to spheric coordinates (radius,theta,phi)
-        """
-        for pobject in self.partclObjList:
-            pobject.cart2sphere()
