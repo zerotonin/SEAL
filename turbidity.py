@@ -206,8 +206,8 @@ class Cloud:
         self.sizeRange = sizeRange # tuple with the minim and maximum size / radius of our tetrahedron
         self.maxVectorMagnitue = maxVectorMagnitue # 6 item wide tuple with the minimum and maximum values of the
         self.sealPosition = np.zeros(shape = 3) #centre of the coordinate system of the Seal in disctance to (0,0,0) of world
-        self.sealOrientation = np.zeros(shape = 3)
-       # positions in order: xmin xmax ymin ymax zmin zmax
+        self.sealOrientation = np.zeros(shape = 3)  # orientation as yaw pitch roll
+        self.watercurrent = np.zeros(shape = 3) # force of the water current 
  
     def add_particles(self):
         """
@@ -270,12 +270,11 @@ class Cloud:
         end up with the Coordinate values in the world Coordinate System 
         """    
         for pobject in self.partclObjList:
-            pobject.randomWalk(self.sealPosition)             # for all Particles in List run randomwalk
-            relPariclePos = pobject.position-self.sealPosition
-            relPariclePosNorm = np.linalg.norm(relPariclePos)
+            pobject.particleMovement(self.sealPosition,self.waterCurrent)             # for all Particles in List run randomwalk
+            relPariclePosNorm = np.linalg.norm(pObject.position)
             if  relPariclePosNorm > self.maxVectorMagnitue: # if the magnitude of the particle vector is bigger than 10, 
                 newPosition = self.resetParticles(relPariclePos,relPariclePosNorm)
-                pobject.position = newPosition + self.sealPosition 
+               
        
 
     def CloudDepth2Temperature(self):
@@ -287,7 +286,6 @@ class Cloud:
         """
         for pobject in self.partclObjList:
             if pobject.activeMovement == True:
-
                 pobject.depth2Temperature()
     
 
