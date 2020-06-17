@@ -306,16 +306,20 @@ class Cloud:
         new postion which is defined by the resetParticle function.
         """    
         for pObject in self.partclObjList:
-            # we move particles relative to seal
+            # we move particles relative to seal and save vector in p-object trajectory
             pObject.particleMovement(self.sealPosition,self.waterCurrent,self.sealStep)             # for all Particles in List run randomwalk
             # checking if particle norm is still in range
             relParticlePosNorm = np.linalg.norm(pObject.position)
             if  relParticlePosNorm > self.maxVectorMagnitue: # if the magnitude of the particle vector is bigger than 10, 
                 #respawing particles that drifted away
-                newPosition = self.resetParticles(pObject.position,relParticlePosNorm)
+                pObject.position = self.resetParticles(pObject.position,relParticlePosNorm)
                
        
 
+#class plasticCloud(Cloud):
+#    def __init__(self):
+#        self.plasticType = "PVC"
+#        super().__init__('PVC Cloud')
 
     
 
