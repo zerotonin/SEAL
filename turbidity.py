@@ -7,8 +7,8 @@ class Particle:
     def __init__(self, position,size, groundLevel = -70.0,samplesPerSec =10.0):
         """
         Creates a list of particles. Particles are in spherical space with defined 3 positions, 
-        consisted of Radius, Theta and Phi values. The particle class holds information about the size 
-        and position of a particle inside our turbidity simulation. 
+        consisted x y and z with the seal center beeing postion (0,0,0). The particle class
+        holds information about the size and position of a particle inside our turbidity simulation. 
 
         @param size          float default: none
             size save the particle radius in µm. Particles have no form so far but if
@@ -18,10 +18,18 @@ class Particle:
             tuple consistin of three coordinates radius,theta,phi
         @param trajectory 
             list of former position of particle
+        @param activeMovement  
+            defines area where partciles should have active movement (0m to -70m)
+        @param visible 
+            particles are visible in the water, They are not visible above 0m and below -70,1m
         @param groundLevel  float  default: -70.0
             the depth of an ocean in metres
         @param samplesPerSec float default: 10.0 
-            The models basic frequency. How often it updates in one second.
+            The models basic frequency. How often it updates in one second
+        @param temperature 
+            depth dependent temperature
+        @param viscosity
+            temperature dependent viscosity of saltwater
         """
         self.size = size
         self.position       = position # tuple consistin of three coordinates radius,theta,phi
@@ -76,7 +84,7 @@ class Particle:
         spherical space.
         
         @param current 
-        is a moving vector of current, where numpy array is three values containing radius,theta,phi
+        is a moving vector of current, where numpy array is three values containing x.y.z
         @param position
         coordinates of particle in spherical space, that are updated by random walk coordinates with 
         defined step size in the current's vectors direction.
@@ -122,7 +130,7 @@ class Particle:
 
     def getBrownianMotionStepSize(self):
         """
-        the temperature2SteoSize function runs a temperature dependent brownian motion for each particle.
+        the temperature2StepSize function runs a temperature dependent brownian motion for each particle.
 
         In a three dimensional space we cand describe the velocity in each direction by the Einstein-Smoluchowski (E-S) equation
         for observation duration approaching 0 sec. As we will describe motion behaviour in high temporal resolution. We
@@ -145,9 +153,16 @@ class Particle:
 
 
     def particleMovement(self,sealPosition,waterCurrent,sealStep):
-        #saving the old position
-        #self.trajectory.append(self.position)
-        # checking if the particle is moving
+        """
+        the particleMovement function moves all particles relative to the seal postion and activly by 
+        brownian motion. 
+        For the statecheck the absolute position of the particles is calculated to calculate the respetive 
+        depth and temperature.
+        Next the active movement is checked, and those particle beeing visbile and freefloating are moved
+        by the brownian motion(randomwalk), the wateCurrent and the sealStep
+        Those particle on the seafloor that are not activly moving are just moved by the SealStep
+        Those particles above water and 10cm under the seefloor are not moving.
+        """
         
         self.absPosition = self.position + sealPosition
         self.particleStateCheck()
@@ -200,12 +215,22 @@ class Cloud:
             turbidity sphere, this parameter represent the density of the particles
         @param sizeRange       tuple default=none
             tuple with the minimum and maximum size of the particles.(min,max)
-        @param radiusMax       float default= none
+        @param maxVectorMagnitute       float default= none
             this value sets the Radius of the turbidty sphere, this value should be taken from
             the maximum sight of the habor seal underwater
         @param partclObjList    list default=none  
             list of particle objects within the turbidity cloud. length of the list defined by 
             max_particles 
+        @param sealPosition 
+            center of the coordinate system of the seal in distance to the (o,0,0) point in the world
+        @param sealOrientation 
+            Orientation as yaw, pitch, roll
+        @param sealStep
+            change of position and orientation (x,y,z,yaw,pitch,roll)
+        @param sealTrajectory 
+            list of seal movement vectors ? 
+        @param waterCurrent
+            force of the water current 
         """
         self.name = name # string name
         self.max_particles = max_particles # integer number of particles of the same size and position range
@@ -222,7 +247,7 @@ class Cloud:
         """
         The add_particle function initializes and adds random sized particles in random position 
         within the Cloud. This forms the partclObjList.These positions are descriebed with
-        radius, theta and phi.
+        x,y,z with the seal being the center of the coordinate system
         """
         while len(self.partclObjList)<self.max_particles:
 
@@ -231,8 +256,9 @@ class Cloud:
           
     def randomInit(self):
         """
-        the randomInit function creates random numbers for each coordinate (radius, theta, phi)
-        within their ranges.
+        the randomInit function creates random numbers for each coordinate (x,y,z).
+        This is limited by a set maxVectorMagnitute within the getRandomVectorMagnitute
+        function
 
         Sizes of the particles are between 20µm and 160µm
         """  
@@ -245,7 +271,7 @@ class Cloud:
         """
         Creats a vector with a random magnitute from 0 to maxVectorMagnitue(10), Thereby
         randomly choosen positions with a distance of less than 10m for each particle 
-        sorrounding the center of the seals coordinate system is choosen starting at postion 
+        sorrounding the center of the seals coordinate system is choosen starting at position 
         (0,0,0) in the world coordinate system, representing a position at the ocean surface
         """
         normCoord = np.empty(3)
@@ -268,15 +294,16 @@ class Cloud:
     def moveParticles(self):
         """
         this function lets all particles move activly by a browninan motion 
-        and a current. Those particle who get a higher vector magnitute than the 
-        MaxVectorMagnitute(10), need to reset to opposite side of the seals 
-        visual sphere. Therefore relPariclePos calculates the vector between the 
-        particle postion and the seals position within the world coordinate system
-        The relPariclePosNorm calculates the magnitude of this vector. 
-        Those particles that have a higher magnitude from the seal than the MaxVectorMagnitude
-        need to set to a new postion which is defined by the resetParticle function. 
-        Afterwards the sealPostionVector needs to be added again to those particles to 
-        end up with the Coordinate values in the world Coordinate System 
+        and a current and passivly by a SealStep. 
+        ############################################################################
+        We need to safe the start and end postion of all particles before and after
+        the movement. This is safed as oldPosition and newPosition (see particle Movement)
+        ############################################################################
+        Those particle who get a higher vector magnitute than the MaxVectorMagnitute(10),
+        need to reset to opposite side of the seals visual sphere.The relPariclePosNorm 
+        calculates the magnitude of the particle Vectors.Those particles that have a 
+        higher magnitude from the seal than the MaxVectorMagnitude need to reset to a 
+        new postion which is defined by the resetParticle function.
         """    
         for pObject in self.partclObjList:
             # we move particles relative to seal
