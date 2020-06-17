@@ -178,8 +178,8 @@ class Particle:
         self.position += step
         newPosition =copy.deepcopy(self.position)
         status = copy.deepcopy(self.visible)
-        print(step,oldPosition,newPosition,status)
-        print("=======================================================")
+        #print(step,oldPosition,newPosition,status)
+        #print("=======================================================")
 
         self.trajectory.append((oldPosition,newPosition,status))
 
