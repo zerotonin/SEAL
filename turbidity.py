@@ -38,7 +38,6 @@ class Particle:
         self.visible        = True 
         self.OFavailable    = list()
         self.groundLevel    = -70.0 # depth in meter
-        self.samplesPerSec  = samplesPerSec
         self.temperature    = float("NAN")
         self.viscosity      = float("NAN")
         
