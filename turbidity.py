@@ -159,7 +159,7 @@ class Particle:
         For the statecheck the absolute position of the particles is calculated to calculate the respetive 
         depth and temperature.
         Next the active movement is checked, and those particle beeing visbile and freefloating are moved
-        by the brownian motion(randomwalk), the wateCurrent and the sealStep
+        by the brownian motion(randomwalk), the waterCurrent and the sealStep
         Those particle on the seafloor that are not activly moving are just moved by the SealStep
         Those particles above water and 10cm under the seefloor are not moving.
         """
