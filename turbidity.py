@@ -329,15 +329,18 @@ class Seal:
         self.sealOrientation = np.zeros(shape = 3)  # orientation as yaw pitch roll
         self.sealStep = np.zeros(shape =6) # change of position and orientation
         self.sealTrajectory = list()
+        self.activeSealMovement = True
 
     def print(self):
         return 'Hello World'
-    #def SealStateCheck(self):
-    #    if self.sealPosition[2] > 0 
-    #        #seal steps needs to go down (self.sealStep[2])
-    #    elif or self.sealPosition[2] <= -70
-    #        #seal step need to go up ?
-    #    else MoveSeal randomly 
+
+    def SealStateCheck(self):
+        if self.sealPosition[2] > 0 or self.sealPosition[2] <= -70:
+            self.activeSealMovement = False
+            #seal steps needs to go down (self.sealStep[2])
+        else:
+            self.activeSealMovement == True
+    
 
     def MoveSeal(self): # function to simulate dive (series of seal trajectories)
         """
@@ -345,19 +348,27 @@ class Seal:
         in correct order. sealStep holding information for x,y,z direction of vector as well as
         yaw,pitch,roll (orientation of the seal)
         """    
+        if self.activeSealMovement == True:
 
-        sealStepCoordinates = np.random.uniform(-5,5,size = (3)) #randomly choosen stepSize 
-        sealStepOrientation = np.random.uniform(0,360,size = (3)) #ramdomly chooses orientation of step 
-        self.sealStep = np.concatenate((sealStepCoordinates, sealStepOrientation), axis=None)
+            sealStepCoordinates = np.random.uniform(-5,5,size = (3)) #randomly choosen stepSize 
+            sealStepOrientation = np.random.uniform(0,np.pi*2,size = (3)) #ramdomly chooses orientation of step 
+            self.sealStep = np.concatenate((sealStepCoordinates, sealStepOrientation), axis=None)
         
         
-        #self.sealPosition = self.sealPosition+self.sealStep[0:3]
-        self.sealPosition += self.sealStep[0:3] # new Seal Position after one sealStep/Movement
-        SealPosition = copy.deepcopy(self.sealPosition)
-        self.sealOrientation = self.sealStep[3:6] # new sealOrientation after each sealStep (should be the same as during the step?)
-        SealOrientation = copy.deepcopy(self.sealOrientation)
+            #self.sealPosition = self.sealPosition+self.sealStep[0:3]
+            self.sealPosition += self.sealStep[0:3] # new Seal Position after one sealStep/Movement
+            SealPosition = copy.deepcopy(self.sealPosition)
+            self.sealOrientation = self.sealStep[3:6] # new sealOrientation after each sealStep (should be the same as during the   step?)
+            SealOrientation = copy.deepcopy(self.sealOrientation)
 
-        print(SealPosition,SealOrientation)
-        print("=======================================================")
-      
-        self.sealTrajectory.append((SealPosition,SealOrientation))
+            print(self.sealStep,SealPosition,SealOrientation)
+            print("=======================================================")
+
+            self.sealTrajectory.append((SealPosition,SealOrientation))
+        else :
+            self.activeSeaMovement = False
+
+
+###########################################
+#the newly created self.sealStep needs to be inherited by the particle  class or Cloud class to run the particleMovement #function 
+###########################################
