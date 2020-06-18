@@ -204,7 +204,8 @@ class Cloud:
                 name,
                 max_particles = 400,
                 sizeRange = (0.001,1.0),
-                maxVectorMagnitue= 10): # needs to be vector magnitute , discribing the length of a vector
+                maxVectorMagnitue= 10):
+                #super()__init__(self) # needs to be vector magnitute , discribing the length of a vector
         """ 
         @param name            float default: none
             a individual name should be given to each new version of the turbidity sphere
@@ -241,7 +242,7 @@ class Cloud:
         self.sealStep = np.zeros(shape =6) # change of position and orientation
         self.sealTrajectory = list()
         self.waterCurrent = np.zeros(shape = 3) # force of the water current 
- 
+    
     def add_particles(self):
         """
         The add_particle function initializes and adds random sized particles in random position 
@@ -320,5 +321,42 @@ class Cloud:
 #        self.plasticType = "PVC"
 #        super().__init__('PVC Cloud')
 
-    
+class Seal: 
+    def __init__ (self,name):
 
+        self.name = name
+        self.sealPosition = np.zeros(shape = 3) #centre of the coordinate system of the Seal in disctance to (0,0,0) of world
+        self.sealOrientation = np.zeros(shape = 3)  # orientation as yaw pitch roll
+        self.sealStep = np.zeros(shape =6) # change of position and orientation
+        self.sealTrajectory = list()
+
+    def print(self):
+        return 'Hello World'
+    #def SealStateCheck(self):
+    #    if self.sealPosition[2] > 0 
+    #        #seal steps needs to go down (self.sealStep[2])
+    #    elif or self.sealPosition[2] <= -70
+    #        #seal step need to go up
+
+    def MoveSeal(self,sealPosition,sealStep,sealOrientation): # function to simulate dive (series of seal trajectories)
+        """
+        this function should safe a sealTrajectory list listing all endPosition after each sealStep for a single dive
+        in correct order. sealStep holding information for x,y,z direction of vector as well as
+        yaw,pitch,roll (orientation of the seal)
+        """    
+
+        sealStepCoordinates = np.random.uniform(-5,5,size = (3)) #randomly choosen stepSize 
+        sealStepOrientation = np.random.uniform(0,360,size = (3)) #ramdomly chooses orientation of step 
+        sealStep = np.concatenate((sealStepCoordinates, sealStepOrientation), axis=None)
+        
+        
+        #self.sealPosition = self.sealPosition+self.sealStep[0:3]
+        sealPosition += sealStep[0:3] # new Seal Position after one sealStep/Movement
+        SealPosition = copy.deepcopy(sealPosition)
+        sealOrientation = sealStep[3:6] # new sealOrientation after each sealStep (should be the same as during the step?)
+        SealOrientation = copy.deepcopy(sealOrientation)
+
+        print(SealPosition,SealOrientation)
+        print("=======================================================")
+      
+        self.sealTrajectory.append((SealPosition,SealOrientation))
