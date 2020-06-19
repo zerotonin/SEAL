@@ -17,7 +17,12 @@ class SEAL_SIM:
     
     def meterPerSecond2meterPerSample(self,velocity)
         return copy.deepcopy(velocity/self.sps)
-        
+    
+    def sealPosOrient2Cloud(self):
+
+        self.pCloud.sealPosition = self.seal.sealPosition
+        self.pCloud.sealStep = self.seal.sealStep
+    
 
     def simulate_sample(self):
 

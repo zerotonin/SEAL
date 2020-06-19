@@ -240,7 +240,7 @@ class Cloud:
         self.sealPosition = np.zeros(shape = 3) #centre of the coordinate system of the Seal in disctance to (0,0,0) of world
         self.sealOrientation = np.zeros(shape = 3)  # orientation as yaw pitch roll
         self.sealStep = np.zeros(shape =6) # change of position and orientation
-        self.sealTrajectory = list()
+        #self.sealTrajectory = list()
         self.waterCurrent = np.zeros(shape = 3) # force of the water current 
     
     def add_particles(self):
