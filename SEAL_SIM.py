@@ -8,16 +8,11 @@ class SEAL_SIM:
         self.seal = seal_agent.Seal(self)
         self.pCloud = turbidity.Cloud(self)
         self.pCloud.add_particles()
-        
-
-        
+            
     def meterPerSecond2meterPerSample(self,velocity):
         # THis function should be inherited
         return copy.deepcopy(velocity/self.sps)
     
-        
-    
-
     def simulate_sample(self):
         # move da seal
         self.seal.MoveSeal()
