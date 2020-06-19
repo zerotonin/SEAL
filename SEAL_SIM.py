@@ -15,7 +15,7 @@ class SEAL_SIM:
         else:
             print('Unknown mode ' + modus + '. Cloud was not initialised ')
     
-    def meterPerSecond2meterPerSample(self,velocity)
+    def meterPerSecond2meterPerSample(self,velocity):
     # THis function should be inherited
         return copy.deepcopy(velocity/self.sps)
     
