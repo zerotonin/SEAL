@@ -7,14 +7,10 @@ class SEAL_SIM:
         self.waterCurrent = np.array([0.0,2.0,0.0]) # velocity in meter per second will be transformed into an evironment object
         self.seal = seal_agent.Seal(self)
         self.pCloud = turbidity.Cloud(self)
+        self.pCloud.add_particles()
         
 
-    def cloudInit(self,modus):
-        if modus == 'random':
-            seal.pCloud.add_particles()
-        else:
-            print('Unknown mode ' + modus + '. Cloud was not initialised ')
-    
+        
     def meterPerSecond2meterPerSample(self,velocity):
         # THis function should be inherited
         return copy.deepcopy(velocity/self.sps)

@@ -1,4 +1,5 @@
 import numpy as np
+import copy
 class Seal: 
     def __init__(self,simObj):
 
