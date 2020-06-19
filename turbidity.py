@@ -4,7 +4,7 @@ import copy
 #from sympy import *
 
 class Particle:
-    def __init__(self, position,size, groundLevel = -70.0,samplesPerSec =10.0):
+    def __init__(self,cloudObj, position,size, groundLevel = -70.0,samplesPerSec =10.0):
         """
         Creates a list of particles. Particles are in spherical space with defined 3 positions, 
         consisted x y and z with the seal center beeing postion (0,0,0). The particle class
@@ -31,7 +31,8 @@ class Particle:
         @param viscosity
             temperature dependent viscosity of saltwater
         """
-        self.size = size
+        self.cloudObj       = cloudObj
+        self.size           = size
         self.position       = position # tuple consistin of three coordinates radius,theta,phi
         self.trajectory     = [] # list of former positions
         self.activeMovement = True 
@@ -40,6 +41,7 @@ class Particle:
         self.groundLevel    = -70.0 # depth in meter
         self.temperature    = float("NAN")
         self.viscosity      = float("NAN")
+        self.samplesPerSec  = self.cloudObj.simObj.sps
         
 
 
@@ -252,7 +254,7 @@ class Cloud:
         while len(self.partclObjList)<self.max_particles:
 
             posSize = self.randomInit() # get random size and position
-            self.partclObjList.append(Particle(posSize[0],posSize[1])) # initialise particle and add to list
+            self.partclObjList.append(Particle(self,posSize[0],posSize[1])) # initialise particle and add to list
           
     def randomInit(self):
         """
