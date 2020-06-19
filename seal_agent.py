@@ -21,6 +21,22 @@ class Seal:
             self.activeSealMovement == True
     
 
+    def createSealStep(self,mode):
+        if mode == 'random':
+            self.createRandomStep()
+        elif mode == 'straightDown':
+            self.sealStep = np.array([0.,0.,-10.0,0.,0.,0.])
+        elif mode == '45down':
+            self.sealStep = np.array([5.0,0.,-5.0,0.,0.,0.])
+        else:
+            print('Unkown step type: ' + mode)
+
+    def createRandomStep(self):
+        sealStepCoordinates = np.random.uniform(-5,5,size = (3)) #randomly choosen stepSize 
+        sealStepOrientation = np.random.uniform(0,np.pi*2,size = (3)) #ramdomly chooses orientation of step 
+        self.sealStep = np.concatenate((sealStepCoordinates, sealStepOrientation), axis=None)
+        
+
     def MoveSeal(self): # function to simulate dive (series of seal trajectories)
         """
         this function should safe a sealTrajectory list listing all endPosition after each sealStep for a single dive
@@ -29,15 +45,12 @@ class Seal:
         """    
         if self.activeSealMovement == True:
 
-            sealStepCoordinates = np.random.uniform(-5,5,size = (3)) #randomly choosen stepSize 
-            sealStepOrientation = np.random.uniform(0,np.pi*2,size = (3)) #ramdomly chooses orientation of step 
-            self.sealStep = np.concatenate((sealStepCoordinates, sealStepOrientation), axis=None)
-        
+            
         
             #self.sealPosition = self.sealPosition+self.sealStep[0:3]
             self.sealPosition += self.sealStep[0:3] # new Seal Position after one sealStep/Movement
             SealPosition = copy.deepcopy(self.sealPosition)
-            self.sealOrientation = self.sealStep[3:6] # new sealOrientation after each sealStep (should be the same as during the   step?)
+            self.sealOrientation += self.sealStep[3:6] # new sealOrientation after each sealStep (should be the same as during the   step?)
             SealOrientation = copy.deepcopy(self.sealOrientation)
 
             print(self.sealStep,SealPosition,SealOrientation)

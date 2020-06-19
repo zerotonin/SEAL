@@ -14,9 +14,13 @@ class SEAL_SIM:
         return copy.deepcopy(velocity/self.sps)
     
     def simulate_sample(self):
-        # move da seal
-        self.seal.MoveSeal()
+        # create a step
+        self.seal.createSealStep('45down')
+        print(self.seal.sealStep)
         # move da particles
         self.pCloud.moveParticles()
+        print(self.seal.sealStep)
+        # move da seal
+        self.seal.MoveSeal()
 
 

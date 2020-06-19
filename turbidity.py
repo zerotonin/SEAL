@@ -239,11 +239,10 @@ class Cloud:
         self.partclObjList = [] # list of particle objects
         self.sizeRange = sizeRange # tuple with the minim and maximum size / radius of our tetrahedron
         self.maxVectorMagnitue = maxVectorMagnitue # 6 item wide tuple with the minimum and maximum values of the
-        self.sealPosition = self.simObj.seal.sealPosition #centre of the coordinate system of the Seal in disctance to (0,0,0) of world
+        self.sealPosition    = self.simObj.seal.sealPosition #centre of the coordinate system of the Seal in disctance to (0,0,0) of world
         self.sealOrientation = self.simObj.seal.sealOrientation  # orientation as yaw pitch roll
-        self.sealStep = self.simObj.seal.sealStep # change of position and orientation
-        #self.sealTrajectory = list()
-        self.waterCurrent = self.simObj.waterCurrent # force of the water current 
+        self.sealStep        = self.simObj.seal.sealStep # change of position and orientation
+        self.waterCurrent    = self.simObj.waterCurrent # force of the water current 
     
     def add_particles(self):
         """
@@ -309,7 +308,7 @@ class Cloud:
         """    
         for pObject in self.partclObjList:
             # we move particles relative to seal and save vector in p-object trajectory
-            pObject.particleMovement(self.sealPosition,self.waterCurrent,self.sealStep)             # for all Particles in List run randomwalk
+            pObject.particleMovement(self.sealPosition,self.waterCurrent,self.simObj.seal.sealStep)             # for all Particles in List run randomwalk
             # checking if particle norm is still in range
             relParticlePosNorm = np.linalg.norm(pObject.position)
             if  relParticlePosNorm > self.maxVectorMagnitue: # if the magnitude of the particle vector is bigger than 10, 
