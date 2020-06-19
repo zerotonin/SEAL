@@ -201,7 +201,7 @@ class Cloud:
     """
 
     def __init__(self,
-                name,
+                simObj,
                 max_particles = 400,
                 sizeRange = (0.001,1.0),
                 maxVectorMagnitue= 10):
@@ -232,7 +232,7 @@ class Cloud:
         @param waterCurrent
             force of the water current 
         """
-        self.name = name # string name
+        self.simObj = simObj # string name
         self.max_particles = max_particles # integer number of particles of the same size and position range
         self.partclObjList = [] # list of particle objects
         self.sizeRange = sizeRange # tuple with the minim and maximum size / radius of our tetrahedron
