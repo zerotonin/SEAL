@@ -237,11 +237,11 @@ class Cloud:
         self.partclObjList = [] # list of particle objects
         self.sizeRange = sizeRange # tuple with the minim and maximum size / radius of our tetrahedron
         self.maxVectorMagnitue = maxVectorMagnitue # 6 item wide tuple with the minimum and maximum values of the
-        self.sealPosition = np.zeros(shape = 3) #centre of the coordinate system of the Seal in disctance to (0,0,0) of world
-        self.sealOrientation = np.zeros(shape = 3)  # orientation as yaw pitch roll
-        self.sealStep = np.zeros(shape =6) # change of position and orientation
+        self.sealPosition = self.simObj.seal.sealPosition #centre of the coordinate system of the Seal in disctance to (0,0,0) of world
+        self.sealOrientation = self.simObj.seal.sealOrientation  # orientation as yaw pitch roll
+        self.sealStep = self.simObj.seal.sealStep # change of position and orientation
         #self.sealTrajectory = list()
-        self.waterCurrent = np.zeros(shape = 3) # force of the water current 
+        self.waterCurrent = self.simObj.waterCurrent # force of the water current 
     
     def add_particles(self):
         """
