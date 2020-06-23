@@ -20,7 +20,7 @@ class Environment:
     
     def checkVisibility(self):
        """
-       Function checks if coordinates of particles are inside of a sphere and visible. 
+       Function checks if coordinates of particles are visible. 
        Particle is not visible if it's above the surface level and if it's below ground level. 
        """
        if self.absPosition[2] >= self.oceanSurface or self.absPosition[2] <= self.oceanDepth-0.1: # how to get self.absoultePosition from turbidity.particles ? or does it go the other way ? 
@@ -29,6 +29,11 @@ class Environment:
            self.visible = True
 
     def creatObstacles(self):
+        """
+        this function is creating specific Obstacles representing rectangluar colums from oceanDepth to oceanSurface
+        for now this is manually defined and only consists of one single Obstacle. Would need to be multplied to list 
+        of obstacles. --> checkActiveMovement function und SealStateCheck need to take all obstacles into account ? HOW? 
+        """
         self.pt1 = np.array([0,0])
         self.pt2 = np.array([1,1])
         self.left = min(self.pt1[0],self.pt2[0])
@@ -40,7 +45,8 @@ class Environment:
 
         """
         The checkActiveMovement function defines which particles are moving and which are stationary.
-        Those particles with a self.position[2](z value) between -70m and -70.1m are stationary. 
+        Those particles with a self.position[2](z value) between -70m and -70.1m  and those that are located within the 
+        x,y coordinates of an obstacle are stationary. 
         Those that are between 0 and -70m are moving according to the randomWalk function. 
         """ 
         if self.visible == True:
@@ -60,4 +66,9 @@ class Environment:
        self.checkActiveMovement()
 
     def SealStateCheck(self):
-        pass
+        if self.sealPosition[2] > 0 or self.sealPosition[2] <= -70 or self.left <= self.sealPosition[0] <= self.right and self.front <= self.sealPosition[1] <= self.back
+            self.activeSealMovement = False
+            #seal steps needs to go down (self.sealStep[2])
+        else:
+            self.activeSealMovement == True
+    
