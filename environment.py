@@ -7,6 +7,7 @@ class Environment:
         self.oceanDepth = -70
         self.activeMovement = True 
         self.visible        = True 
+        self.absPosition = np.array([0.5,0.5,-7.0])
 
     def waterCurrent(self):
         """
@@ -17,7 +18,7 @@ class Environment:
         self.waterCurrent = np.array([0.0,2.0,0.0]) # just a simple example will be changed later 
 
     
-    def checkVisibility(self,oceanSurface,oceanDepth):
+    def checkVisibility(self):
        """
        Function checks if coordinates of particles are inside of a sphere and visible. 
        Particle is not visible if it's above the surface level and if it's below ground level. 
@@ -27,22 +28,28 @@ class Environment:
        else: 
            self.visible = True
 
-    #def creatObstacles(self):
+    def creatObstacles(self):
+        self.pt1 = np.array([0,0])
+        self.pt2 = np.array([1,1])
+        self.left = min(self.pt1[0],self.pt2[0])
+        self.front = min(self.pt1[1],self.pt2[1])
+        self.right = max(self.pt1[0],self.pt2[0])
+        self.back = max(self.pt1[1],self.pt2[1])
 
-    def checkActiveMovement(self):
-       """
-       The checkActiveMovement function defines which particles are moving and which are stationary.
-       Those particles with a self.position[2](z value) between -70m and -70.1m are stationary. 
-       Those that are between 0 and -70m are moving according to the randomWalk function. 
-       """
+    def checkActiveMovement(self): 
 
-       if self.visible == True:
-           if self.absPosition[2]<= self.oceanDepth or Obstacle.left <= self.absPosition[0] <= Obstacle.right and Obstacle.front <= self.absPosition[1] <= Obstacle.back:
-               self.activeMovement = False
-           else: 
-               self.activeMovement = True
-       else:
-           self.activeMovement = False  
+        """
+        The checkActiveMovement function defines which particles are moving and which are stationary.
+        Those particles with a self.position[2](z value) between -70m and -70.1m are stationary. 
+        Those that are between 0 and -70m are moving according to the randomWalk function. 
+        """ 
+        if self.visible == True:
+            if self.absPosition[2]<= self.oceanDepth or self.left <= self.absPosition[0] <= self.right and self.front <= self.absPosition[1] <= self.back:
+                self.activeMovement = False
+            else: 
+                self.activeMovement = True
+        else:
+            self.activeMovement = False  
            
     def particleStateCheck(self):
        """
@@ -53,27 +60,4 @@ class Environment:
        self.checkActiveMovement()
 
     def SealStateCheck(self):
-
-class Obstacle:
-    #"""
-    #A rectangle identified by two points.
-    #The rectangle stores left, top, right, and bottom values.
-    #Coordinates are based on cartasian coordinates.
-    #origin                               top
-    #+-----> x increases                |
-    #|                           left  -+-  right
-    #v                                  |
-    #y increases                         bottom
-    #set_points  -- reset rectangle coordinates
-    #"""
-    def __init__(self,name):
-
-        """Initialize a rectangle from two points."""
-        self.name = name
-        self.pt1 = np.array([0,0])
-        self.pt2 = np.array([1,1])
-        self.left = min(self.pt1[0],self.pt2[0])
-        self.front = min(self.pt1[1],self.pt2[1])
-        self.right = max(self.pt1[0],self.pt2[0])
-        self.back = max(self.pt1[1],self.pt2[1])
-    # somehow create a list of specific obstacles  ? 
+        pass
