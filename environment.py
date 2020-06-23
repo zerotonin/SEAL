@@ -29,8 +29,8 @@ class Environment:
 
     def creatObstacles(self):
 
-        obstacle = [[0:1],[0:1],[self.oceanSurface:self.oceanDepth]] # creat an obstacle going from 0-1m in x and 0-1 m in y dimension 
-   
+        #obstacle = [[0:1],[0:1],[self.oceanSurface:self.oceanDepth]] # creat an obstacle going from 0-1m in x and 0-1 m in y dimension 
+
     def checkActiveMovement(self):
        """
        The checkActiveMovement function defines which particles are moving and which are stationary.
@@ -39,7 +39,7 @@ class Environment:
        """
 
        if self.visible == True:
-           if self.absPosition[2]<= self.oceanDepth or self.absPosition[0,1] = obstacle[0,1]:
+           if self.absPosition[2]<= self.oceanDepth or Obstacle.left <= self.absPosition[0] <= Obstacle.right and Obstacle.top <= self.absPosition[1] <= Obstacle.bottom:
                self.activeMovement = False
            else: 
                self.activeMovement = True
@@ -55,3 +55,32 @@ class Environment:
        self.checkActiveMovement()
 
     def SealStateCheck(self):
+
+class Obstacle:
+
+    """
+    A rectangle identified by two points.
+    The rectangle stores left, top, right, and bottom values.
+    Coordinates are based on screen coordinates.
+    origin                               top
+     +-----> x increases                |
+     |                           left  -+-  right
+     v                                  |
+    y increases                         bottom
+    set_points  -- reset rectangle coordinates
+    """
+
+    def __init__(self, pt1, pt2):
+        """Initialize a rectangle from two points."""
+        self.set_points(pt1, pt2)
+
+    def set_points(self, pt1, pt2):
+        """Reset the rectangle coordinates."""
+        (x1, y1) = pt1.as_tuple()
+        (x2, y2) = pt2.as_tuple()
+        self.left = min(x1, x2)
+        self.top = min(y1, y2)
+        self.right = max(x1, x2)
+        self.bottom = max(y1, y2)
+    # somehow create a list of specific obstacles  ? 
+    
