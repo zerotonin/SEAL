@@ -58,12 +58,13 @@ class Environment:
             self.activeMovement = False  
            
     def particleStateCheck(self):
-       """
-       The particlStateCheck function calls the information for the visibility and active movement
-       state of the particle
-       """
-       self.checkVisibility()
-       self.checkActiveMovement()
+
+        """
+        The particlStateCheck function calls the information for the visibility and active movement
+        state of the particle
+        """
+        self.checkVisibility()
+        self.checkActiveMovement()
 
     def SealStateCheck(self):
         if self.sealPosition[2] > 0 or self.sealPosition[2] <= -70 or self.left <= self.sealPosition[0] <= self.right and self.front <= self.sealPosition[1] <= self.back
