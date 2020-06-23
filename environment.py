@@ -75,5 +75,5 @@ class Obstacle:
         self.left = min(self.pt1[0],self.pt2[0])
         self.front = min(self.pt1[1],self.pt2[1])
         self.right = max(self.pt1[0],self.pt2[0])
-        self.back = min(self.pt1[1],self.pt2[1])
+        self.back = max(self.pt1[1],self.pt2[1])
     # somehow create a list of specific obstacles  ? 
