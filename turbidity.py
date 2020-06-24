@@ -166,7 +166,7 @@ class Particle:
         """
         
         self.absPosition = self.position + sealPosition
-        self.particleStateCheck()
+        self.couldObj.simObj.environment.particleStateCheck(self)
         
         if self.activeMovement == True and self.visible == True:
             # perform Brownian motion

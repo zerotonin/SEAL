@@ -29,15 +29,15 @@ class Environment:
         pass
 
     
-    def checkVisibility(self):
+    def checkVisibility(self,parObj):
        """
        Function checks if coordinates of particles are visible. 
        Particle is not visible if it's above the surface level and if it's below ground level. 
        """
-       if self.absPosition[2] >= self.oceanSurface or self.absPosition[2] <= self.oceanDepth-0.1: # how to get self.absoultePosition from turbidity.particles ? or does it go the other way ? 
-           self.visible = False
+       if parObj.absPosition[2] >= self.oceanSurface or parObj.absPosition[2] <= self.oceanDepth-0.1: # how to get self.absoultePosition from turbidity.particles ? or does it go the other way ? 
+           parObj.visible = False
        else: 
-           self.visible = True
+           parObj.visible = True
 
     def creatObstacles(self):
         """
@@ -52,7 +52,7 @@ class Environment:
         self.right = max(self.pt1[0],self.pt2[0])
         self.back = max(self.pt1[1],self.pt2[1])
 
-    def checkActiveMovement(self): 
+    def checkActiveMovement(self,parObj): 
 
         """
         The checkActiveMovement function defines which particles are moving and which are stationary.
@@ -68,15 +68,15 @@ class Environment:
         else:
             self.activeMovement = False  
            
-    def particleStateCheck(self):
+    def particleStateCheck(self,parObj):
 
         """
         The particlStateCheck function calls the information for the visibility and active movement
         state of the particle
         """
         ### for particles in ParticleObjectList() for loop calling turbidity funciton ? 
-        self.checkVisibility()
-        self.checkActiveMovement()
+        self.checkVisibility(parObj)
+        self.checkActiveMovement(parObj)
 
     def SealStateCheck(self):
 
