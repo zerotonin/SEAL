@@ -242,7 +242,7 @@ class Cloud:
         self.sealPosition    = self.simObj.seal.sealPosition #centre of the coordinate system of the Seal in disctance to (0,0,0) of world
         self.sealOrientation = self.simObj.seal.sealOrientation  # orientation as yaw pitch roll
         self.sealStep        = self.simObj.seal.sealStep # change of position and orientation
-        self.waterCurrent    = self.simObj.waterCurrent # force of the water current 
+        self.waterCurrent    = np.zeros(shape=3) # force of the water current 
     
     def add_particles(self):
         """
@@ -306,6 +306,8 @@ class Cloud:
         higher magnitude from the seal than the MaxVectorMagnitude need to reset to a 
         new postion which is defined by the resetParticle function.
         """    
+        #update water current
+        self.waterCurrent = self.simObj.environment.getWaterCurrent()
         for pObject in self.partclObjList:
             # we move particles relative to seal and save vector in p-object trajectory
             pObject.particleMovement(self.sealPosition,self.waterCurrent,self.simObj.seal.sealStep)             # for all Particles in List run randomwalk
