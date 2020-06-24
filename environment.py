@@ -7,7 +7,7 @@ class Environment:
         self.oceanDepth = -70
         self.activeMovement = True 
         self.visible        = True 
-        self.absPosition = np.array([0.5,0.5,-7.0]) # needs to be taken from partcile class in turbidity 
+        self.absPosition = np.array([2,1,-7.0]) # needs to be taken from partcile class in turbidity 
 
     def waterCurrent(self):
         """
@@ -63,11 +63,14 @@ class Environment:
         The particlStateCheck function calls the information for the visibility and active movement
         state of the particle
         """
+        ### for particles in ParticleObjectList() for loop calling turbidity funciton ? 
         self.checkVisibility()
         self.checkActiveMovement()
 
     def SealStateCheck(self):
-        if self.sealPosition[2] > 0 or self.sealPosition[2] <= -70 or self.left <= self.sealPosition[0] <= self.right and self.front <= self.sealPosition[1] <= self.back
+
+        ### for sealPosition in Seal_agend ??? 
+        if self.sealPosition[2] > 0 or self.sealPosition[2] <= -70 or self.left <= self.sealPosition[0] <= self.right and self.front <= self.sealPosition[1] <= self.back:
             self.activeSealMovement = False
             #seal steps needs to go down (self.sealStep[2])
         else:
