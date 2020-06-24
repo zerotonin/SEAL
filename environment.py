@@ -7,7 +7,7 @@ class Environment:
         self.oceanDepth = -70
         self.activeMovement = True 
         self.visible        = True 
-        self.absPosition = np.array([0.5,0.5,-7.0])
+        self.absPosition = np.array([0.5,0.5,-7.0]) # needs to be taken from partcile class in turbidity 
 
     def waterCurrent(self):
         """
