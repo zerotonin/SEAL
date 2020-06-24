@@ -1,10 +1,10 @@
-import turbidity, seal_agent,copy
+import turbidity, seal_agent,copy,environment
 import numpy as np
 
 class SEAL_SIM:
     def __init__(self):
         self.sps = 100 # samples per second
-        self.waterCurrent = environment.waterCurrent(self) # velocity in meter per second will be transformed into an evironment object
+        self.envirnoment = environment.environment(self) # velocity in meter per second will be transformed into an evironment object
         self.seal = seal_agent.Seal(self)
         self.pCloud = turbidity.Cloud(self)
         self.pCloud.add_particles()

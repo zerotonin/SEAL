@@ -1,8 +1,8 @@
 import numpy as np 
 
 class Environment:
-    def __init__(self):
-        
+    def __init__(self,simObj):
+        self.simObj = simObj
         self.oceanSurface = 0
         self.oceanDepth = -70
         self.activeMovement = True 
