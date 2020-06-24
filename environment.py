@@ -8,14 +8,25 @@ class Environment:
         self.activeMovement = True 
         self.visible        = True 
         self.absPosition = np.array([2,1,-7.0]) # needs to be taken from partcile class in turbidity 
+        self.waterCurrent = np.array([0.0,2.0,0.0]) # just a simple example will be changed later 
+        self.waterCurrentMode = 'static'
 
-    def waterCurrent(self):
+    def getWaterCurrent(self):
         """
         should be defined as moving vector (x.y.z) which should change dependent on position in 3D world ? 
         dependen on all 3 dimensions ? 
         look for waterCurrent values in paper ??
         """
-        self.waterCurrent = np.array([0.0,2.0,0.0]) # just a simple example will be changed later 
+
+        if self.waterCurrentMode == 'static':
+            return self.waterCurrent
+        elif self.waterCurrentMode == 'interp':
+            return self.interpolateCurrent()
+        else:
+            print('This should be a real error / unkown mode')
+    
+    def interpolateCurrent(self):
+        pass
 
     
     def checkVisibility(self):
