@@ -61,7 +61,7 @@ class Environment:
         Those that are between 0 and -70m are moving according to the randomWalk function. 
         """ 
         if self.visible == True:
-            if self.absPosition[2]<= self.oceanDepth or self.left <= self.absPosition[0] <= self.right and self.front <= self.absPosition[1] <= self.back:
+            if parObj.absPosition[2]<= self.oceanDepth or self.left <= parObj.absPosition[0] <= self.right and self.front <= parObj.absPosition[1] <= self.back:
                 self.activeMovement = False
             else: 
                 self.activeMovement = True
@@ -78,7 +78,7 @@ class Environment:
         self.checkVisibility(parObj)
         self.checkActiveMovement(parObj)
 
-    def SealStateCheck(self):
+    def SealStateCheck(self, sealObj):
 
         ### for sealPosition in Seal_agend ??? 
         if self.sealPosition[2] > 0 or self.sealPosition[2] <= -70 or self.left <= self.sealPosition[0] <= self.right and self.front <= self.sealPosition[1] <= self.back:

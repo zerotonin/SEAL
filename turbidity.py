@@ -38,7 +38,7 @@ class Particle:
         self.activeMovement = True 
         self.visible        = True 
         self.OFavailable    = list()
-        self.groundLevel    = -70.0 # depth in meter
+        self.groundLevel    = self.cloudObj.simObj.environment.oceanDepth # depth in meter
         self.temperature    = float("NAN")
         self.viscosity      = float("NAN")
         self.samplesPerSec  = self.cloudObj.simObj.sps
@@ -166,7 +166,7 @@ class Particle:
         """
         
         self.absPosition = self.position + sealPosition
-        self.couldObj.simObj.environment.particleStateCheck(self)
+        self.cloudObj.simObj.environment.particleStateCheck(self)
         
         if self.activeMovement == True and self.visible == True:
             # perform Brownian motion
