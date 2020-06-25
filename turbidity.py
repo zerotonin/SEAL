@@ -5,7 +5,8 @@ import copy
 
 class Particle:
     '''
-    Class 'Particle' holds information about the size and position of a particle inside the turbidity simulation. 
+    Class 'Particle' holds information about the size and position of a particle inside the turbidity simulation.
+    This class defines trajectiries of particles movement by Brownian motion in the ocean that forms tubidity.  
     Generated particles form cloud (class 'Cloud') with a seal as a center of a particles' cloud (class 'Seal').
     The trajectories of particles' movement are influanced by water currents, water viscosity and obstacles e.g.
     corals, rocks etc. (class 'Enviroment')
@@ -16,8 +17,8 @@ class Particle:
         This function initialises a list of random sized particles[µm] with a random x,y,z position, limited by
         radius of the visual field of a seal (@ param maxVectorMagnitue in the 'Seal' class). Particles are in 
         cartesian 3D space with the seal as a center postion (0,0,0). Particles are moving by Brownian motion, 
-        where we consider viscosity of the ocean' water, so particles have different velocity of random walk 
-        movement (Brownian motion) depending on the depth of their position in the 3D space of ocean (z axis 
+        where we consider viscosity of the ocean' water, so particles have different velocity of random walk' 
+        movement (Brownian motion), depending on the depth of their position in the 3D space of ocean (z axis 
         position).Trajectories of particles movement are also influenced by the water currents.
 
         @param cloudObj      string default: none
@@ -39,13 +40,13 @@ class Particle:
             particles are visible in the water for seal, and form opic flow. They are not
             visible above 0 [m] and below -70,1 [m] and if their position is same as a position of obstacle.
         @param OFavailable     int default: none
-            the list of particles that are visible and move actively (????)
-        @param temperature  float default: none (????)
+            the list of particles that are visible and move actively.
+        @param temperature  float default: none
             the temperature [K] of water that changes with the depth of ocean. 
-        @param viscosity    float default: none (????)
+        @param viscosity    float default: none 
             viscosity of saltwater [Ns/m²,Pa*s] that depends on temerature and vary with the depth.
         @param samplesPerSec float default: 10.0 
-            the model's basic frequency. How often it updates in one second.
+            the model's basic frequency. It defines, how often samples are updated per one second.
         '''
         self.cloudObj       = cloudObj # particles form cloud object
         self.size           = size # radius of the particles [µm]
@@ -61,11 +62,11 @@ class Particle:
 
     def randomWalk(self):
         """
-        The function 'randomWalk' define the random step size of a particle that moves via 
+        The function 'randomWalk' defines the random step size of a particle that moves via 
         Brownian motion in the space of seal's visual field.
 
-        @ return a random array of particle's coordinates position x,y,z, influenced by Brownian motion
-        step size         
+        @ return a random array of particle's coordinates position x,y,z influenced by Brownian motion
+        step size.         
         """
         
         stepSize = self.getBrownianMotionStepSize()
@@ -74,23 +75,26 @@ class Particle:
 
     
     def depth2Temperature(self):
-        """
-        The temperature of the water environment is modelled based on f1. The data represented by
-        a Gaussian function is temperature data from the Gulf of Finland (Figure 2). Fitting was
-        done via plotly @ 29th May 2020
+        '''
+        The function 'depth2Temperature' creates a gradient of water's temerature in the ocean
+        environment. The data is taken from the doi.org/10.3389/fmars.2018.00287. 
+        The data represented by a Gaussian function is temperature data from the Gulf of Finland (Figure 2).
+        Fitting was done via plotly @ 29th May 2020.
 
         Gaussian function: 
 
-        A  = 3.1643818163582185
-        H  = 5.289978692454068
-        xo = -2.854807838826537
+        A (area)  = 3.1643818163582185
+        H (FWHM) = 5.289978692454068
+        xo () = -2.854807838826537
         w  = 13.943640614002176
+        z  = 
+
+        The distance between \f$(x_1,y_1)\f$ and \f$(x_2,y_2)\f$ is 
+  \f$\sqrt{(x_2-x_1)^2+(y_2-y_1)^2}\f$.
 
         temperatue(z) = A+H*exp(-(z-xo)²/(2*w²))
 
-        f1: Placke, Manja, et al. "Long-term mean circulation of the Baltic Sea as represented by 
-        various ocean circulation models." Frontiers in Marine Science 5 (2018): 287.
-        """
+        '''
         self.temperature = 3.1643818163582185+5.289978692454068*np.exp(-1*(self.absPosition[2]+2.854807838826537)**2/(2*13.943640614002176**2))
     
     def temperature2viscosity(self):
