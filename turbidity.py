@@ -67,20 +67,24 @@ class Particle:
 
     def checkVisibility(self):
        """
-       Function checks if coordinates of particles are inside of a sphere and visible. 
-       Particle is not visible if it's above the surface level and if it's below ground level. 
+       The 'checkVisibility' function checks if position of particle is inside of a visual field of 
+       a seal. Particles are not visible above 0 [m] and below -70,0 [m] (z axis or absPosition[2]), 
+       and if their position is same as a position of obstacle. 
        """
        if self.absPosition[2] >= 0. or self.absPosition[2] <= self.groundLevel-0.1:
            self.visible = False
+           # elif for obstacles ?
        else: 
            self.visible = True
    
     def checkActiveMovement(self):
        """
        The checkActiveMovement function defines which particles are moving and which are stationary.
-       Those particles with a self.position[2](z value) between -70m and -70.1m are stationary. 
-       Those that are between 0 and -70m are moving according to the randomWalk function. 
+       Those particles with a self.position[2](z value) between -70[m] and -70.1[m] are stationary. 
+       Those that are between 0 and -70[m] are moving according to the randomWalk function. Also, particles
+       which position is the same as position of obsticles are not moving. 
        """
+       # + for obstacles?
        if self.visible == True:
            if self.absPosition[2]<= self.groundLevel:
                self.activeMovement = False
@@ -91,22 +95,19 @@ class Particle:
            
     def particleStateCheck(self):
        """
-       The particlStateCheck function calls the information for the visibility and active movement
-       state of the particle
+       The particleStateCheck function calls the information for the visibility and active movement
+       state of the particle.
        """
        self.checkVisibility()
        self.checkActiveMovement()
 
     def randomWalk(self):
         """
-        Creates a random walk trajectory for particles, that move in the direction of currents in a 
-        spherical space.
-        
-        @param current 
-        is a moving vector of current, where numpy array is three values containing x.y.z
-        @param position
-        coordinates of particle in spherical space, that are updated by random walk coordinates with 
-        defined step size in the current's vectors direction.
+        The function 'randomWalk' define the random step size of a particle that moves via 
+        Brownian motion in the space of seal's visual field.
+
+        @ return a random array of particle's coordinates position x,y,z, influenced by Brownian motion
+        step size         
         """
         
         stepSize = self.getBrownianMotionStepSize()
