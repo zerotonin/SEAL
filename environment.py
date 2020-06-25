@@ -37,8 +37,9 @@ class Environment:
     
     def checkVisibility(self,parObj):
        """
-       Function checks if coordinates of particles are visible. 
-       Particle is not visible if it's above the surface level and if it's below ground level. 
+       The 'checkVisibility' function checks if position of particle is inside of a visual field of 
+       a seal. Particles are not visible above 0 [m] and below -70,0 [m] (z axis or absPosition[2]), 
+       and if their position is same as a position of obstacle. 
        """
        if parObj.absPosition[2] >= self.oceanSurface or parObj.absPosition[2] <= self.oceanDepth-0.1: # how to get self.absoultePosition from turbidity.particles ? or does it go the other way ? 
            parObj.visible = False
@@ -62,10 +63,10 @@ class Environment:
 
         """
         The checkActiveMovement function defines which particles are moving and which are stationary.
-        Those particles with a self.position[2](z value) between -70m and -70.1m  and those that are located within the 
-        x,y coordinates of an obstacle are stationary. 
-        Those that are between 0 and -70m are moving according to the randomWalk function. 
-        """ 
+        Those particles with a self.position[2](z value) between -70[m] and -70.1[m] are stationary. 
+        Those that are between 0 and -70[m] are moving according to the randomWalk function. Also, particles
+        which position is the same as position of obsticles are not moving. 
+        """
         if self.visible == True:
             if parObj.absPosition[2]<= self.oceanDepth or self.left <= parObj.absPosition[0] <= self.right and self.front <= parObj.absPosition[1] <= self.back:
                 self.activeMovement = False
@@ -77,8 +78,8 @@ class Environment:
     def particleStateCheck(self,parObj):
 
         """
-        The particlStateCheck function calls the information for the visibility and active movement
-        state of the particle
+        The particleStateCheck function calls the information for the visibility and active movement
+        state of the particle.
         """
         ### for particles in ParticleObjectList() for loop calling turbidity funciton ? 
         self.checkVisibility(parObj)

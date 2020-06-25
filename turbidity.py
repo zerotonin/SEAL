@@ -62,45 +62,6 @@ class Particle:
         self.samplesPerSec  = self.cloudObj.simObj.sps #samples per second
         
 
-
-        
-
-    def checkVisibility(self):
-       """
-       The 'checkVisibility' function checks if position of particle is inside of a visual field of 
-       a seal. Particles are not visible above 0 [m] and below -70,0 [m] (z axis or absPosition[2]), 
-       and if their position is same as a position of obstacle. 
-       """
-       if self.absPosition[2] >= 0. or self.absPosition[2] <= self.groundLevel-0.1:
-           self.visible = False
-           # elif for obstacles ?
-       else: 
-           self.visible = True
-   
-    def checkActiveMovement(self):
-       """
-       The checkActiveMovement function defines which particles are moving and which are stationary.
-       Those particles with a self.position[2](z value) between -70[m] and -70.1[m] are stationary. 
-       Those that are between 0 and -70[m] are moving according to the randomWalk function. Also, particles
-       which position is the same as position of obsticles are not moving. 
-       """
-       # + for obstacles?
-       if self.visible == True:
-           if self.absPosition[2]<= self.groundLevel:
-               self.activeMovement = False
-           else: 
-               self.activeMovement = True
-       else:
-           self.activeMovement = False  
-           
-    def particleStateCheck(self):
-       """
-       The particleStateCheck function calls the information for the visibility and active movement
-       state of the particle.
-       """
-       self.checkVisibility()
-       self.checkActiveMovement()
-
     def randomWalk(self):
         """
         The function 'randomWalk' define the random step size of a particle that moves via 
