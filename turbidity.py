@@ -53,7 +53,6 @@ class Particle:
         self.trajectory     = [] # list of former positions x,y,z
         self.activeMovement = True #particles actively move by Brownian motian
         self.visible        = True #particles are in the visual field of a seal
-        self.OFavailable    = list() #list of available particles
         self.temperature    = float("NAN")
         self.viscosity      = float("NAN")
         self.samplesPerSec  = self.cloudObj.simObj.sps #samples per second
