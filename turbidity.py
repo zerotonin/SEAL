@@ -183,7 +183,7 @@ class Cloud:
                 simObj,
                 max_particles = 400,
                 sizeRange = (0.001,1.0),
-                maxVectorMagnitue= 10):
+                maxVectorMagnitue= .3):
                 #super()__init__(self) # needs to be vector magnitute , discribing the length of a vector
         """ 
         @param name            float default: none
