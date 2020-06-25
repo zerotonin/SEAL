@@ -4,44 +4,62 @@ import copy
 #from sympy import *
 
 class Particle:
-    def __init__(self,cloudObj, position,size, groundLevel = -70.0,samplesPerSec =10.0):
-        """
-        Creates a list of particles. Particles are in spherical space with defined 3 positions, 
-        consisted x y and z with the seal center beeing postion (0,0,0). The particle class
-        holds information about the size and position of a particle inside our turbidity simulation. 
+    '''
+    Class 'Particle' holds information about the size and position of a particle inside the turbidity simulation. 
+    Generated particles form cloud (class 'Cloud') with a seal as a center of a particles' cloud (class 'Seal').
+    The trajectories of particles' movement are influanced by water currents, water viscosity and obstacles e.g.
+    corals, rocks etc. (class 'Enviroment')
+    '''
 
+    def __init__(self,cloudObj, position,size, groundLevel = -70.0,samplesPerSec =10.0):
+        '''
+        This function initialises a list of random sized particles[µm] with a random x,y,z position, limited by
+        radius of the visual field of a seal (@ param maxVectorMagnitue in the 'Seal' class). Particles are in 
+        cartesian 3D space with the seal as a center postion (0,0,0). Particles are moving by Brownian motion, 
+        where we consider viscosity of the ocean' water, so particles have different velocity of random walk 
+        movement (Brownian motion) depending on the depth of their position in the 3D space of ocean (z axis 
+        position).Trajectories of particles movement are also influenced by the water currents.
+
+        @param cloudObj      string default: none
+           string that defines that particles move as a cloud object.
         @param size          float default: none
-            size save the particle radius in µm. Particles have no form so far but if
+            size save the particle radius [µm]. Particles have no form so far but if
             plotted spheres or tetrahedron might be best according to the rendering 
             algorithm.
         @param position     np.array default: none
-            tuple consistin of three coordinates radius,theta,phi
-        @param trajectory 
-            list of former position of particle
-        @param activeMovement  
-            defines area where partciles should have active movement (0m to -70m)
-        @param visible 
-            particles are visible in the water, They are not visible above 0m and below -70,1m
+            tuple consisting of three random coordinates x,y,z in 3D cartesian space.
+        @param trajectory    float default: none
+            list of former position of particle x,y,z. List is supplemented with updated
+            former positions when particles move.
+        @param activeMovement  bool default: True
+            defines boundaries of the ocean' space, where partciles move actively. 
+            Active movement of particles is true for ocean depth with the limit - 0 [m] to -70 [m],
+            and true when particles are not in the area of obstacle.
+        @param visible         bool default: True
+            particles are visible in the water for seal, and form opic flow. They are not
+            visible above 0 [m] and below -70,1 [m] and if their position is same as a position of obstacle.
+        @param OFavailable     int default: none
+            the list of particles that are visible and move actively (????)
         @param groundLevel  float  default: -70.0
-            the depth of an ocean in metres
+            the depth of an ocean [m] that is limited by the value of -70 [m].
+        @param temperature  float default: none (????)
+            the temperature [K] of water that changes with the depth of ocean. 
+        @param viscosity    float default: none (????)
+            viscosity of saltwater [Ns/m²,Pa*s] that depends on temerature and vary with the depth.
         @param samplesPerSec float default: 10.0 
-            The models basic frequency. How often it updates in one second
-        @param temperature 
-            depth dependent temperature
-        @param viscosity
-            temperature dependent viscosity of saltwater
-        """
-        self.cloudObj       = cloudObj
-        self.size           = size
-        self.position       = position # tuple consistin of three coordinates radius,theta,phi
-        self.trajectory     = [] # list of former positions
-        self.activeMovement = True 
-        self.visible        = True 
-        self.OFavailable    = list()
-        self.groundLevel    = self.cloudObj.simObj.environment.oceanDepth # depth in meter
+            the model's basic frequency. How often it updates in one second.
+        '''
+        self.cloudObj       = cloudObj # particles form cloud object
+        self.size           = size # radius of the particles [µm]
+        self.position       = position # tuple consisting of three coordinates x,y,z
+        self.trajectory     = [] # list of former positions x,y,z
+        self.activeMovement = True #particles actively move by Brownian motian
+        self.visible        = True #particles are in the visual field of a seal
+        self.OFavailable    = list() #list of available particles
+        self.groundLevel    = self.cloudObj.simObj.environment.oceanDepth # depth of ocean [m]
         self.temperature    = float("NAN")
         self.viscosity      = float("NAN")
-        self.samplesPerSec  = self.cloudObj.simObj.sps
+        self.samplesPerSec  = self.cloudObj.simObj.sps #samples per second
         
 
 
