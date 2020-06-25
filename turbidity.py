@@ -11,7 +11,7 @@ class Particle:
     corals, rocks etc. (class 'Enviroment')
     '''
 
-    def __init__(self,cloudObj, position,size, groundLevel = -70.0,samplesPerSec =10.0):
+    def __init__(self,cloudObj, position,size):
         '''
         This function initialises a list of random sized particles[µm] with a random x,y,z position, limited by
         radius of the visual field of a seal (@ param maxVectorMagnitue in the 'Seal' class). Particles are in 
@@ -40,8 +40,6 @@ class Particle:
             visible above 0 [m] and below -70,1 [m] and if their position is same as a position of obstacle.
         @param OFavailable     int default: none
             the list of particles that are visible and move actively (????)
-        @param groundLevel  float  default: -70.0
-            the depth of an ocean [m] that is limited by the value of -70 [m].
         @param temperature  float default: none (????)
             the temperature [K] of water that changes with the depth of ocean. 
         @param viscosity    float default: none (????)
@@ -56,7 +54,6 @@ class Particle:
         self.activeMovement = True #particles actively move by Brownian motian
         self.visible        = True #particles are in the visual field of a seal
         self.OFavailable    = list() #list of available particles
-        self.groundLevel    = self.cloudObj.simObj.environment.oceanDepth # depth of ocean [m]
         self.temperature    = float("NAN")
         self.viscosity      = float("NAN")
         self.samplesPerSec  = self.cloudObj.simObj.sps #samples per second
