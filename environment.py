@@ -103,10 +103,13 @@ class Environment:
         which position is the same as position of obsticles are not moving. 
         """
         if self.visible == True:
-            if parObj.absPosition[2]<= self.oceanDepth or m <= r:
+            if parObj.absPosition[2]<= self.oceanDepth:
                 self.activeMovement = False
             else: 
                 self.activeMovement = True
+                particleObstacleDist = np.linalg.norm(parObj.absPosition[0:2]-obstacle[0:2]) 
+               if particleObstacleDist < obstacle[2]:
+                    parObj.activeMovement = False
         else:
             self.activeMovement = False  
            
