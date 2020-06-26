@@ -63,7 +63,13 @@ class Environment:
     this function is creating specific Obstacles representing rectangluar colums from oceanDepth to oceanSurface
     for now this is manually defined and only consists of one single Obstacle. Would need to be multplied to list 
     of obstacles. --> checkActiveMovement function und SealStateCheck need to take all obstacles into account ? HOW? 
+    
+    make two lists:
+    obstacle list 
+    checkobstacle list
     """
+    obstacle[x,y,r,ri]
+
     r =  2 #radius of the object / objectMagnitute
     ri =  r -0.1 #inner invisible radius of object
     op = np.array([1,2])  #center of the object defined by x and y  
@@ -108,7 +114,7 @@ class Environment:
             else: 
                 self.activeMovement = True
                 particleObstacleDist = np.linalg.norm(parObj.absPosition[0:2]-obstacle[0:2]) 
-               if particleObstacleDist < obstacle[2]:
+               if particleObstacleDist <= obstacle[2]:
                     parObj.activeMovement = False
         else:
             self.activeMovement = False  
