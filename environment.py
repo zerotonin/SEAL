@@ -2,7 +2,7 @@ import numpy as np
 from scipy import interpolate
 class Environment:
     '''
-    The 'Enviroment' class contains functions that are used for creating ocean enviroment where particles are
+    The 'Enviroment' class contains functions that are used for creating ocean' enviroment where particles are
     moving in the visual field of a seal. Seal is the center of particles' cloud in cartesian space. The depth 
     limit of the ocean is -70 m. 
     @param groundLevel  float  default: -70.0
@@ -10,6 +10,10 @@ class Environment:
     '''
 
     def __init__(self,simObj):
+         '''
+         @param groundLevel  float  default: -70.0
+        the depth of an ocean [m] that is limited by the value of -70 [m].
+        '''
         self.simObj = simObj
         self.oceanSurface = 0
         self.oceanDepth = -70
