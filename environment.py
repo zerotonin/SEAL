@@ -34,63 +34,29 @@ class Environment:
             print('This should be a real error / unkown mode')
     
     def interpolateCurrent(self):
-    #        Parameters:	
-    #x, y : array_like
-    #
-    #Arrays defining the data point coordinates.
-    #
-    #If the points lie on a regular grid, x can specify the column coordinates and y the row coordinates, for example:
-    #
-    #>>>
-    #>>> x = [0,1,2];  y = [0,3]; z = [[1,2,3], [4,5,6]]
-    #Otherwise, x and y must specify the full coordinates for each point, for example:
-    #
-    #>>>
-    #>>> x = [0,1,2,0,1,2];  y = [0,0,0,3,3,3]; z = [1,2,3,4,5,6]
-    #If x and y are multi-dimensional, they are flattened before use.
-    #
-    #z : array_like
-    #
-    #The values of the function to interpolate at the data points. If z is a multi-dimensional array, it is flattened before use. The length of a flattened z array is either len(x)*len(y) if x and y specify the column and row coordinates or len(z) == len(x) == len(y) if x and y specify coordinates for each point.
-    #
-    #kind : {‘linear’, ‘cubic’, ‘quintic’}, optional
-    #
-    #The kind of spline interpolation to use. Default is ‘linear’.
-    #
-    #copy : bool, optional
-    #
-    #If True, the class makes internal copies of x, y and z. If False, references may be used. The default is to copy.
-    #
-    #bounds_error : bool, optional
-    #
-    #If True, when interpolated values are requested outside of the domain of the input data (x,y), a ValueError is raised. If False, then fill_value is used.
-    #
-    #fill_value : number, optional
-    #
-    #If provided, the value to use for points outside of the interpolation domain. If omitted (None), values outside the domain are extrapolated.
-    #
-    #Returns:	
-    #values_x : ndarray, shape xi.shape[:-1] + values.shape[ndim:]
-    #
-    #Interpolated values at input coordinates.
-    #        pass
-    #    Construct a 2-D grid and interpolate on it:
-    #
-    #>>>
-    #>>> from scipy import interpolate
-    #>>> x = np.arange(-5.01, 5.01, 0.25)
-    #>>> y = np.arange(-5.01, 5.01, 0.25)
-    #>>> xx, yy = np.meshgrid(x, y)
-    #>>> z = np.sin(xx**2+yy**2)
-    #>>> f = interpolate.interp2d(x, y, z, kind='cubic')
+    #  WorldCoordinates:
+    #  x = np.array(-1000,1000,0,1) from -1000m to 1000 m in 10cm steps
+    #  y = np.array(-1000,1000,0,1)
+    #  edges of coordinate system beeing (-1000,-1000),(-1000,1000),(1000,-1000),(1000,1000)
+    #  waterCrurenCoordinates:
+    #  watercurrent at the edges beeing  
+    #  (2,-1),(2,-2),(1,-1),(1,-2)
+    #  x = np.array(2,1,0.1)
+    #  y = np.array(-1,-2,0.1)
+    
+    from scipy import interpolate
+    x = np.arange(-1000,1000,0,1)
+    y = np.arange(-1000,1000,0,1)
+    xx, yy = np.meshgrid(x, y)
+    z = np.sin(xx**2+yy**2)
+    f = interpolate.interp2d(x, y, z, kind='cubic')
     #Now use the obtained interpolation function and plot the result:
     #
-    #>>>
-    #>>> xnew = np.arange(-5.01, 5.01, 1e-2)
-    #>>> ynew = np.arange(-5.01, 5.01, 1e-2)
-    #>>> znew = f(xnew, ynew)
-    #>>> plt.plot(x, z[0, :], 'ro-', xnew, znew[0, :], 'b-')
-    #>>> plt.show()
+    xnew = np.arange(2,1,0.1)
+    ynew = np.arange(-1,-2,0.1)
+    znew = f(xnew, ynew)
+    plt.plot(x, z[0, :], 'ro-', xnew, znew[0, :], 'b-')
+    plt.show()
 
     def creatObstacles(self,parObj):
     """
@@ -100,7 +66,7 @@ class Environment:
     """
     r =  2 #radius of the object / objectMagnitute
     ri =  r -0.1 #inner invisible radius of object
-    op = np.array([x,y])  #center of the object defined by x and y  
+    op = np.array([1,2])  #center of the object defined by x and y  
     m = np.linalg.norm(parObj.absPosition[0,1]-op)    
     # if clause placed in check visbility and check Active Movement ? how does this work for several Obstacles 
     # if m > r :
