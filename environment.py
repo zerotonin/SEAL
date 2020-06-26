@@ -82,10 +82,16 @@ class Environment:
        a seal. Particles are not visible above 0 [m] and below -70,0 [m] (z axis or absPosition[2]), 
        and if their position is same as a position of obstacle. 
        """
-       if parObj.absPosition[2] >= self.oceanSurface or parObj.absPosition[2] <= self.oceanDepth-0.1 or m < ri: # how to get self.absoultePosition from turbidity.particles ? or does it go the other way ? 
+       if parObj.absPosition[2] >= self.oceanSurface or parObj.absPosition[2] <= self.oceanDepth-0.1: # how to get self.absoultePosition from turbidity.particles ? or does it go the other way ? 
            parObj.visible = False
        else: 
            parObj.visible = True
+           for obstacle in self.obstacleList:
+               particleObstacleDist = np.linalg.norm(parObj.absPosition[0:2]-obstacle[0:2]) 
+               if particleObstacleDist < obstacle[3]:
+                    parObj.visible = False
+
+           
 
 
     def checkActiveMovement(self,parObj): 
@@ -97,7 +103,7 @@ class Environment:
         which position is the same as position of obsticles are not moving. 
         """
         if self.visible == True:
-            if parObj.absPosition[2]<= self.oceanDepth or m < r:
+            if parObj.absPosition[2]<= self.oceanDepth or m <= r:
                 self.activeMovement = False
             else: 
                 self.activeMovement = True
