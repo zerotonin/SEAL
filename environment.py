@@ -11,11 +11,11 @@ class Environment:
     '''
 
     def __init__(self,simObj):
-<<<<<<< HEAD
+
         '''
         @param groundLevel  float  default: -70.0
         the depth of an ocean [m] that is limited by the value of -70 [m].
-=======
+
         
         This function initializes the simulation of ocean. Where upper and lower bondaries are limited by the 
         depth of -70[m]. Inside if the ocean seals are places. Seals are centers of clouds with particles 
@@ -39,7 +39,6 @@ class Environment:
            the position of a water current in the space of an ocean.
         @ param waterCurrentMode srt default: none
           the state of the water current in the ocean.         
->>>>>>> 27daab795588f12b8ba68874fada411ca5217f26
         '''
         self.simObj = simObj #name
         self.oceanSurface = 0 # [m]
