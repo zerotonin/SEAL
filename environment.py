@@ -16,7 +16,7 @@ class Environment:
         @param groundLevel  float  default: -70.0
         the depth of an ocean [m] that is limited by the value of -70 [m].
 =======
-         '''
+        
         This function initializes the simulation of ocean. Where upper and lower bondaries are limited by the 
         depth of -70[m]. Inside if the ocean seals are places. Seals are centers of clouds with particles 
         that are moved by brownian motion and water current. 
@@ -134,8 +134,6 @@ class Environment:
                particleObstacleDist = np.linalg.norm(parObj.absPosition[0:2]-obstacle[0]) #obstale[0] = (x,y)
                if particleObstacleDist < obstacle[2]: #obstacle[2] = inner radius
                     parObj.visible = False
-
-           
 
 
     def checkActiveMovement(self,parObj): 
