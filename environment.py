@@ -1,23 +1,55 @@
 import numpy as np 
+#from scipy import interpolate
 
 class Environment:
     '''
-    The 'Enviroment' class contains functions that are used for creating ocean enviroment where particles are
+    The 'Environment' class contains functions that are used for creating ocean' enviroment where particles are
     moving in the visual field of a seal. Seal is the center of particles' cloud in cartesian space. The depth 
-    limit of the ocean is -70 m. 
-    @param groundLevel  float  default: -70.0
-        the depth of an ocean [m] that is limited by the value of -70 [m].
+    limit of the ocean is -70 m. Ocean in the environment contains obstacles that should be bypassed by the seal.
+    The obstacle is surrounded by visible but inactive particles and the core of the obstacle - invisible and 
+    inactive particles
     '''
 
     def __init__(self,simObj):
-        self.simObj = simObj
-        self.oceanSurface = 0
-        self.oceanDepth = -70
+
+        '''
+        @param groundLevel  float  default: -70.0
+        the depth of an ocean [m] that is limited by the value of -70 [m].
+
+        
+        This function initializes the simulation of ocean. Where upper and lower bondaries are limited by the 
+        depth of -70[m]. Inside if the ocean seals are places. Seals are centers of clouds with particles 
+        that are moved by brownian motion and water current. 
+        @param simObj     str default: none
+        the name of the environment simulation.
+        @param oceanSurface    float default: 0.0
+        the upper limit of the ocean's surface [m]
+        @param oceanDepth      float default: -70.0
+        the lower bottom limit of the ocean - 70 [m]
+        @param activeMovement  bool default: True
+           defines boundaries of the ocean' space, where partciles move actively. 
+           Active movement of particles is true for ocean depth with the limit - 0 [m] to -70 [m],
+           and true when particles are not in the area of obstacle.
+        @param visible         bool default: True
+           particles are visible in the water for seal, and form opic flow. They are not
+           visible above 0 [m] and below -70,1 [m] and if their position is same as a position of obstacle.
+        @ param absPosition array default: none
+           the absolute space position in the cartasian system coordinate in the ocean, x,y,z.
+        @ param waterCurrent  array default: none
+           the position of a water current in the space of an ocean.
+        @ param waterCurrentMode srt default: none
+          the state of the water current in the ocean.         
+        '''
+        self.simObj = simObj #name
+        self.oceanSurface = 0 # [m]
+        self.oceanDepth = -70 # [m]
         self.activeMovement = True 
         self.visible        = True 
         self.absPosition = np.array([2,1,-7.0]) # needs to be taken from partcile class in turbidity 
         self.waterCurrent = np.array([0.0,2.0,0.0]) # just a simple example will be changed later 
         self.waterCurrentMode = 'static'
+        self.obstacleList = []
+        self.observableObstacleList = []
 
     def getWaterCurrent(self):
         """
@@ -33,9 +65,63 @@ class Environment:
         else:
             print('This should be a real error / unkown mode')
     
-    def interpolateCurrent(self):
-        pass
+   # def interpolateCurrent(self):
+   # #  WorldCoordinates:
+   # #  x = np.array(-1000,1000,0,1) from -1000m to 1000 m in 10cm steps
+   # #  y = np.array(-1000,1000,0,1)
+   # #  edges of coordinate system beeing (-1000,-1000),(-1000,1000),(1000,-1000),(1000,1000)
+   # #  waterCrurenCoordinates:
+   # #  watercurrent at the edges beeing  
+   # #  (2,-1),(2,-2),(1,-1),(1,-2)
+   # #  x = np.array(2,1,0.1)
+   # #  y = np.array(-1,-2,0.1)
+   # 
+   # from scipy import interpolate
+   # x = np.arange(-1000,1000,0,1)
+   # y = np.arange(-1000,1000,0,1)
+   # xx, yy = np.meshgrid(x, y)
+   # z = np.sin(xx**2+yy**2)
+   # f = interpolate.interp2d(x, y, z, kind='cubic')
+   # #Now use the obtained interpolation function and plot the result:
+   # #
+   # xnew = np.arange(2,1,0.1)
+   # ynew = np.arange(-1,-2,0.1)
+   # znew = f(xnew, ynew)
+   # plt.plot(x, z[0, :], 'ro-', xnew, znew[0, :], 'b-')
+   # plt.show()
 
+    def creatObstacles(self):
+        """
+        this function is creating specific Obstacles representing rectangluar colums from oceanDepth to oceanSurface
+        for now this is manually defined and only consists of one single Obstacle. Would need to be multplied to list 
+        of obstacles. --> checkActiveMovement function und SealStateCheck need to take all obstacles into account ? HOW? 
+
+        obstacle(initialCoord[x,y],r,ri)
+        """
+    
+        self.maxObstacles = 200
+        
+        while len(self.obstacleList)<self.maxObstacles:
+               obstacle = self.randomInit() # get random x,y,radius and innerradius
+               self.obstacleList.append(obstacle) # initialise obstacles(initialCoord[x,y],r,ri) and add to list
+
+    def randomInit(self):
+        """
+        The 'randomInit' function returns a list of random sized particles[µm] within a size range 
+        of 20µm and 160µm.
+        And in returns 'initialCoord' as a random vector (x,y,z) with a range from -1 to 1.
+        This is limited by a set maxVectorMagnitute within the getRandomVectorMagnitute
+        function.
+        """  
+        radius = np.random.uniform(0.1,10.0, size=(1)) # set size to 10cm to 10m radius
+        initialCoord = np.random.uniform(-1,1,size = (2))*5000 # random vector (x,y,) from -5km to 5km 
+        return (initialCoord,radius,radius-0.1)
+
+    def checkObstacleDistance(self,sealObj,cloudObj):
+        
+        for obstacle in self.obstacleList:
+            if np.linalg.norm(sealObj.sealPosition[0:2]-obstacle[0])- cloudObj.maxVectorMagnitue- obstacle[1] < 0:
+                self.observableObstacleList.append(obstacle)
     
     def checkVisibility(self,parObj):
        """
@@ -47,19 +133,11 @@ class Environment:
            parObj.visible = False
        else: 
            parObj.visible = True
+           for obstacle in self.obstacleList:
+               particleObstacleDist = np.linalg.norm(parObj.absPosition[0:2]-obstacle[0]) #obstale[0] = (x,y)
+               if particleObstacleDist < obstacle[2]: #obstacle[2] = inner radius
+                    parObj.visible = False
 
-    def creatObstacles(self):
-        """
-        this function is creating specific Obstacles representing rectangluar colums from oceanDepth to oceanSurface
-        for now this is manually defined and only consists of one single Obstacle. Would need to be multplied to list 
-        of obstacles. --> checkActiveMovement function und SealStateCheck need to take all obstacles into account ? HOW? 
-        """
-        self.pt1 = np.array([0,0])
-        self.pt2 = np.array([1,1])
-        self.left = min(self.pt1[0],self.pt2[0])
-        self.front = min(self.pt1[1],self.pt2[1])
-        self.right = max(self.pt1[0],self.pt2[0])
-        self.back = max(self.pt1[1],self.pt2[1])
 
     def checkActiveMovement(self,parObj): 
 
@@ -70,10 +148,13 @@ class Environment:
         which position is the same as position of obsticles are not moving. 
         """
         if self.visible == True:
-            if parObj.absPosition[2]<= self.oceanDepth or self.left <= parObj.absPosition[0] <= self.right and self.front <= parObj.absPosition[1] <= self.back:
+            if parObj.absPosition[2]<= self.oceanDepth:
                 self.activeMovement = False
             else: 
                 self.activeMovement = True
+                particleObstacleDist = np.linalg.norm(parObj.absPosition[0:2]-obstacle[0]) #obstale[0] = (x,y) 
+                if particleObstacleDist <= obstacle[1]: #obstacle[1] = radius
+                    parObj.activeMovement = False
         else:
             self.activeMovement = False  
            

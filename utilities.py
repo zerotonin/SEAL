@@ -5,29 +5,33 @@ import numpy as np
 
 
 class plotUtils:
+    '''
+    Class 'plotUtilities' contains functions for creating plots for 3D particles' cloud 
+    visialization and for plotting vectors distribution
+    '''
     def __init__(self):
         # maybe later on we want to keep our particle object list here
         self.name = 'plotting utilities for turbidity model'
 
         ''' 
-        This class creates a list of position values (x,y,z) and size values (s) of each particle of the Cloud to plot
-        each particle in respective size into a squared coordinate system.
-
-
+        This class creates a list of position values (x,y,z) and size values (s) of each particle of the 
+        Cloud to plot each particle in respective size into a squared coordinate system.
          '''
 
     def particleObjList2CoordList(self,partclObjList):
         '''
-        This function returns lists of position values x,y,z and size value s of all particles .
+        This function returns lists of position values x,y,z and size value s of all particles from
+        partclObjList.
+        @return four lists with x,y,z positions and particles sizes.
         '''
-        xdata = list()#create list 
-        ydata = list()
-        zdata = list()
-        sdata = list()
+        xdata = list()#create list of x coordinated
+        ydata = list()#create list of y coordinated
+        zdata = list()#create list of z coordinated
+        sdata = list()#create list of particles' sizes
 
 
-        for particle in partclObjList :# for each particle take certain value and make...
-            xdata.append(particle.position[0])# list containing x position 
+        for particle in partclObjList :
+            xdata.append(particle.position[0])
             ydata.append(particle.position[1])
             zdata.append(particle.position[2])
             sdata.append(particle.size[0])
@@ -36,7 +40,8 @@ class plotUtils:
     
     def makeSquare3DAxis(self):
         '''
-        This function equals axes by giving same limits.
+        This function equals axes in 3D plot by giving same limits.
+        @ return a 3D coordinate system with equal axes, ready to plot input data.
         '''
         fig = plt.figure()# open fig space
         ax = Axes3D(fig)#make 3D plot
@@ -44,12 +49,13 @@ class plotUtils:
         ax.set_xlim(-10,10)# x axes goes from -10 to 10 since Cloudsphere is 10
         ax.set_ylim(-10,10)# same here
         ax.set_zlim(-10,10)
-        return fig,ax # returns a 3D coordinate system with equal axes, ready to plot data
+        return fig,ax
         
 
     def plot3D_positionSizeColorCoded(self,partclObjList):
         '''
-        This function finally returns particles plotted in a 3D coordinate system according to their position and size
+        This function finally returns particles plotted in a 3D coordinate system according to 
+        their position and size. Where z - is the depth of the ocean where cloud is located.
         '''
         
         coordinates = self.particleObjList2CoordList(partclObjList)
@@ -63,7 +69,8 @@ class plotUtils:
     
     def plot3D_positionRelSize(self,partclObjList):
         '''
-        Function that builds 3d graph with zoomed * 10^3 particles sizes.
+        Function that builds 3d graph with zoomed * 10^3 particles sizes for better visualization 
+        due to the small size of particles.
         '''
 
         fig,ax = self.makeSquare3DAxis()
@@ -79,8 +86,8 @@ class plotUtils:
 
     def VectorMagnitude(self,partclObjList):
         '''
-        This function might take coordinates for x,y,z of particle and
-        return the list of values of vector magnitude
+        This function might take coordinates for x,y,z of particle.
+        @return the list of values of vector magnitude VctMgn for each particle in the cloud.
         '''
 
         VctMgn = list()
@@ -90,7 +97,10 @@ class plotUtils:
         return VctMgn 
 
     def plot_vectorHistogram(self,partclObjList):
-
+        '''
+        This function plots the distribution of the particles's vectors magnitude in the 
+        visual field of a seal
+        '''
         VctMgn = self.VectorMagnitude(partclObjList)
 
         fig = plt.figure()# open fig space
@@ -105,6 +115,10 @@ class plotUtils:
     
 
 class mathUtils:
+    '''
+    This class contains tools for switching between cartesian and spheric coordinate
+    systems for particles.
+    '''
     def __init__(self):
         self.name = 'math utilities for coordinate stuff'
 
