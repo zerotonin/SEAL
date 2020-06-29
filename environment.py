@@ -1,5 +1,6 @@
 import numpy as np 
-from scipy import interpolate
+#from scipy import interpolate
+
 class Environment:
     '''
     The 'Enviroment' class contains functions that are used for creating ocean' enviroment where particles are
@@ -10,8 +11,8 @@ class Environment:
     '''
 
     def __init__(self,simObj):
-         '''
-         @param groundLevel  float  default: -70.0
+        '''
+        @param groundLevel  float  default: -70.0
         the depth of an ocean [m] that is limited by the value of -70 [m].
         '''
         self.simObj = simObj
@@ -22,6 +23,8 @@ class Environment:
         self.absPosition = np.array([2,1,-7.0]) # needs to be taken from partcile class in turbidity 
         self.waterCurrent = np.array([0.0,2.0,0.0]) # just a simple example will be changed later 
         self.waterCurrentMode = 'static'
+        self.obstacleList = []
+        self.Obstacle = np.zeros(shape=4)
 
     def getWaterCurrent(self):
         """
@@ -37,47 +40,64 @@ class Environment:
         else:
             print('This should be a real error / unkown mode')
     
-    def interpolateCurrent(self):
-    #  WorldCoordinates:
-    #  x = np.array(-1000,1000,0,1) from -1000m to 1000 m in 10cm steps
-    #  y = np.array(-1000,1000,0,1)
-    #  edges of coordinate system beeing (-1000,-1000),(-1000,1000),(1000,-1000),(1000,1000)
-    #  waterCrurenCoordinates:
-    #  watercurrent at the edges beeing  
-    #  (2,-1),(2,-2),(1,-1),(1,-2)
-    #  x = np.array(2,1,0.1)
-    #  y = np.array(-1,-2,0.1)
-    
-    from scipy import interpolate
-    x = np.arange(-1000,1000,0,1)
-    y = np.arange(-1000,1000,0,1)
-    xx, yy = np.meshgrid(x, y)
-    z = np.sin(xx**2+yy**2)
-    f = interpolate.interp2d(x, y, z, kind='cubic')
-    #Now use the obtained interpolation function and plot the result:
-    #
-    xnew = np.arange(2,1,0.1)
-    ynew = np.arange(-1,-2,0.1)
-    znew = f(xnew, ynew)
-    plt.plot(x, z[0, :], 'ro-', xnew, znew[0, :], 'b-')
-    plt.show()
+   # def interpolateCurrent(self):
+   # #  WorldCoordinates:
+   # #  x = np.array(-1000,1000,0,1) from -1000m to 1000 m in 10cm steps
+   # #  y = np.array(-1000,1000,0,1)
+   # #  edges of coordinate system beeing (-1000,-1000),(-1000,1000),(1000,-1000),(1000,1000)
+   # #  waterCrurenCoordinates:
+   # #  watercurrent at the edges beeing  
+   # #  (2,-1),(2,-2),(1,-1),(1,-2)
+   # #  x = np.array(2,1,0.1)
+   # #  y = np.array(-1,-2,0.1)
+   # 
+   # from scipy import interpolate
+   # x = np.arange(-1000,1000,0,1)
+   # y = np.arange(-1000,1000,0,1)
+   # xx, yy = np.meshgrid(x, y)
+   # z = np.sin(xx**2+yy**2)
+   # f = interpolate.interp2d(x, y, z, kind='cubic')
+   # #Now use the obtained interpolation function and plot the result:
+   # #
+   # xnew = np.arange(2,1,0.1)
+   # ynew = np.arange(-1,-2,0.1)
+   # znew = f(xnew, ynew)
+   # plt.plot(x, z[0, :], 'ro-', xnew, znew[0, :], 'b-')
+   # plt.show()
 
-    def creatObstacles(self,parObj):
-    """
-    this function is creating specific Obstacles representing rectangluar colums from oceanDepth to oceanSurface
-    for now this is manually defined and only consists of one single Obstacle. Would need to be multplied to list 
-    of obstacles. --> checkActiveMovement function und SealStateCheck need to take all obstacles into account ? HOW? 
-    
-    make two lists:
-    obstacle list 
-    checkobstacle list
-    """
-    obstacle[x,y,r,ri]
+    def creatObstacles(self):
+        """
+        this function is creating specific Obstacles representing rectangluar colums from oceanDepth to oceanSurface
+        for now this is manually defined and only consists of one single Obstacle. Would need to be multplied to list 
+        of obstacles. --> checkActiveMovement function und SealStateCheck need to take all obstacles into account ? HOW? 
 
-    r =  2 #radius of the object / objectMagnitute
-    ri =  r -0.1 #inner invisible radius of object
-    op = np.array([1,2])  #center of the object defined by x and y  
-    m = np.linalg.norm(parObj.absPosition[0,1]-op)    
+        make two lists:
+        obstacle list 
+        checkobstacle list
+        """
+    #obstacle[x,y,r,ri]
+        self.maxObstacles = 200
+        
+        while len(self.obstacleList)<self.maxObstacles:
+               obstacle = self.randomInit() # get random x,y,radius and innerradius
+               self.obstacleList.append(obstacle) # initialise particle and add to list
+
+    def randomInit(self):
+        """
+        The 'randomInit' function returns a list of random sized particles[µm] within a size range 
+        of 20µm and 160µm.
+        And in returns 'initialCoord' as a random vector (x,y,z) with a range from -1 to 1.
+        This is limited by a set maxVectorMagnitute within the getRandomVectorMagnitute
+        function.
+        """  
+        radius = np.random.uniform(0.1,10.0, size=(1)) # set size to 10cm to 10m radius
+        initialCoord = np.random.uniform(-1,1,size = (2))*5000 # random vector (x,y,) from -5km to 5km 
+        return (initialCoord,radius,radius-0.1)
+
+        #r =  2 #radius of the object / objectMagnitute
+        #ri =  r -0.1 #inner invisible radius of object
+        #op = np.array([1,2])  #center of the object defined by x and y  
+        #m = np.linalg.norm(parObj.absPosition[0,1]-op)    
     # if clause placed in check visbility and check Active Movement ? how does this work for several Obstacles 
     # if m > r :
     #     visible == True and activeMovement == True 
@@ -118,7 +138,7 @@ class Environment:
             else: 
                 self.activeMovement = True
                 particleObstacleDist = np.linalg.norm(parObj.absPosition[0:2]-obstacle[0:2]) 
-               if particleObstacleDist <= obstacle[2]:
+                if particleObstacleDist <= obstacle[2]:
                     parObj.activeMovement = False
         else:
             self.activeMovement = False  
