@@ -3,21 +3,47 @@ import numpy as np
 
 class Environment:
     '''
-    The 'Enviroment' class contains functions that are used for creating ocean' enviroment where particles are
+    The 'Environment' class contains functions that are used for creating ocean' enviroment where particles are
     moving in the visual field of a seal. Seal is the center of particles' cloud in cartesian space. The depth 
-    limit of the ocean is -70 m. 
-    @param groundLevel  float  default: -70.0
-        the depth of an ocean [m] that is limited by the value of -70 [m].
+    limit of the ocean is -70 m. Ocean in the environment contains obstacles that should be bypassed by the seal.
+    The obstacle is surrounded by visible but inactive particles and the core of the obstacle - invisible and 
+    inactive particles
     '''
 
     def __init__(self,simObj):
+<<<<<<< HEAD
         '''
         @param groundLevel  float  default: -70.0
         the depth of an ocean [m] that is limited by the value of -70 [m].
+=======
+         '''
+        This function initializes the simulation of ocean. Where upper and lower bondaries are limited by the 
+        depth of -70[m]. Inside if the ocean seals are places. Seals are centers of clouds with particles 
+        that are moved by brownian motion and water current. 
+        @param simObj     str default: none
+        the name of the environment simulation.
+        @param oceanSurface    float default: 0.0
+        the upper limit of the ocean's surface [m]
+        @param oceanDepth      float default: -70.0
+        the lower bottom limit of the ocean - 70 [m]
+        @param activeMovement  bool default: True
+           defines boundaries of the ocean' space, where partciles move actively. 
+           Active movement of particles is true for ocean depth with the limit - 0 [m] to -70 [m],
+           and true when particles are not in the area of obstacle.
+        @param visible         bool default: True
+           particles are visible in the water for seal, and form opic flow. They are not
+           visible above 0 [m] and below -70,1 [m] and if their position is same as a position of obstacle.
+        @ param absPosition array default: none
+           the absolute space position in the cartasian system coordinate in the ocean, x,y,z.
+        @ param waterCurrent  array default: none
+           the position of a water current in the space of an ocean.
+        @ param waterCurrentMode srt default: none
+          the state of the water current in the ocean.         
+>>>>>>> 27daab795588f12b8ba68874fada411ca5217f26
         '''
-        self.simObj = simObj
-        self.oceanSurface = 0
-        self.oceanDepth = -70
+        self.simObj = simObj #name
+        self.oceanSurface = 0 # [m]
+        self.oceanDepth = -70 # [m]
         self.activeMovement = True 
         self.visible        = True 
         self.absPosition = np.array([2,1,-7.0]) # needs to be taken from partcile class in turbidity 

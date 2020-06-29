@@ -5,9 +5,6 @@ This is a python project designed to simulate hydrodynamic and optic sensation o
 
 # Known issues
 
-- particles are not evenly distributed
-- - check vector length histogram
-
 # Windows: batch to start from GitBash 
 
 Filenname: startCodeSeal.bat
