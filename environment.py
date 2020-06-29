@@ -96,11 +96,9 @@ class Environment:
         for now this is manually defined and only consists of one single Obstacle. Would need to be multplied to list 
         of obstacles. --> checkActiveMovement function und SealStateCheck need to take all obstacles into account ? HOW? 
 
-        make two lists:
-        obstacle list 
-        checkobstacle list
+        obstacle(initialCoord[x,y],r,ri)
         """
-    #obstacle(initialCoord[x,y],r,ri)
+    
         self.maxObstacles = 200
         
         while len(self.obstacleList)<self.maxObstacles:
@@ -120,9 +118,10 @@ class Environment:
         return (initialCoord,radius,radius-0.1)
 
     def checkObstacleDistance(self,sealObj,cloudObj):
+        
         for obstacle in self.obstacleList:
-            if np.linalg.norm(sealObj.sealPosition[0:2]-obstacle[0])- cloudObj.maxVectorMagnitue- obstacle[1] < 0
-            self.observableObstacleList.append(obstacle)
+            if np.linalg.norm(sealObj.sealPosition[0:2]-obstacle[0])- cloudObj.maxVectorMagnitue- obstacle[1] < 0:
+                self.observableObstacleList.append(obstacle)
     
     def checkVisibility(self,parObj):
        """
