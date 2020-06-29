@@ -50,7 +50,7 @@ class Environment:
         self.waterCurrent = np.array([0.0,2.0,0.0]) # just a simple example will be changed later 
         self.waterCurrentMode = 'static'
         self.obstacleList = []
-        self.Obstacle = np.zeros(shape=4)
+        self.observableObstacleList = []
 
     def getWaterCurrent(self):
         """
@@ -119,6 +119,11 @@ class Environment:
         radius = np.random.uniform(0.1,10.0, size=(1)) # set size to 10cm to 10m radius
         initialCoord = np.random.uniform(-1,1,size = (2))*5000 # random vector (x,y,) from -5km to 5km 
         return (initialCoord,radius,radius-0.1)
+
+    def checkObstacleDistance(self,sealObj,cloudObj):
+        for obstacle in self.obstacleList:
+            if np.linalg.norm(sealObj.sealPosition[0:2]-obstacle[0])- cloudObj.maxVectorMagnitue- obstacle[1] < 0
+            self.observableObstacleList.append(obstacle)
     
     def checkVisibility(self,parObj):
        """
