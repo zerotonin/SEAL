@@ -133,7 +133,7 @@ class Environment:
            parObj.visible = False
        else: 
            parObj.visible = True
-           for obstacle in self.obstacleList:
+           for obstacle in self.observableObstacleList:
                particleObstacleDist = np.linalg.norm(parObj.absPosition[0:2]-obstacle[0]) #obstale[0] = (x,y)
                if particleObstacleDist < obstacle[2]: #obstacle[2] = inner radius
                     parObj.visible = False
@@ -152,9 +152,10 @@ class Environment:
                 self.activeMovement = False
             else: 
                 self.activeMovement = True
-                particleObstacleDist = np.linalg.norm(parObj.absPosition[0:2]-obstacle[0]) #obstale[0] = (x,y) 
-                if particleObstacleDist <= obstacle[1]: #obstacle[1] = radius
-                    parObj.activeMovement = False
+                for obstacle in self.observableObstacleList:
+                    particleObstacleDist = np.linalg.norm(parObj.absPosition[0:2]-obstacle[0]) #obstale[0] = (x,y) 
+                    if particleObstacleDist <= obstacle[1]: #obstacle[1] = radius
+                        parObj.activeMovement = False
         else:
             self.activeMovement = False  
            
