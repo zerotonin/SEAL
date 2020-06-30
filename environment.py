@@ -1,5 +1,5 @@
 import numpy as np 
-#from scipy import interpolate
+from scipy import interpolate
 
 class Environment:
     '''
@@ -65,30 +65,30 @@ class Environment:
         else:
             print('This should be a real error / unkown mode')
     
-   # def interpolateCurrent(self):
-   # #  WorldCoordinates:
-   # #  x = np.array(-1000,1000,0,1) from -1000m to 1000 m in 10cm steps
-   # #  y = np.array(-1000,1000,0,1)
-   # #  edges of coordinate system beeing (-1000,-1000),(-1000,1000),(1000,-1000),(1000,1000)
-   # #  waterCrurenCoordinates:
-   # #  watercurrent at the edges beeing  
-   # #  (2,-1),(2,-2),(1,-1),(1,-2)
-   # #  x = np.array(2,1,0.1)
-   # #  y = np.array(-1,-2,0.1)
-   # 
-   # from scipy import interpolate
-   # x = np.arange(-1000,1000,0,1)
-   # y = np.arange(-1000,1000,0,1)
-   # xx, yy = np.meshgrid(x, y)
-   # z = np.sin(xx**2+yy**2)
-   # f = interpolate.interp2d(x, y, z, kind='cubic')
-   # #Now use the obtained interpolation function and plot the result:
-   # #
-   # xnew = np.arange(2,1,0.1)
-   # ynew = np.arange(-1,-2,0.1)
-   # znew = f(xnew, ynew)
-   # plt.plot(x, z[0, :], 'ro-', xnew, znew[0, :], 'b-')
-   # plt.show()
+    def interpolateCurrent(self):
+        """
+        WorldCoordinates:
+        x = np.array(-1000,1000,0,1) from -1000m to 1000 m in 10cm steps
+        y = np.array(-1000,1000,0,1)
+        edges of coordinate system beeing (-1000,-1000),(-1000,1000),(1000,-1000),(1000,1000)
+        waterCrurenCoordinates:
+        watercurrent at the edges beeing  
+        (1,1),(1,-1),(1,-1),(-1,-1)
+        x = np.array(1,-1,0.1)
+        y = np.array(1,-1,0.1)
+        """
+        x = np.arange(-1000,1000,0,1)
+        y = np.arange(-1000,1000,0,1)
+        xx, yy = np.meshgrid(x, y)
+        z = np.sin(xx**2+yy**2)
+        f = interpolate.interp2d(x, y, z, kind='cubic')
+        #Now use the obtained interpolation function and plot the result:
+        #
+        xnew = np.arange(1,-1,0.1)
+        ynew = np.arange(1,-1,0.1)
+        znew = f(xnew, ynew)
+        plt.plot(x, z[0, :], 'ro-', xnew, znew[0, :], 'b-')
+        plt.show()
 
     def creatObstacles(self):
         """
