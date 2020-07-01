@@ -92,9 +92,7 @@ class Environment:
 
     def creatObstacles(self):
         """
-        this function is creating specific Obstacles representing rectangluar colums from oceanDepth to oceanSurface
-        for now this is manually defined and only consists of one single Obstacle. Would need to be multplied to list 
-        of obstacles. --> checkActiveMovement function und SealStateCheck need to take all obstacles into account ? HOW? 
+        this function is creating specific Obstacles representing circular colums from oceanDepth to oceanSurface
 
         obstacle(initialCoord[x,y],r,ri)
         """
@@ -107,17 +105,20 @@ class Environment:
 
     def randomInit(self):
         """
-        The 'randomInit' function returns a list of random sized particles[µm] within a size range 
-        of 20µm and 160µm.
-        And in returns 'initialCoord' as a random vector (x,y,z) with a range from -1 to 1.
-        This is limited by a set maxVectorMagnitute within the getRandomVectorMagnitute
-        function.
+        The 'randomInit' function returns a list of random sized obstacles within a size range 
+        of 10cm to 10m radius.
+        And in returns 'initialCoord' as a random vector (x,y) with a range from -5000m to 5000m
         """  
         radius = np.random.uniform(0.1,10.0, size=(1)) # set size to 10cm to 10m radius
         initialCoord = np.random.uniform(-1,1,size = (2))*5000 # random vector (x,y,) from -5km to 5km 
         return (initialCoord,radius,radius-0.1)
 
     def checkObstacleDistance(self,sealObj,cloudObj):
+        """
+        this function checks if the obstacles is in sight of the seal. Only if the magnitute from the obstacle to the seal
+        subtracktd by the radius of the obstacle and the radius of the particleCloud is < 0 the obstacle is in sight 
+        of the seal and therefore needs to be checked for visibility and active movement 
+        """
         
         for obstacle in self.obstacleList:
             if np.linalg.norm(sealObj.sealPosition[0:2]-obstacle[0])- cloudObj.maxVectorMagnitue- obstacle[1] < 0:
@@ -127,7 +128,7 @@ class Environment:
        """
        The 'checkVisibility' function checks if position of particle is inside of a visual field of 
        a seal. Particles are not visible above 0 [m] and below -70,0 [m] (z axis or absPosition[2]), 
-       and if their position is same as a position of obstacle. 
+       and if their position is witin the inner radius of an obstacle in sight of the seal. 
        """
        if parObj.absPosition[2] >= self.oceanSurface or parObj.absPosition[2] <= self.oceanDepth-0.1: # how to get self.absoultePosition from turbidity.particles ? or does it go the other way ? 
            parObj.visible = False
@@ -139,8 +140,7 @@ class Environment:
                     parObj.visible = False
 
 
-    def checkActiveMovement(self,parObj): 
-
+    def checkActiveMovement(self,parObj):
         """
         The checkActiveMovement function defines which particles are moving and which are stationary.
         Those particles with a self.position[2](z value) between -70[m] and -70.1[m] are stationary. 
@@ -160,21 +160,28 @@ class Environment:
             self.activeMovement = False  
            
     def particleStateCheck(self,parObj):
-
         """
         The particleStateCheck function calls the information for the visibility and active movement
         state of the particle.
         """
-        ### for particles in ParticleObjectList() for loop calling turbidity funciton ? 
         self.checkVisibility(parObj)
         self.checkActiveMovement(parObj)
 
     def SealStateCheck(self, sealObj):
-
-        ### for sealPosition in Seal_agend ??? 
-        if self.sealPosition[2] > 0 or self.sealPosition[2] <= -70 or self.left <= self.sealPosition[0] <= self.right and self.front <= self.sealPosition[1] <= self.back:
-            self.activeSealMovement = False
+        """
+        the sealStatecheck function defines activeSealMovement to be true or false. Only those sealpositions
+        that have a activeSealMovement will be activly moved in the sealAgend class.
+        The Seals active movement is false if the agends is above water or below the seafloor or within an 
+        obstacle.
+        The possibility for this movements ending in such a position needs to be impossible. HOW ? 
+        
+        """
+        if sealObj.sealPosition[2] >= self.oceanSurface or sealObj.sealPosition[2] <= self.oceanDepth:
+            sealObj.activeSealMovement = False
             #seal steps needs to go down (self.sealStep[2])
         else:
-            self.activeSealMovement == True
+            sealObj.activeSealMovement == True
+            sealObstacleDist = np.linalg.norm(sealObj.position[0:2]-obstacle[0])
+            if sealObstacleDist <= obstacle[1]:
+                sealObj.activeSealMovement == False 
     
