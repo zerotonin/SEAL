@@ -1,5 +1,5 @@
 import numpy as np 
-from scipy import interpolate
+#from scipy import interpolate
 
 class Environment:
     '''
@@ -125,19 +125,19 @@ class Environment:
                 self.observableObstacleList.append(obstacle)
     
     def checkVisibility(self,parObj):
-       """
-       The 'checkVisibility' function checks if position of particle is inside of a visual field of 
-       a seal. Particles are not visible above 0 [m] and below -70,0 [m] (z axis or absPosition[2]), 
-       and if their position is witin the inner radius of an obstacle in sight of the seal. 
-       """
-       if parObj.absPosition[2] >= self.oceanSurface or parObj.absPosition[2] <= self.oceanDepth-0.1: # how to get self.absoultePosition from turbidity.particles ? or does it go the other way ? 
-           parObj.visible = False
-       else: 
-           parObj.visible = True
-           for obstacle in self.observableObstacleList:
-               particleObstacleDist = np.linalg.norm(parObj.absPosition[0:2]-obstacle[0]) #obstale[0] = (x,y)
-               if particleObstacleDist < obstacle[2]: #obstacle[2] = inner radius
-                    parObj.visible = False
+        """
+        The 'checkVisibility' function checks if position of particle is inside of a visual field of 
+        a seal. Particles are not visible above 0 [m] and below -70,0 [m] (z axis or absPosition[2]), 
+        and if their position is witin the inner radius of an obstacle in sight of the seal. 
+        """
+        if parObj.absPosition[2] >= self.oceanSurface or parObj.absPosition[2] <= self.oceanDepth-0.1: # how to get self.absoultePosition from turbidity.particles ? or does it go the other way ? 
+            parObj.visible = False
+        else: 
+            parObj.visible = True
+            for obstacle in self.observableObstacleList:
+                particleObstacleDist = np.linalg.norm(parObj.absPosition[0:2]-obstacle[0]) #obstale[0] = (x,y)
+                if particleObstacleDist < obstacle[2]: #obstacle[2] = inner radius
+                     parObj.visible = False
 
 
     def checkActiveMovement(self,parObj):
@@ -174,7 +174,7 @@ class Environment:
         The Seals active movement is false if the agends is above water or below the seafloor or within an 
         obstacle.
         The possibility for this movements ending in such a position needs to be impossible. HOW ? 
-        
+
         """
         if sealObj.sealPosition[2] >= self.oceanSurface or sealObj.sealPosition[2] <= self.oceanDepth:
             sealObj.activeSealMovement = False
