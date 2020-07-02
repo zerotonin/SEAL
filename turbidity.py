@@ -188,12 +188,50 @@ class Cloud:
     The Cloud class holds functions to create and move particles within the cloud, which is the 
     visual field of a seal. Seal is a center of a cloud (0,0,0). When particles are outside of the visual
     fild of a seal, they are being reset, so the number of particles inside a cloud is constant.
+   
+            PARTICLE
+             180µm  a
+    |----------|-----------|
+    \          |ya      be/
+     \         |         /
+      \        |        /
+       \      b|       / c
+        \      |      /
+         \     |     / y = 90°
+          \    |    /
+           \   |   /
+            \  |al/
+             \ | /
+               o
+             SEAL
+
+                   a
+    tan(alpha) =   -
+                   b
+             a
+    b = ----------
+        tan(alpha)
+
+
+    alpha  = best visual resolution of a seal 0.08666667° R1)
+    a =  20 -160µm R2)
+                                                                                                  160
+    b for the best optical performance in R1 with the maximum size particle of R2 1850 µm = ----------------
+                                                                                            tan(0.086666667)
+
+    The lowest count of particles in the baltic sea is 1500 particles pro cm³ R3). For a cube of 0.18 cm³ in which 
+    the seal can sea particles this renders 270 particles.
+
+
+    R1) Michael Weiffen, Bettina Möller, Björn Mauck, Guido Dehnhardt, Effect of water turbidity on the visual acuity of harbor seals (Phoca vitulina) Vision Research (2005)
+    R2) Bunke, Dennis, et al. "Natural and Anthropogenic Sediment Mixing Processes in the South-Western Baltic Sea." Frontiers in Marine Science (2019).
+    R3) Miroslaw Jonasz (1983) Particle-size distributions in the Baltic, Tellus B:Chemical and Physical Meteorology, 35:5, 346-358, DOI: 10.3402/tellusb.v35i5.14624
     """
 
     def __init__(self,
                 simObj,
-                max_particles = 400,
-                sizeRange = (0.001,1.0),
+                max_particles = 270,
+                sizeRange = (.00002,0.00016), # in meter
                 maxVectorMagnitue= .3):
                 #super()__init__(self) # needs to be vector magnitute , discribing the length of a vector
         """ 
@@ -252,7 +290,7 @@ class Cloud:
         This is limited by a set maxVectorMagnitute within the getRandomVectorMagnitute
         function.
         """  
-        size = np.random.uniform(self.sizeRange[0], self.sizeRange[1], size=(1))*0.00016 + 0.00002
+        size = np.random.uniform(self.sizeRange[0], self.sizeRange[1], size=(1))
         initialCoord = np.random.uniform(-1,1,size = (3)) # random vector (x,y,z) from -1 to 1
         initialCoord = self.getRandomVectorMagnitude(initialCoord)
         return (initialCoord,size)
