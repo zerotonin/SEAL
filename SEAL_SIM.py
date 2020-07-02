@@ -1,4 +1,4 @@
-import turbidity, seal_agent,copy,environment
+import turbidity, seal_agent,copy,environment,utilities
 import numpy as np
 
 class SEAL_SIM:
@@ -8,6 +8,7 @@ class SEAL_SIM:
         self.seal = seal_agent.Seal(self)
         self.pCloud = turbidity.Cloud(self)
         self.pCloud.add_particles()
+        self.plot = utilities.plotUtils()
             
     def meterPerSecond2meterPerSample(self,velocity):
         # THis function should be inherited
