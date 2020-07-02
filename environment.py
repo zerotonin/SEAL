@@ -43,6 +43,7 @@ class environment:
         self.simObj = simObj #name
         self.oceanSurface = 0 # [m]
         self.oceanDepth = -70 # [m]
+        self.oceanLimit = (-70,70) # [m]
         self.activeMovement = True 
         self.visible        = True 
         self.absPosition = np.array([2,1,-7.0]) # needs to be taken from partcile class in turbidity 
