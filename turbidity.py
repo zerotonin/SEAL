@@ -232,7 +232,7 @@ class Cloud:
                 simObj,
                 max_particles = 270,
                 sizeRange = (.00002,0.00016), # in meter
-                maxVectorMagnitue= .3):
+                maxVectorMagnitue= 0.0018):
                 #super()__init__(self) # needs to be vector magnitute , discribing the length of a vector
         """ 
         This function initialises a list of random sized particles[µm] with a random x,y,z position, limited by

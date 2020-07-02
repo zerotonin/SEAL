@@ -1,7 +1,7 @@
 import numpy as np 
 #from scipy import interpolate
 
-class Environment:
+class environment:
     '''
     The 'Environment' class contains functions that are used for creating ocean' enviroment where particles are
     moving in the visual field of a seal. Seal is the center of particles' cloud in cartesian space. The depth 
