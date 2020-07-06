@@ -80,8 +80,8 @@ class environment:
         """
         x= np.arange(-1000,1000,0,1)
         y= np.arange(-1000,1000,0,1)
-        z=np.arange(-1000,1000,0,1)
-        v=np.arange(2,10,0,1)
+        z=np.arange(0,-70,0,1)
+        v=np.arange(2,10,0,1) # v values discribe value of current ? 
 
         #generate new grid
         X,Y,Z=np.mgrid[0:1:10j, 0:1:10j, 0:1:10j]
