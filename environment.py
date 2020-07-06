@@ -69,8 +69,9 @@ class environment:
     def interpolateCurrent(self):
         """
         WorldCoordinates:
-        x = np.array(-1000,1000,0,1) from -1000m to 1000 m in 10cm steps
-        y = np.array(-1000,1000,0,1)
+        x = np.array(-1000,1000,0.1) from -1000m to 1000 m in 10cm steps
+        y = np.array(-1000,1000,0.1)
+        z = np.array(0,-70,0.1)
         edges of coordinate system beeing (-1000,-1000),(-1000,1000),(1000,-1000),(1000,1000)
         waterCrurenCoordinates:
         watercurrent at the edges beeing  
@@ -78,10 +79,10 @@ class environment:
         x = np.array(1,-1,0.1)
         y = np.array(1,-1,0.1)
         """
-        x= np.arange(-1000,1000,0,1)
-        y= np.arange(-1000,1000,0,1)
-        z=np.arange(0,-70,0,1)
-        v=np.arange(2,10,0,1) # v values discribe value of current ? 
+        x= np.arange(-1000,1000,0.1)
+        y= np.arange(-1000,1000,0.1)
+        z=np.arange(0,-70,0.1)
+        v=np.arange(2,10,0.1) # v values discribe value of current ? 
 
         #generate new grid
         X,Y,Z=np.mgrid[0:1:10j, 0:1:10j, 0:1:10j]
