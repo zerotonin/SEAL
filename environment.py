@@ -78,18 +78,17 @@ class environment:
         x = np.array(1,-1,0.1)
         y = np.array(1,-1,0.1)
         """
-        x = np.arange(-1000,1000,0,1)
-        y = np.arange(-1000,1000,0,1)
-        xx, yy = np.meshgrid(x, y)
-        z = np.sin(xx**2+yy**2)
-        f = interpolate.interp2d(x, y, z, kind='cubic')
-        #Now use the obtained interpolation function and plot the result:
-        #
-        xnew = np.arange(1,-1,0.1)
-        ynew = np.arange(1,-1,0.1)
-        znew = f(xnew, ynew)
-        plt.plot(x, z[0, :], 'ro-', xnew, znew[0, :], 'b-')
-        plt.show()
+        x= np.arange(-1000,1000,0,1)
+        y= np.arange(-1000,1000,0,1)
+        z=np.arange(-1000,1000,0,1)
+        v=np.arange(2,10,0,1)
+
+        #generate new grid
+        X,Y,Z=np.mgrid[0:1:10j, 0:1:10j, 0:1:10j]
+
+        #interpolate "data.v" on new grid "inter_mesh"
+        V = gd((x,y,z), v, (X,Y,Z), method='linear')
+        
 
     def creatObstacles(self):
         """
