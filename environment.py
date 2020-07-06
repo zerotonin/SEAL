@@ -1,4 +1,5 @@
 import numpy as np 
+from scipy.interpolate import RegularGridInterpolator
 #from scipy import interpolate
 
 class environment:
@@ -72,23 +73,29 @@ class environment:
         x = np.array(-1000,1000,0.1) from -1000m to 1000 m in 10cm steps
         y = np.array(-1000,1000,0.1)
         z = np.array(0,-70,0.1)
-        edges of coordinate system beeing (-1000,-1000),(-1000,1000),(1000,-1000),(1000,1000)
+        edges of coordinate system beeing (-1000,-1000,0),(-1000,1000,0),(1000,-1000,0),(1000,1000,0)
+                                          (-1000,-1000,-70),(-1000,1000,-70),(1000,-1000,-70),(1000,1000,-70)
         waterCrurenCoordinates:
         watercurrent at the edges beeing  
         (1,1),(1,-1),(1,-1),(-1,-1)
         x = np.array(1,-1,0.1)
         y = np.array(1,-1,0.1)
         """
+        
+        def f(x, y, z):
+            return 2 * x**3 + 3 * y**2 - z
         x= np.arange(-1000,1000,0.1)
         y= np.arange(-1000,1000,0.1)
         z=np.arange(0,-70,0.1)
-        v=np.arange(2,10,0.1) # v values discribe value of current ? 
+        data = f(*np.meshgrid(x, y, z, indexing='ij', sparse=True))
+        #data is now a 3-D array with data[i,j,k] = f(x[i], y[j], z[k]). Next, define an interpolating function from this data:
+        my_interpolating_function = RegularGridInterpolator((x, y, z), data)
+        #Evaluate the interpolating function at the two points (x,y,z) = (2.1, 6.2, -8.3) and (3.3, 5.2, -7.1):
 
-        #generate new grid
-        X,Y,Z=np.mgrid[0:1:10j, 0:1:10j, 0:1:10j]
-
-        #interpolate "data.v" on new grid "inter_mesh"
-        V = gd((x,y,z), v, (X,Y,Z), method='linear')
+        pts = np.array([[2.1, 6.2, -8.3], [3.3, 5.2, -7.1]])
+        my_interpolating_function(pts)
+        array([ 125.80469388,  146.30069388])
+    
         
 
     def creatObstacles(self):
