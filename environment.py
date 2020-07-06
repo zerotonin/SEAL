@@ -83,7 +83,7 @@ class environment:
         """
         
         def f(x, y, z):
-            return 2 * x**3 + 3 * y**2 - z
+            return 2 * x**3 + 3 * y**2 - z #what should this function be ? 
         x= np.arange(-1000,1000,0.1)
         y= np.arange(-1000,1000,0.1)
         z=np.arange(0,-70,0.1)
