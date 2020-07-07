@@ -67,6 +67,44 @@ class environment:
         else:
             print('This should be a real error / unkown mode')
     
+
+    def setCurrents(self,currents= np.zeros(shape=(8,3))):
+        
+        # data matrix for interpolation
+
+        for i in range(0,3):
+            # initialise 4D matrix in which the three components
+            # of a current force are divide other the fourth dimension.
+            # Hence the first dimension represent thrust, the second slip
+            # and the third lift. The first three dimensions represent 
+            # the edges of our environment with the lower left hind 
+            # corner being [0,0,0].
+            data=np.zeros(shape=(2,2,2,3))
+
+            data[0][0][0][i] = currents[0,i]
+            data[1][0][0][i] = currents[1,i]
+            data[0][1][0][i] = currents[2,i]
+            data[1][1][0][i] = currents[3,i]
+            data[0][0][1][i] = currents[4,i]
+            data[1][0][1][i] = currents[5,i]
+            data[0][1][1][i] = currents[6,i]
+            data[1][1][1][i] = currents[7,i]
+
+        # Stützvektoren
+        x = np.array([self.oceanLimit[0],self.oceanLimit[1],self.oceanLimit[0],self.oceanLimit[1],self.oceanLimit[0],self.oceanLimit[1],self.oceanLimit[0],self.oceanLimit[1]]) 
+        y = np.array([self.oceanLimit[0],self.oceanLimit[0],self.oceanLimit[1],self.oceanLimit[1],self.oceanLimit[0],self.oceanLimit[0],self.oceanLimit[1],self.oceanLimit[1]]) 
+        z = np.array([self.oceanDepth,self.oceanDepth,self.oceanDepth,self.oceanDepth,self.oceanSurface, self.oceanSurface,self.oceanSurface, self.oceanSurface])
+
+        self.waterCurrentFunc =(RegularGridInterpolator((x.sort(), y.sort(), z.sort()), data[0]),RegularGridInterpolator((x, y, z), data[1]),RegularGridInterpolator((x, y, z), data[2]))
+    
+    def getWaterCurrent_interp(self):
+
+        pos = self.simObj.sealPosition
+        self.waterCurrent = np.array([self.waterCurrentFunc[0](pos[0],pos[1],pos[2]),
+                                      self.waterCurrentFunc[1](pos[0],pos[1],pos[2]),
+                                      self.waterCurrentFunc[2](pos[0],pos[1],pos[2])])
+    
+
     def interpolateCurrent(self):
         """
         WorldCoordinates:

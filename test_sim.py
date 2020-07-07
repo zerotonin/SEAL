@@ -6,10 +6,20 @@ reload(SEAL_SIM)
 simObj = SEAL_SIM.SEAL_SIM()
 
 
+currentSys = np.zeros(shape=(8,3))
+currentSys[0,:] = [10,0,0]      
+currentSys[1,:] = [8,1,2]      
+currentSys[2,:] = [8,0,0]      
+currentSys[3,:] = [5,5,2]    
+currentSys[4,:] = [10,0,0]      
+currentSys[5,:] = [8,3,0]      
+currentSys[6,:] = [8,0,0]      
+currentSys[7,:] = [5,7,0]     
 
+simObj.environment.setCurrents(CurrentSys)
 
 # This test can be later used to find resolutable particles
-# for the optic flow calculation
+# for the optic flow calculationq
 #         a                         / a \
 #    b = ----------  alpha = arctan|  - |
 #        tan(alpha)                 \ b/
