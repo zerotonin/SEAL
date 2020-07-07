@@ -156,18 +156,17 @@ class environment:
         And in returns 'initialCoord' as a random vector (x,y) with a range from -5000m to 5000m
         """  
         radius = np.random.uniform(0.1,10.0, size=(1)) # set size to 10cm to 10m radius
-        initialCoord = np.random.uniform(-1,1,size = (2))*5000 # random vector (x,y,) from -5km to 5km 
+        initialCoord = np.random.uniform(-5000,5000,size = (2)) # random vector (x,y,) from -5km to 5km 
         return (initialCoord,radius,radius-0.1)
 
-    def checkObstacleDistance(self,sealObj,cloudObj):
+    def checkObstacleDistance(self):
         """
         this function checks if the obstacles is in sight of the seal. Only if the magnitute from the obstacle to the seal
         subtracktd by the radius of the obstacle and the radius of the particleCloud is < 0 the obstacle is in sight 
         of the seal and therefore needs to be checked for visibility and active movement 
         """
-        
         for obstacle in self.obstacleList:
-            if np.linalg.norm(sealObj.sealPosition[0:2]-obstacle[0])- cloudObj.maxVectorMagnitue- obstacle[1] < 0:
+            if np.linalg.norm(self.simObj.seal.sealPosition[0:2]-obstacle[0])- self.simObj.pCloud.maxVectorMagnitue- obstacle[1] < 0:
                 self.observableObstacleList.append(obstacle)
     
     def checkVisibility(self,parObj):
