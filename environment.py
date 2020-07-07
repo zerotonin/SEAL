@@ -90,7 +90,7 @@ class environment:
             data[0][1][1][i] = currents[6,i]
             data[1][1][1][i] = currents[7,i]
 
-        # Stützvektoren
+        # supportVectors
         x = np.array([self.oceanLimit[0],self.oceanLimit[1],self.oceanLimit[0],self.oceanLimit[1],self.oceanLimit[0],self.oceanLimit[1],self.oceanLimit[0],self.oceanLimit[1]]) 
         y = np.array([self.oceanLimit[0],self.oceanLimit[0],self.oceanLimit[1],self.oceanLimit[1],self.oceanLimit[0],self.oceanLimit[0],self.oceanLimit[1],self.oceanLimit[1]]) 
         z = np.array([self.oceanDepth,self.oceanDepth,self.oceanDepth,self.oceanDepth,self.oceanSurface, self.oceanSurface,self.oceanSurface, self.oceanSurface])
