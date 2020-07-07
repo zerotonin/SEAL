@@ -1,6 +1,11 @@
 import numpy as np
 import copy
 class Seal: 
+    """
+    the seal class holds informations about the seal agent in the 3D cartisian world, simulating 
+    the ocean. It holds infomation about the seals position, orientation,and it active movement, 
+    defined by habor seal typical trajectories taken from video data.
+    """
     def __init__(self,simObj):
 
         self.simObj = simObj
@@ -9,10 +14,27 @@ class Seal:
         self.sealStep = np.zeros(shape =6) # change of position and orientation
         self.sealTrajectory = list()
         self.activeSealMovement = True
+        """
+        @param simObj               string default: none
+           string that gives a name: simulation object.           
+        @param sealPosition         default: np.zeros(shape=3)
+            seal Position gives a specifi x,y,z position for the seal 
+            starting at the surface of the ocean at startPosition(0,0,0)
+        @param sealOrientation      default: np.zeros(shape=3)
+            orientation is defined by three values between 0 and 2pi 
+            decribing pitch, yaw and roll ? 
+        @param sealStep             default: np.zeros(shape=6)
+            sealstep is defined by a movingVector of the agendt
+            with x,y,z beeing between -5 and 5 and and 
+            the respective sealOrientation values
+        @param sealTrajectory       list default: none
+            a list saving the sealPosition and sealOrientation for each sealStep
+        @param activeSealMovement   bool default: True 
+            the seal agend is actively moving while below the oceanSurface(z=0)
+            and the oceanFloor(-70)
 
-    def print(self):
-        return 'Hello World'
 
+        """
     def SealStateCheck(self):
         if self.sealPosition[2] > 0 or self.sealPosition[2] <= -70:
             self.activeSealMovement = False
