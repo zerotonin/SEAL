@@ -32,10 +32,13 @@ class Seal:
         @param activeSealMovement   bool default: True 
             the seal agend is actively moving while below the oceanSurface(z=0)
             and the oceanFloor(-70)
-
-
         """
     def SealStateCheck(self):
+        """
+        the SealStateCheck checks the position of the seal. Only if the position 
+        is within the watercolum of the ocean the activeSealMovement bool is True. 
+        This is needed to imply active movement of the seal agent.
+        """
         if self.sealPosition[2] > 0 or self.sealPosition[2] <= -70:
             self.activeSealMovement = False
             #seal steps needs to go down (self.sealStep[2])
@@ -44,6 +47,14 @@ class Seal:
     
 
     def createSealStep(self,mode):
+        """
+        In order to ensure a divepattern, starting at the ocean surface, going down, and 
+        goingt up again ending at the surface again three differen sealSteps are define.
+        To test we definde a straight down dive and a 45down dive. otherwise the sealSteps
+        will be randomly defined with the x y z values beeing limited between-5 and 5 m.
+        This will be change later to connect it to haborSealDiveData to simulate real 
+        seal like steps.
+        """
         if mode == 'random':
             self.createRandomStep()
         elif mode == 'straightDown':
@@ -54,6 +65,12 @@ class Seal:
             print('Unkown step type: ' + mode)
 
     def createRandomStep(self):
+        """
+        creating random sealStep consisting of randomly choosen StepCoordinates x,y,z 
+        beeing limited betweem -5 and 5m, defining the direction and lenght of the step,
+        AND randomly choosen orientation of the seal during this step defines by yaw pitch
+        and roll values beeing limited to 0 to 2pi.
+        """
         sealStepCoordinates = np.random.uniform(-5,5,size = (3)) #randomly choosen stepSize 
         sealStepOrientation = np.random.uniform(0,np.pi*2,size = (3)) #ramdomly chooses orientation of step 
         self.sealStep = np.concatenate((sealStepCoordinates, sealStepOrientation), axis=None)
@@ -62,7 +79,7 @@ class Seal:
     def MoveSeal(self): # function to simulate dive (series of seal trajectories)
         """
         this function should safe a sealTrajectory list listing all endPosition after each sealStep for a single dive
-        in correct order. sealStep holding information for x,y,z direction of vector as well as
+        in correct order. sealStep holding information for x,y,z direction of MovingVector as well as
         yaw,pitch,roll (orientation of the seal)
         """    
         if self.activeSealMovement == True:
@@ -81,8 +98,3 @@ class Seal:
             self.sealTrajectory.append((SealPosition,SealOrientation))
         else :
             self.activeSealMovement = False
-
-
-###########################################
-#the newly created self.sealStep needs to be inherited by the particle  class or Cloud class to run the particleMovement #function 
-###########################################
