@@ -110,7 +110,6 @@ class environment:
         WorldCoordinates:
         (-1000,-1000,0),(-1000,1000,0),(1000,-1000,0),(1000,1000,0)
         (-1000,-1000,-70),(-1000,1000,-70),(1000,-1000,-70),(1000,1000,-70)
-        
         """
         self.setCurrents()
         self.getWaterCurrent_interp()
@@ -120,7 +119,6 @@ class environment:
     def creatObstacles(self):
         """
         this function is creating specific Obstacles representing circular colums from oceanDepth to oceanSurface
-
         obstacle(initialCoord[x,y],r,ri)
         """
     
