@@ -95,26 +95,12 @@ class environment:
         self.waterCurrentFunc =(RegularGridInterpolator((x, y, z), data[0]),RegularGridInterpolator((x, y, z), data[1]),RegularGridInterpolator((x, y, z), data[2]))
         self.waterCurrentMode = 'interp'
 
-
     def getWaterCurrent_interp(self):
 
         pos = self.simObj.seal.sealPosition
         self.waterCurrent = np.array([self.waterCurrentFunc[0]((pos[0],pos[1],pos[2])),
                                       self.waterCurrentFunc[1]((pos[0],pos[1],pos[2])),
                                       self.waterCurrentFunc[2]((pos[0],pos[1],pos[2]))])
-    
-
-    def interpolateCurrent(self):
-        """
-        WorldCoordinates:
-        (-1000,-1000,0),(-1000,1000,0),(1000,-1000,0),(1000,1000,0)
-        (-1000,-1000,-70),(-1000,1000,-70),(1000,-1000,-70),(1000,1000,-70)
-        """
-        self.setCurrents()
-        self.getWaterCurrent_interp()
-    
-        
-
     def creatObstacles(self):
         """
         this function is creating specific Obstacles representing circular colums from oceanDepth to oceanSurface
