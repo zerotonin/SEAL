@@ -34,8 +34,6 @@ class environment:
         @param visible         bool default: True
            particles are visible in the water for seal, and form opic flow. They are not
            visible above 0 [m] and below -70,1 [m] and if their position is same as a position of obstacle.
-        @ param absPosition array default: none
-           the absolute space position in the cartasian system coordinate in the ocean, x,y,z.
         @ param waterCurrent  array default: none
            the position of a water current in the space of an ocean.
         @ param waterCurrentMode srt default: none
@@ -47,7 +45,6 @@ class environment:
         self.oceanLimit = (-70,70) # [m]
         self.activeMovement = True 
         self.visible        = True 
-        self.absPosition = np.array([2,1,-7.0]) # needs to be taken from partcile class in turbidity 
         self.waterCurrent = np.array([0.0,2.0,0.0]) # just a simple example will be changed later 
         self.waterCurrentMode = 'static'
         self.obstacleList = []
@@ -72,6 +69,7 @@ class environment:
         
         # data matrix for interpolation
 
+        data=(np.zeros(shape=(2,2,2)),np.zeros(shape=(2,2,2)),np.zeros(shape=(2,2,2)))
         for i in range(0,3):
             # initialise 4D matrix in which the three components
             # of a current force are divide other the fourth dimension.
@@ -79,30 +77,31 @@ class environment:
             # and the third lift. The first three dimensions represent 
             # the edges of our environment with the lower left hind 
             # corner being [0,0,0].
-            data=np.zeros(shape=(2,2,2,3))
 
-            data[0][0][0][i] = currents[0,i]
-            data[1][0][0][i] = currents[1,i]
-            data[0][1][0][i] = currents[2,i]
-            data[1][1][0][i] = currents[3,i]
-            data[0][0][1][i] = currents[4,i]
-            data[1][0][1][i] = currents[5,i]
-            data[0][1][1][i] = currents[6,i]
-            data[1][1][1][i] = currents[7,i]
+
+            data[i][0][0][0] = currents[0,i]
+            data[i][1][0][0] = currents[1,i]
+            data[i][0][1][0] = currents[2,i]
+            data[i][1][1][0] = currents[3,i]
+            data[i][0][0][1] = currents[4,i]
+            data[i][1][0][1] = currents[5,i]
+            data[i][0][1][1] = currents[6,i]
+            data[i][1][1][1] = currents[7,i]
 
         # supportVectors
-        x = np.array([self.oceanLimit[0],self.oceanLimit[1],self.oceanLimit[0],self.oceanLimit[1],self.oceanLimit[0],self.oceanLimit[1],self.oceanLimit[0],self.oceanLimit[1]]) 
-        y = np.array([self.oceanLimit[0],self.oceanLimit[0],self.oceanLimit[1],self.oceanLimit[1],self.oceanLimit[0],self.oceanLimit[0],self.oceanLimit[1],self.oceanLimit[1]]) 
-        z = np.array([self.oceanDepth,self.oceanDepth,self.oceanDepth,self.oceanDepth,self.oceanSurface, self.oceanSurface,self.oceanSurface, self.oceanSurface])
-
-        self.waterCurrentFunc =(RegularGridInterpolator((x.sort(), y.sort(), z.sort()), data[0]),RegularGridInterpolator((x, y, z), data[1]),RegularGridInterpolator((x, y, z), data[2]))
+        x = np.array([self.oceanLimit[0],self.oceanLimit[1]]) 
+        y = np.array([self.oceanLimit[0],self.oceanLimit[1]]) 
+        z = np.array([self.oceanDepth,self.oceanSurface])
+        self.waterCurrentFunc =(RegularGridInterpolator((x, y, z), data[0]),RegularGridInterpolator((x, y, z), data[1]),RegularGridInterpolator((x, y, z), data[2]))
     
+
+
     def getWaterCurrent_interp(self):
 
-        pos = self.simObj.sealPosition
-        self.waterCurrent = np.array([self.waterCurrentFunc[0](pos[0],pos[1],pos[2]),
-                                      self.waterCurrentFunc[1](pos[0],pos[1],pos[2]),
-                                      self.waterCurrentFunc[2](pos[0],pos[1],pos[2])])
+        pos = self.simObj.seal.sealPosition
+        self.waterCurrent = np.array([self.waterCurrentFunc[0]((pos[0],pos[1],pos[2])),
+                                      self.waterCurrentFunc[1]((pos[0],pos[1],pos[2])),
+                                      self.waterCurrentFunc[2]((pos[0],pos[1],pos[2]))])
     
 
     def interpolateCurrent(self):
