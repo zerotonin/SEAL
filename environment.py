@@ -60,7 +60,7 @@ class environment:
         if self.waterCurrentMode == 'static':
             return self.waterCurrent
         elif self.waterCurrentMode == 'interp':
-            return self.interpolateCurrent()
+            return self.getWaterCurrent_interp()
         else:
             print('This should be a real error / unkown mode')
     
@@ -93,7 +93,7 @@ class environment:
         y = np.array([self.oceanLimit[0],self.oceanLimit[1]]) 
         z = np.array([self.oceanDepth,self.oceanSurface])
         self.waterCurrentFunc =(RegularGridInterpolator((x, y, z), data[0]),RegularGridInterpolator((x, y, z), data[1]),RegularGridInterpolator((x, y, z), data[2]))
-    
+        self.waterCurrentMode = 'interp'
 
 
     def getWaterCurrent_interp(self):
