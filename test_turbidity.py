@@ -79,19 +79,3 @@ C.Cloudsphere2cart()
 print(C.partclObjList[0].position)                                                                                                 
 C.Cloudcart2sphere()                                                                                                               
 print(C.partclObjList[0].position) 
-
-
-text in settings.json in workspace by Anna
-{
-    "python.testing.unittestArgs": [
-        "-v",
-        "-s",
-        ".",
-        "-p",
-        "*test.py"
-    ],
-    "python.testing.pytestEnabled": true,
-    "python.testing.nosetestsEnabled": false,
-    "python.testing.unittestEnabled": false,
-    "python.pythonPath": "C:\\Users\\Anna\\Anaconda3\\python.exe"
-}
