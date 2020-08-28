@@ -9,6 +9,7 @@ class SEAL_SIM:
         self.pCloud = turbidity.Cloud(self)
         self.pCloud.add_particles()
         self.plot = utilities.plotUtils()
+        self.math = utilities.mathUtils()
             
     def meterPerSecond2meterPerSample(self,velocity):
         # THis function should be inherited

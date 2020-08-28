@@ -16,7 +16,7 @@ currentSys[5,:] = [8,3,0]
 currentSys[6,:] = [8,0,0]      
 currentSys[7,:] = [5,7,0]     
 
-simObj.environment.setCurrents(CurrentSys)
+simObj.environment.setCurrents(currentSys)
 
 # This test can be later used to find resolutable particles
 # for the optic flow calculationq
