@@ -10,6 +10,7 @@ class SEAL_SIM:
         self.pCloud.add_particles()
         self.plot = utilities.plotUtils()
         self.math = utilities.mathUtils()
+        
             
     def meterPerSecond2meterPerSample(self,velocity):
         # THis function should be inherited
@@ -21,8 +22,9 @@ class SEAL_SIM:
         print(self.seal.sealStep)
         # move da particles
         self.pCloud.moveParticles()
-        print(self.seal.sealStep)
+        for po in self.pCloud.partclObjList:  
+            print(po.position)
         # move da seal
         self.seal.MoveSeal()
 
-
+        # particle.trajectory saves the old and new position of the particles after every sealMovement, how to apply cart2sphere function on this list ?)
