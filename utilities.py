@@ -123,28 +123,28 @@ class mathUtils:
         self.name = 'math utilities for coordinate stuff'
 
     def cart2sphere(self):
-       """
-       Converts cartasian coordinates (x = pobject.positison[0],y = pobject.positison[1],
-       z = pobject.positison[2]) of pobjects in self.partclObjList to sperical coordinates
-       and returns radius, theta, phi coordinates as list of floats.
-       r = sqrt(x*x + y*y + z*z)
-       theta = atan2((x*x +y*y),z)
-       phi = atan2(y,x)
-       """
-       XsqPlusYsq = self.position[0]**2 + self.position[1]**2
-       r = m.sqrt(XsqPlusYsq + self.position[2]**2)               # r
-       theta = m.atan2(m.sqrt(XsqPlusYsq),self.position[2])     # theta 
-       phi = m.atan2(self.position[1],self.position[0])          # phi not correct 
-       self.position = [r,theta,phi]
-       return [r,theta,phi]
+        """
+        Converts cartasian coordinates (x = pobject.positison[0],y = pobject.positison[1],
+        z = pobject.positison[2]) of pobjects in self.partclObjList to sperical coordinates
+        and returns radius, theta, phi coordinates as list of floats.
+        r = sqrt(x*x + y*y + z*z)
+        theta = atan2((x*x +y*y),z)
+        phi = atan2(y,x)
+        """
+        XsqPlusYsq = self.position[0]**2 + self.position[1]**2
+        r = m.sqrt(XsqPlusYsq + self.position[2]**2)               # r
+        theta = m.atan2(m.sqrt(XsqPlusYsq),self.position[2])     # theta 
+        phi = m.atan2(self.position[1],self.position[0])          # phi not correct 
+        self.position = [r,theta,phi]
+        return [r,theta,phi]
 
     def Cloudcart2sphere (self,partclObjList):
-    """
-    The Cloudcart2sphere function converts the postion of each particle from 
-    cartasian coordinates (x,y,z) to spheric coordinates (radius,theta,phi)
-    """
-    for pobject in self.partclObjList:
-        pobject.cart2sphere()
+        """
+        The Cloudcart2sphere function converts the postion of each particle from 
+        cartasian coordinates (x,y,z) to spheric coordinates (radius,theta,phi)
+        """
+        for pobject in self.partclObjList:
+            pobject.cart2sphere()
     #def sphere2cart (self): 
     #    """
     #    Converts spheric coordinates(r = pobject.positison[0],theta = pobject.positison[1],
