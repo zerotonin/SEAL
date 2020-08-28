@@ -170,15 +170,21 @@ class Particle:
         self.position += step
         newPosition =copy.deepcopy(self.position)
         status = copy.deepcopy(self.visible)
-        #print(step,oldPosition,newPosition,status)
-        #print("=======================================================")
 
+        XsqPlusYsq = oldPosition[0]**2 + oldPosition[1]**2
+        r = m.sqrt(XsqPlusYsq + oldPosition[2]**2)               # r
+        theta = m.atan2(m.sqrt(XsqPlusYsq),oldPosition[2])     # theta 
+        phi = m.atan2(oldPosition[1],oldPosition[0])          # phi not correct 
+        oldPosition = [r,theta,phi]
+
+        XsqPlusYsq = newPosition[0]**2 + newPosition[1]**2
+        r = m.sqrt(XsqPlusYsq + newPosition[2]**2)               # r
+        theta = m.atan2(m.sqrt(XsqPlusYsq),newPosition[2])     # theta 
+        phi = m.atan2(newPosition[1],newPosition[0])          # phi not correct 
+        newPosition = [r,theta,phi]
+        # before saving the position have them converted to spherical coordinates
+        
         self.trajectory.append((oldPosition,newPosition,status))
-
-   
-    
-
-
 
 
 class Cloud:
