@@ -1,5 +1,7 @@
 import numpy as np
 import copy
+import csv
+import random
 class Seal: 
     """
     the seal class holds informations about the seal agent in the 3D cartisian world, simulating 
@@ -14,6 +16,9 @@ class Seal:
         self.sealStep = np.zeros(shape =6) # change of position and orientation
         self.sealTrajectory = list()
         self.activeSealMovement = True
+        self.minutes = 20
+        self.traLen = self.minutes*60*25
+        self.traIDX = []
         """
         @param simObj               string default: none
            string that gives a name: simulation object.           
@@ -63,6 +68,42 @@ class Seal:
             self.sealStep = np.array([5.0,0.,-5.0,0.,0.,0.])
         else:
             print('Unkown step type: ' + mode)
+
+    def createThrustSlipYaw(self):
+        """
+        Taken Prototypical Movements from analyized video data by Frederike Hanke. 
+        Giving information about Thrust,Slip and Yaw.
+        """
+        '''import Prototypical Movements (k=200)'''
+        protoMov = np.genfromtxt ('protoMov.csv', delimiter=",")
+        '''import distribution percentage of the 200 clusters. Given as numbers from 0-1 (equal to 0-100%)'''
+        distributionCS = np.genfromtxt ('distributionCS.csv', delimiter=",")
+        '''import transition probability from each Prototypical Movement to another'''
+        transProbCS = np.genfromtxt ('transProbCS.csv', delimiter=",")        
+        '''preallocatio'''
+        traLen = self.minutes*60*25
+
+        '''get start prototype'''
+        randomNumber = random.random() # defines number betwen 0 and 1. the corresponding distributionCS is taken as start PM
+        currentPM = np.where(distributionCS>= randomNumber)
+        currentPM = random.choice(currentPM)[0]
+        self.traIDX.append(protoMov[currentPM])
+
+        '''get random new PM fitting to the transitionProbabilities'''
+        while len(self.traIDX)<self.traLen:
+            randomTransitionNumber = random.random()
+            newPM = np.where(transProbCS[currentPM,:]>= randomTransitionNumber)
+            newPM = random.choice(newPM)[0]
+            currentPM = newPM 
+            self.traIDX.append(protoMov[newPM])
+        print(self.traIDX[1:10])
+
+
+    def createLiftPitch(self):
+
+        pass
+
+
 
     def createRandomStep(self):
         """
