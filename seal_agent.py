@@ -13,10 +13,10 @@ class Seal:
         self.simObj = simObj
         self.sealPosition = np.zeros(shape = 3) #centre of the coordinate system of the Seal in disctance to (0,0,0) of world
         self.sealOrientation = np.zeros(shape = 3)  # orientation as yaw pitch roll
-        self.sealStep = np.zeros(shape =6) # change of position and orientation
+        #self.sealStep = np.zeros(shape =6) # change of position and orientation
         self.sealTrajectory = list()
         self.activeSealMovement = True
-        self.minutes = 20
+        self.minutes = 5
         self.traLen = self.minutes*60*25
         self.traIDX = []
         """
@@ -81,7 +81,7 @@ class Seal:
         '''import transition probability from each Prototypical Movement to another'''
         transProbCS = np.genfromtxt ('transProbCS.csv', delimiter=",")        
         '''preallocatio'''
-        traLen = self.minutes*60*25
+        
 
         '''get start prototype'''
         randomNumber = random.random() # defines number betwen 0 and 1. the corresponding distributionCS is taken as start PM
@@ -96,12 +96,36 @@ class Seal:
             newPM = random.choice(newPM)[0]
             currentPM = newPM 
             self.traIDX.append(protoMov[newPM])
-        print(self.traIDX[1:10])
+        #print(self.traIDX[1:10])
+        print(len(self.traIDX))
 
 
     def createLiftPitch(self):
 
-        pass
+        """
+        creat downward movement discribed by lift and pitch. Data taken from "Forschungsverbund MINOSplus
+        - Weiterführende Arbeiten an Seevögeln und Meeressäugern zur Bewertung von Offshore - Windkraftanlagen
+        Teilvorhaben TP6 – „Seehunde in See“ – Untersuchungen zur räumlichen und zeitlichen Nutzung 
+        der Nordsee durch Seehunde im Zusammenhang mit der Entwicklung von OffshoreWindenergieanlagen"
+        Data were extractec from figure 16 with plotly. This dive distcribes a U-dive 
+        """
+        self.pitch = np.genfromtxt ('pitchData.csv', delimiter=",")
+        self.pitch = np.repeat(self.pitch, 25)
+        #print(pitch)
+        print(len(self.pitch))
+        
+        """
+        to create the lift values figure the seal_agend is moving down for the first 40sec (40*25frames=1000frames)
+        and up for the last 40 sec (100frames) in between its diving on a steady depth for 5500 frames (3min40sec) 
+        discribing a dive lenght of 5min. ff
+        """
+        #divingDown = np.repeat((((self.simObj.environment.oceanDepth)-2)/1000),1000) # diving down for the first 40sec -> 1000 frames,depth per frame depends on total depth to dive to 
+        divingDown = np.repeat(-0.02, 1000)
+        straightDive = np.repeat(0.0,5500)
+        divingUp= np.repeat(0.02, 1000)
+        self.lift = np.concatenate((divingDown,straightDive,divingUp), axis=None)
+        #print(self.lift)
+        print(len(self.lift))
 
 
 
@@ -112,10 +136,14 @@ class Seal:
         AND randomly choosen orientation of the seal during this step defines by yaw pitch
         and roll values beeing limited to 0 to 2pi.
         """
-        sealStepCoordinates = np.random.uniform(-5,5,size = (3)) #randomly choosen stepSize 
-        sealStepOrientation = np.random.uniform(0,np.pi*2,size = (3)) #ramdomly chooses orientation of step 
-        self.sealStep = np.concatenate((sealStepCoordinates, sealStepOrientation), axis=None)
+        #sealStepCoordinates = np.random.uniform(-5,5,size = (3)) #randomly choosen stepSize 
+        #sealStepOrientation = np.random.uniform(0,np.pi*2,size = (3)) #ramdomly chooses orientation of step 
+        self.createThrustSlipYaw()
+        self.createLiftPitch()
+        self.sealStep = np.column_stack((self.traIDX,self.lift ,self.pitch))# thust(m), slip(m),yaw(winkel),lift(m),picth(winkel)?? wie ändert man das ?
         
+        print(len(self.sealStep))   
+        print(self.sealStep)     
 
     def MoveSeal(self): # function to simulate dive (series of seal trajectories)
         """

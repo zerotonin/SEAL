@@ -194,3 +194,21 @@ class mathUtils:
     #    for pobject in self.partclObjList:
     #        if pobject.activeMovement == True:
     #            pobject.depth2Temperature()
+
+    ##    calculating mean,std for ProtMov
+     #   uShapeDiveSurface = np.genfromtxt ('uShapeDiveDepthPitch.csv', skip_footer=68,usecols=(1), delimiter=",") #0-10
+     #   uShapeDiveDown = np.genfromtxt ('uShapeDiveDepthPitch.csv', skip_header=10,skip_footer=64,usecols=(1), delimiter=",") #11-14
+     #   uShapeDiveStraight = np.genfromtxt ('uShapeDiveDepthPitch.csv', skip_header=14,skip_footer=13,usecols=(1), delimiter=",") #15.66
+     #   uShapeDiveUp = np.genfromtxt ('uShapeDiveDepthPitch.csv', skip_header=65,usecols=(1), delimiter=",") #67-87
+     #   '''import transition probability from each Prototypical Movement to another'''
+     #   vShapeDiveSurface = np.genfromtxt ('vShapeDiveDepthPitch.csv', skip_header=1,skip_footer=26,usecols=(1), delimiter=",") #0-12
+     #   vShapeDiveDown = np.genfromtxt ('vShapeDiveDepthPitch.csv', skip_header=12,skip_footer=12,usecols=(1), delimiter=",") #13-26
+     #   vShapeDiveUp = np.genfromtxt ('vShapeDiveDepthPitch.csv', skip_header=26,usecols=(1), delimiter=",") #27-38
+     #   '''preallocatio'''
+     #   print(vShapeDiveSurface)
+     #   print(vShapeDiveDown)
+     #   print(vShapeDiveUp)
+#
+     #   vShapeDiveUpMean = np.mean(vShapeDiveUp, axis=0) #time, depth(m), pitch(degree)
+     #   vShapeDiveUpVar = np.std(vShapeDiveUp, axis= 0)  #time, depth(m), pitch(degree)
+     #   print(vShapeDiveUpMean,vShapeDiveUpVar) 
