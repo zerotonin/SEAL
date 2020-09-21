@@ -2,7 +2,7 @@ import numpy as np
 import random
 from importlib import reload 
     
-class Seal: 
+class ProtMov: 
     """
     the seal class holds informations about the seal agent in the 3D cartisian world, simulating 
     the ocean. It holds infomation about the seals position, orientation,and it active movement, 
@@ -11,10 +11,10 @@ class Seal:
     def __init__(self,simObj):
 
         self.simObj = simObj
-        self.minutes = 5
-        self.traLen = self.minutes*60 #length of trajectroy list per second, giving information about trajectroys with a speed 
+        self.minutes = 5 #length of trajectroy list per second, giving information about trajectroys with a speed 
         # od m/s or deg/s
         self.traIDX = []
+        self.divePitch = []
 
     def createThrustSlipYaw(self):
         """
@@ -61,11 +61,13 @@ class Seal:
         mode = random.choice(mode)
         print(mode)
         if mode == 'uShape':
-            self.uShapeDive()
             self.traLen = 77 #frames -> 385 sec
+            self.uShapeDive()
+            
         elif mode == 'vShape':
-            self.vShapeDive
             self.traLen = 37 #framse -> 185 sec
+            self.vShapeDive()
+            
         else:
             print('Unkown dive type: ' + mode)
 
@@ -83,35 +85,56 @@ class Seal:
         uShapeDiveStraightLen = 51 #frames (degree/0.2sec)
         uShapeDiveUpLen = 12 #frames (degree/0.2sec)
         #print(uShapeDiveUpMean,uShapeDiveUpVar) 
-        uShapeDiveSurfaceTra = np.random.normal(loc=-79.639515, scale=12.78034071, size=None)
-        uShapeDiveDownTra = np.random.normal(loc=63.9146825, scale=8.36629103, size=None)
-        uShapeDiveStraightTra = np.random.normal(loc=8.36629103, scale=5.5529812, size=None)
-        uShapeDiveUpTra = np.random.normal(loc=-68.64291923, scale=15.63982373, size=None)
+        self.uShapeDiveSurfaceTra = np.random.normal(loc=-79.639515, scale=12.78034071, size=None)
+        self.uShapeDiveDownTra = np.random.normal(loc=63.9146825, scale=8.36629103, size=None)
+        self.uShapeDiveStraightTra = np.random.normal(loc=8.36629103, scale=5.5529812, size=None)
+        self.uShapeDiveUpTra = np.random.normal(loc=-68.64291923, scale=15.63982373, size=None)
         #print(uShapeDiveSurfaceTra)
 
+        while len(self.divePitch)<self.traLen:
+            if len(self.divePitch) < uShapeDiveSurfaceLen:
+                pitch = self.uShapeDiveSurfaceTra
+            elif uShapeDiveSurfaceLen <= len(self.divePitch) < (uShapeDiveSurfaceLen+uShapeDiveDownLen):
+                pitch = self.uShapeDiveDownTra
+            elif (uShapeDiveSurfaceLen+uShapeDiveDownLen) <= len(self.divePitch) < (uShapeDiveSurfaceLen+uShapeDiveDownLen+uShapeDiveStraightLen):
+                pitch = self.uShapeDiveStraightTra 
+            else: 
+                pitch = self.uShapeDiveUpTra # get random size and position
+            self.divePitch.append(pitch)
+
+
+        print(self.divePitch)
+        print(len(self.divePitch))
         #zProfileUShapedDive:
 
         uShapeDive = np.genfromtxt ('uShapeDiveDepthPitch.csv',usecols=(1), delimiter=",") #0-10
         uShapeDiveLift = uShapeDive[1:]- uShapeDive[:-1] #lift from frame to frame 0.2 m/s
-        print(uShapeDiveLift)
 
         uShapeDiveThrusLift = np.c_[ np.zeros(len(uShapeDiveLift)),uShapeDiveLift ] 
         print(uShapeDiveThrusLift)
 
     
     def vShapeDive(self):
-
         vShapeDiveSurfaceLen = 11 #frames (degree/0.2sec)
         vShapeDiveDownLen = 14 #frames (degree/0.2sec)
         vShapeDiveUpLen = 12 #frames (degree/0.2sec)
 
-        vShapeDiveSurfaceTra = np.random.normal(loc= -74.53024727, scale=7.65994214, size=None)
-        vShapeDiveDownTra = np.random.normal(loc=17.04128714, scale=25.74478444, size=None)
-        vShapeDiveUpTra = np.random.normal(loc=-49.06783, scale=28.94055575, size=None)
+        self.vShapeDiveSurfaceTra = np.random.normal(loc= -74.53024727, scale=7.65994214, size=None)
+        self.vShapeDiveDownTra = np.random.normal(loc=17.04128714, scale=25.74478444, size=None)
+        self.vShapeDiveUpTra = np.random.normal(loc=-49.06783, scale=28.94055575, size=None)
+
+        while len(self.divePitch)<self.traLen:
+            if len(self.divePitch) < vShapeDiveSurfaceLen:
+                self.pitch = self.vShapeDiveSurfaceTra
+            elif vShapeDiveSurfaceLen <= len(self.divePitch) < (vShapeDiveSurfaceLen+vShapeDiveDownLen):
+                self.pitch = self.vShapeDiveDownTra
+            else: 
+                self.pitch = self.vShapeDiveUpTra # get random size and position
+            self.divePitch.append(self.pitch)
+        print(self.divePitch)
         
         vShapeDive = np.genfromtxt ('vShapeDiveDepthPitch.csv',skip_header=1,usecols=(1), delimiter=",") #0-10
         vShapeDiveLift = vShapeDive[1:]- vShapeDive[:-1] #lift from frame to frame 0.2 m/s
-        print(vShapeDiveLift)
 
         vShapeDiveThrusLift = np.c_[ np.zeros(len(vShapeDiveLift)),vShapeDiveLift ] 
         print(vShapeDiveThrusLift)
