@@ -15,6 +15,7 @@ class ProtMov:
         # od m/s or deg/s
         self.traIDX = []
         self.divePitch = []
+        self.uShapeDiveThrustLiftRot = []
 
     def createThrustSlipYaw(self):
         """
@@ -85,21 +86,21 @@ class ProtMov:
         uShapeDiveStraightLen = 51 #frames (degree/0.2sec)
         uShapeDiveUpLen = 12 #frames (degree/0.2sec)
         #print(uShapeDiveUpMean,uShapeDiveUpVar) 
-        self.uShapeDiveSurfaceTra = np.random.normal(loc=-79.639515, scale=12.78034071, size=None)
-        self.uShapeDiveDownTra = np.random.normal(loc=63.9146825, scale=8.36629103, size=None)
-        self.uShapeDiveStraightTra = np.random.normal(loc=8.36629103, scale=5.5529812, size=None)
-        self.uShapeDiveUpTra = np.random.normal(loc=-68.64291923, scale=15.63982373, size=None)
+        #self.uShapeDiveSurfaceTra = np.random.normal(loc=-79.639515, scale=12.78034071, size=None)
+        #self.uShapeDiveDownTra = np.random.normal(loc=63.9146825, scale=8.36629103, size=None)
+        #self.uShapeDiveStraightTra = np.random.normal(loc=8.36629103, scale=5.5529812, size=None)
+        #self.uShapeDiveUpTra = np.random.normal(loc=-68.64291923, scale=15.63982373, size=None)
         #print(uShapeDiveSurfaceTra)
 
         while len(self.divePitch)<self.traLen:
             if len(self.divePitch) < uShapeDiveSurfaceLen:
-                pitch = self.uShapeDiveSurfaceTra
+                pitch = np.random.normal(loc=-79.639515, scale=12.78034071, size=None)
             elif uShapeDiveSurfaceLen <= len(self.divePitch) < (uShapeDiveSurfaceLen+uShapeDiveDownLen):
-                pitch = self.uShapeDiveDownTra
+                pitch = np.random.normal(loc=63.9146825, scale=8.36629103, size=None)
             elif (uShapeDiveSurfaceLen+uShapeDiveDownLen) <= len(self.divePitch) < (uShapeDiveSurfaceLen+uShapeDiveDownLen+uShapeDiveStraightLen):
-                pitch = self.uShapeDiveStraightTra 
+                pitch = np.random.normal(loc=8.36629103, scale=5.5529812, size=None) 
             else: 
-                pitch = self.uShapeDiveUpTra # get random size and position
+                pitch = np.random.normal(loc=-68.64291923, scale=15.63982373, size=None) # get random size and position
             self.divePitch.append(pitch)
 
 
@@ -109,27 +110,36 @@ class ProtMov:
 
         uShapeDive = np.genfromtxt ('uShapeDiveDepthPitch.csv',usecols=(1), delimiter=",") #0-10
         uShapeDiveLift = uShapeDive[1:]- uShapeDive[:-1] #lift from frame to frame 0.2 m/s
+        print(uShapeDiveLift)
+        uShapeDiveThrustLiftPitch = np.c_[ np.zeros(len(uShapeDiveLift)),uShapeDiveLift,self.divePitch ] 
+        print(uShapeDiveThrustLiftPitch)
 
-        uShapeDiveThrusLift = np.c_[ np.zeros(len(uShapeDiveLift)),uShapeDiveLift ] 
-        print(uShapeDiveThrusLift)
-
+        for row in uShapeDiveThrustLiftPitch:
+            theta = np.radians(row[2]) #how to call self.pitch for each colum ? 
+            c = np.cos(theta)
+            s = np.sin(theta)
+            R = np.array(((c, -s), (s, c)))
+            row[0:2] = np.dot(R,row[0:2])
+            #self.uShapeDiveThrustLiftRot = np.append(self.uShapeDiveThrustLiftRot, rotThrustLift)
+            #self.uShapeDiveThrustLiftRot.append(rotThrustLift)
+        print(uShapeDiveThrustLiftPitch)#
+        #thrust ist negativ warum ? weil pitch negativ nach unten? und positiv nach oben ?
     
     def vShapeDive(self):
         vShapeDiveSurfaceLen = 11 #frames (degree/0.2sec)
         vShapeDiveDownLen = 14 #frames (degree/0.2sec)
         vShapeDiveUpLen = 12 #frames (degree/0.2sec)
 
-        self.vShapeDiveSurfaceTra = np.random.normal(loc= -74.53024727, scale=7.65994214, size=None)
-        self.vShapeDiveDownTra = np.random.normal(loc=17.04128714, scale=25.74478444, size=None)
-        self.vShapeDiveUpTra = np.random.normal(loc=-49.06783, scale=28.94055575, size=None)
-
+        #self.vShapeDiveSurfaceTra = np.random.normal(loc= -74.53024727, scale=7.65994214, size=None)
+        #self.vShapeDiveDownTra = np.random.normal(loc=17.04128714, scale=25.74478444, size=None)
+        #self.vShapeDiveUpTra = np.random.normal(loc=-49.06783, scale=28.94055575, size=None)
         while len(self.divePitch)<self.traLen:
             if len(self.divePitch) < vShapeDiveSurfaceLen:
-                self.pitch = self.vShapeDiveSurfaceTra
+                self.pitch = np.random.normal(loc= -74.53024727, scale=7.65994214, size=None)
             elif vShapeDiveSurfaceLen <= len(self.divePitch) < (vShapeDiveSurfaceLen+vShapeDiveDownLen):
-                self.pitch = self.vShapeDiveDownTra
+                self.pitch = np.random.normal(loc=17.04128714, scale=25.74478444, size=None)
             else: 
-                self.pitch = self.vShapeDiveUpTra # get random size and position
+                self.pitch = np.random.normal(loc=-49.06783, scale=28.94055575, size=None) # get random size and position
             self.divePitch.append(self.pitch)
         print(self.divePitch)
         
@@ -138,3 +148,10 @@ class ProtMov:
 
         vShapeDiveThrusLift = np.c_[ np.zeros(len(vShapeDiveLift)),vShapeDiveLift ] 
         print(vShapeDiveThrusLift)
+
+    #def rotate_via_numpy(self,i, divePitch):
+    #    """Use numpy to build a rotation matrix and take the dot product."""
+    #    x, y = i
+    #    c, s = np.cos(divePitch), np.sin(divePitch)
+    #    j = np.matrix([[c, s], [-s, c]])
+    #    m = np.dot(j, [x, y])
