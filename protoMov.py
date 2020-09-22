@@ -13,10 +13,6 @@ class ProtMov:
         self.simObj = simObj
         self.traIDX = []
         self.divePitch = []
-        self.uShapeDiveThrustLiftRot = []
-
-   
-
     def generator (self):
         '''
         this function randomly chooses between uShape and vShapes dives.
@@ -35,16 +31,17 @@ class ProtMov:
             self.traLen = 77 #frames -> 385 sec
             self.uShapeDive()
             self.createThrustSlipYaw()
-            
+            self.createThrustLiftPitch(self.divePitch,'uShape',self.thrust)  
         elif mode == 'vShape':
             self.traLen = 36 #framse -> 185 sec
             self.vShapeDive()
             self.createThrustSlipYaw()
-        
-            
+            self.createThrustLiftPitch(self.divePitch,'vShape',self.thrust)
         else:
             print('Unkown dive type: ' + mode)
-
+        self.test= np.c_[[i[0:2] for i in self.DiveThrustLiftPitch],self.slip,[i[2] for i in self.DiveThrustLiftPitch],self.yaw] # [thrust(m/s),lift(m/s),slip(m/s),pitch(degree/s),yaw(degree/s)]
+        print(self.test)
+        
     def uShapeDive(self):
         
         '''
@@ -70,9 +67,6 @@ class ProtMov:
                 pitch = np.random.normal(loc=-68.64291923, scale=15.63982373, size=None) # get random size and position
             self.divePitch.append(pitch)
         
-        
-        self.createThrustLiftPitch(self.divePitch,'uShape')
-        
     def vShapeDive(self):
         '''
         this function randomly chooses pitch vectors according to the 4 
@@ -93,7 +87,7 @@ class ProtMov:
             else: 
                 self.pitch = np.random.normal(loc=-49.06783, scale=28.94055575, size=None) # get random size and position
             self.divePitch.append(self.pitch)
-        self.createThrustLiftPitch(self.divePitch,'vShape',)
+        
 
 
 
@@ -110,7 +104,6 @@ class ProtMov:
         transProbCS = np.genfromtxt ('transProbCS.csv', delimiter=",")        
         '''preallocatio'''
         
-
         '''get start prototype'''
         randomNumber = random.random() # defines number betwen 0 and 1. the corresponding distributionCS is taken as start PM
         currentPM = np.where(distributionCS>= randomNumber)
@@ -124,8 +117,9 @@ class ProtMov:
             newPM = random.choice(newPM)[0]
             currentPM = newPM 
             self.traIDX.append(protoMov[newPM]) #traIDX = [thrust(m),Slip(m),Yaw(m)]
-        print(self.traIDX[1:20])
-        print(len(self.traIDX))
+        self.thrust = [i[0] for i in self.traIDX]
+        self.slip = [i[1] for i in self.traIDX]
+        self.yaw = [i[2] for i in self.traIDX]
 
     def createThrustLiftPitch(self,divePitch,mode,thrust):
         '''
@@ -142,21 +136,18 @@ class ProtMov:
         R(pitch) * (thrust(0), lift) --> (thrust',lift')
         '''
         if mode == 'uShape':
-            Dive = np.genfromtxt ('uShapeDiveDepthPitch.csv',usecols=(1), delimiter=",") #0-10
-            
+            Dive = np.genfromtxt ('uShapeDiveDepthPitch.csv',usecols=(1), delimiter=",")   
         elif mode == 'vShape':
-            Dive = np.genfromtxt ('vShapeDiveDepthPitch.csv',usecols=(1), delimiter=",") #0-10
+            Dive = np.genfromtxt ('vShapeDiveDepthPitch.csv',usecols=(1), delimiter=",")
 
         DiveLift = Dive[1:]- Dive[:-1] #lift from frame to frame 0.2 m/s
         DiveLift = np.interp(np.arange(0,(self.traLen*5),1), np.arange(0,(self.traLen*5),5), DiveLift)
         self.divePitch = np.interp(np.arange(0,(self.traLen*5),1), np.arange(0,(self.traLen*5),5), self.divePitch)
-
-        DiveThrustLiftPitch = np.c_[ np.zeros(len(DiveLift)),DiveLift,self.divePitch ] 
-        print(DiveThrustLiftPitch)
-        for row in DiveThrustLiftPitch:
+        self.DiveThrustLiftPitch = np.c_[thrust,DiveLift,self.divePitch ] 
+        for row in self.DiveThrustLiftPitch:
             theta = np.radians(row[2]) #how to call self.pitch for each colum ? 
             c = np.cos(theta)
             s = np.sin(theta)
             R = np.array(((c, -s), (s, c)))
             row[0:2] = np.dot(R,row[0:2])
-        print(DiveThrustLiftPitch) #gives [thrust(0.2m/s),lift(0.2m/s),pitch(0.2degree/s)]
+        
