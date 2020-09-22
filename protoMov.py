@@ -9,10 +9,10 @@ class ProtMov:
     defined by habor seal typical trajectories taken from video data.
     """
     def __init__(self,simObj):
-
         self.simObj = simObj
         self.traIDX = []
         self.divePitch = []
+
     def generator (self):
         '''
         this function randomly chooses between uShape and vShapes dives.
@@ -39,8 +39,9 @@ class ProtMov:
             self.createThrustLiftPitch(self.divePitch,'vShape',self.thrust)
         else:
             print('Unkown dive type: ' + mode)
-        self.test= np.c_[[i[0:2] for i in self.DiveThrustLiftPitch],self.slip,[i[2] for i in self.DiveThrustLiftPitch],self.yaw] # [thrust(m/s),lift(m/s),slip(m/s),pitch(degree/s),yaw(degree/s)]
-        print(self.test)
+        self.diveProtoMov= np.c_[[i[0:2] for i in self.DiveThrustLiftPitch],self.slip,[i[2] for i in self.DiveThrustLiftPitch],self.yaw] # [thrust(m/s),lift(m/s),slip(m/s),pitch(degree/s),yaw(degree/s)]
+        print(self.diveProtoMov)
+        print(len(self.diveProtoMov))
         
     def uShapeDive(self):
         
