@@ -69,7 +69,8 @@ class ProtMov:
             else: 
                 pitch = np.random.normal(loc=-68.64291923, scale=15.63982373, size=None) # get random size and position
             self.divePitch.append(pitch)
-
+        
+        
         self.createThrustLiftPitch(self.divePitch,'uShape')
         
     def vShapeDive(self):
@@ -92,39 +93,9 @@ class ProtMov:
             else: 
                 self.pitch = np.random.normal(loc=-49.06783, scale=28.94055575, size=None) # get random size and position
             self.divePitch.append(self.pitch)
+        self.createThrustLiftPitch(self.divePitch,'vShape',)
 
-        self.createThrustLiftPitch(self.divePitch,'vShape')
 
-    def createThrustLiftPitch(self,divePitch,mode):
-        '''
-        this function takes the before created pitch values for a u or vShape dive and 
-        generates a diveDepth list with the same length. The lift values between every 5 sec 
-        is calculated by subtracting the first value from the second value and so on. 
-        Next a array is created with Thrust set to 0, the lift and pitch values[0,thrust(m),pitch(deg)]
-        In order to get the correct thrust,lift movements acording to the pitch values we need 
-        to rotate the coordinate system by pitch in oder to get the movement from the seal_agents
-        point of view. This is done with a rotation Matrix :
-                    cos(pitch)  -sin(pitch)
-        R(pitch) =  sin(pitch)  cos(pitch)
-        the new thrust and lift vector created by this rotation matrix is calculated with:
-        R(pitch) * (thrust(0), lift) --> (thrust',lift')
-        '''
-        #zProfileUShapedDive:
-        if mode == 'uShape':
-            Dive = np.genfromtxt ('uShapeDiveDepthPitch.csv',usecols=(1), delimiter=",") #0-10
-            
-        elif mode == 'vShape':
-            Dive = np.genfromtxt ('vShapeDiveDepthPitch.csv',usecols=(1), delimiter=",") #0-10
-        DiveLift = Dive[1:]- Dive[:-1] #lift from frame to frame 0.2 m/s
-        DiveThrustLiftPitch = np.c_[ np.zeros(len(DiveLift)),DiveLift,self.divePitch ] 
-        print(DiveThrustLiftPitch)
-        for row in DiveThrustLiftPitch:
-            theta = np.radians(row[2]) #how to call self.pitch for each colum ? 
-            c = np.cos(theta)
-            s = np.sin(theta)
-            R = np.array(((c, -s), (s, c)))
-            row[0:2] = np.dot(R,row[0:2])
-        print(DiveThrustLiftPitch)
 
     def createThrustSlipYaw(self):
         """
@@ -147,11 +118,45 @@ class ProtMov:
         self.traIDX.append(protoMov[currentPM])
 
         '''get random new PM fitting to the transitionProbabilities'''
-        while len(self.traIDX)<self.traLen:
+        while len(self.traIDX)<(self.traLen*5): #length of dive in seconds 
             randomTransitionNumber = random.random()
             newPM = np.where(transProbCS[currentPM,:]>= randomTransitionNumber)
             newPM = random.choice(newPM)[0]
             currentPM = newPM 
-            self.traIDX.append(protoMov[newPM])
+            self.traIDX.append(protoMov[newPM]) #traIDX = [thrust(m),Slip(m),Yaw(m)]
         print(self.traIDX[1:20])
         print(len(self.traIDX))
+
+    def createThrustLiftPitch(self,divePitch,mode,thrust):
+        '''
+        this function takes the before created pitch values for a u or vShape dive and 
+        generates a diveDepth list with the same length. The lift values between every 5 sec 
+        is calculated by subtracting the first value from the second value and so on. 
+        Next a array is created with Thrust set to 0, the lift and pitch values[0,thrust(m),pitch(deg)]
+        In order to get the correct thrust,lift movements acording to the pitch values we need 
+        to rotate the coordinate system by pitch in oder to get the movement from the seal_agents
+        point of view. This is done with a rotation Matrix :
+                    cos(pitch)  -sin(pitch)
+        R(pitch) =  sin(pitch)  cos(pitch)
+        the new thrust and lift vector created by this rotation matrix is calculated with:
+        R(pitch) * (thrust(0), lift) --> (thrust',lift')
+        '''
+        if mode == 'uShape':
+            Dive = np.genfromtxt ('uShapeDiveDepthPitch.csv',usecols=(1), delimiter=",") #0-10
+            
+        elif mode == 'vShape':
+            Dive = np.genfromtxt ('vShapeDiveDepthPitch.csv',usecols=(1), delimiter=",") #0-10
+
+        DiveLift = Dive[1:]- Dive[:-1] #lift from frame to frame 0.2 m/s
+        DiveLift = np.interp(np.arange(0,(self.traLen*5),1), np.arange(0,(self.traLen*5),5), DiveLift)
+        self.divePitch = np.interp(np.arange(0,(self.traLen*5),1), np.arange(0,(self.traLen*5),5), self.divePitch)
+
+        DiveThrustLiftPitch = np.c_[ np.zeros(len(DiveLift)),DiveLift,self.divePitch ] 
+        print(DiveThrustLiftPitch)
+        for row in DiveThrustLiftPitch:
+            theta = np.radians(row[2]) #how to call self.pitch for each colum ? 
+            c = np.cos(theta)
+            s = np.sin(theta)
+            R = np.array(((c, -s), (s, c)))
+            row[0:2] = np.dot(R,row[0:2])
+        print(DiveThrustLiftPitch) #gives [thrust(0.2m/s),lift(0.2m/s),pitch(0.2degree/s)]
