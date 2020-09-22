@@ -11,11 +11,120 @@ class ProtMov:
     def __init__(self,simObj):
 
         self.simObj = simObj
-        self.minutes = 5 #length of trajectroy list per second, giving information about trajectroys with a speed 
-        # od m/s or deg/s
         self.traIDX = []
         self.divePitch = []
         self.uShapeDiveThrustLiftRot = []
+
+   
+
+    def generator (self):
+        '''
+        this function randomly chooses between uShape and vShapes dives.
+        dependent on the diveType it sets the corresponding lenght
+        of the dive (traLen) to a specific number of frames (0.2fps)
+        Data taken from "Forschungsverbund MINOSplus - Weiterführende Arbeiten an Seevögeln
+        und Meeressäugern zur Bewertung von Offshore - Windkraftanlagen Teilvorhaben TP6 
+        – „Seehunde in See“ – Untersuchungen zur räumlichen und zeitlichen Nutzung 
+        der Nordsee durch Seehunde im Zusammenhang mit der Entwicklung von 
+        OffshoreWindenergieanlagen" depth and pitch Data taken from figure 16.
+        '''
+        mode = ('uShape','vShape')
+        mode = random.choice(mode)
+        print(mode)
+        if mode == 'uShape':
+            self.traLen = 77 #frames -> 385 sec
+            self.uShapeDive()
+            self.createThrustSlipYaw()
+            
+        elif mode == 'vShape':
+            self.traLen = 36 #framse -> 185 sec
+            self.vShapeDive()
+            self.createThrustSlipYaw()
+        
+            
+        else:
+            print('Unkown dive type: ' + mode)
+
+    def uShapeDive(self):
+        
+        '''
+        this function randomly chooses pitch vectors according to the 4 
+        phases of a uShaped dive (data taken from figure 16 (see def.generator)
+        each phase is dicribed with an gaussian function by mean and std that 
+        were calculated from the dive data from figure 16. and for each 5 seconds
+        one random value is taken. 
+        '''
+        uShapeDiveSurfaceLen = 10 #frames (degree/0.2sec)
+        uShapeDiveDownLen = 4 #frames (degree/0.2sec)
+        uShapeDiveStraightLen = 51 #frames (degree/0.2sec)
+        uShapeDiveUpLen = 12 #frames (degree/0.2sec)
+
+        while len(self.divePitch)<self.traLen:
+            if len(self.divePitch) < uShapeDiveSurfaceLen:
+                pitch = np.random.normal(loc=-79.639515, scale=12.78034071, size=None)
+            elif uShapeDiveSurfaceLen <= len(self.divePitch) < (uShapeDiveSurfaceLen+uShapeDiveDownLen):
+                pitch = np.random.normal(loc=63.9146825, scale=8.36629103, size=None)
+            elif (uShapeDiveSurfaceLen+uShapeDiveDownLen) <= len(self.divePitch) < (uShapeDiveSurfaceLen+uShapeDiveDownLen+uShapeDiveStraightLen):
+                pitch = np.random.normal(loc=8.36629103, scale=5.5529812, size=None) 
+            else: 
+                pitch = np.random.normal(loc=-68.64291923, scale=15.63982373, size=None) # get random size and position
+            self.divePitch.append(pitch)
+
+        self.createThrustLiftPitch(self.divePitch,'uShape')
+        
+    def vShapeDive(self):
+        '''
+        this function randomly chooses pitch vectors according to the 4 
+        phases of a vShaped dive (data taken from figure 16 (see def.generator)
+        each phase is dicribed with an gaussian function by mean and std that 
+        were calculated from the dive data from figure 16. and for each 5 seconds
+        one random value is taken. 
+        '''
+        vShapeDiveSurfaceLen = 11 #frames (degree/0.2sec)
+        vShapeDiveDownLen = 14 #frames (degree/0.2sec)
+        vShapeDiveUpLen = 11 #frames (degree/0.2sec)
+
+        while len(self.divePitch)<self.traLen:
+            if len(self.divePitch) < vShapeDiveSurfaceLen:
+                self.pitch = np.random.normal(loc= -74.53024727, scale=7.65994214, size=None)
+            elif vShapeDiveSurfaceLen <= len(self.divePitch) < (vShapeDiveSurfaceLen+vShapeDiveDownLen):
+                self.pitch = np.random.normal(loc=17.04128714, scale=25.74478444, size=None)
+            else: 
+                self.pitch = np.random.normal(loc=-49.06783, scale=28.94055575, size=None) # get random size and position
+            self.divePitch.append(self.pitch)
+
+        self.createThrustLiftPitch(self.divePitch,'vShape')
+
+    def createThrustLiftPitch(self,divePitch,mode):
+        '''
+        this function takes the before created pitch values for a u or vShape dive and 
+        generates a diveDepth list with the same length. The lift values between every 5 sec 
+        is calculated by subtracting the first value from the second value and so on. 
+        Next a array is created with Thrust set to 0, the lift and pitch values[0,thrust(m),pitch(deg)]
+        In order to get the correct thrust,lift movements acording to the pitch values we need 
+        to rotate the coordinate system by pitch in oder to get the movement from the seal_agents
+        point of view. This is done with a rotation Matrix :
+                    cos(pitch)  -sin(pitch)
+        R(pitch) =  sin(pitch)  cos(pitch)
+        the new thrust and lift vector created by this rotation matrix is calculated with:
+        R(pitch) * (thrust(0), lift) --> (thrust',lift')
+        '''
+        #zProfileUShapedDive:
+        if mode == 'uShape':
+            Dive = np.genfromtxt ('uShapeDiveDepthPitch.csv',usecols=(1), delimiter=",") #0-10
+            
+        elif mode == 'vShape':
+            Dive = np.genfromtxt ('vShapeDiveDepthPitch.csv',usecols=(1), delimiter=",") #0-10
+        DiveLift = Dive[1:]- Dive[:-1] #lift from frame to frame 0.2 m/s
+        DiveThrustLiftPitch = np.c_[ np.zeros(len(DiveLift)),DiveLift,self.divePitch ] 
+        print(DiveThrustLiftPitch)
+        for row in DiveThrustLiftPitch:
+            theta = np.radians(row[2]) #how to call self.pitch for each colum ? 
+            c = np.cos(theta)
+            s = np.sin(theta)
+            R = np.array(((c, -s), (s, c)))
+            row[0:2] = np.dot(R,row[0:2])
+        print(DiveThrustLiftPitch)
 
     def createThrustSlipYaw(self):
         """
@@ -46,112 +155,3 @@ class ProtMov:
             self.traIDX.append(protoMov[newPM])
         print(self.traIDX[1:20])
         print(len(self.traIDX))
-
-    def generator (self):
-        '''
-        this function randomly chooses between uShape and vShapes dives.
-        dependent on the diveType it sets the corresponding lenght
-        of the dive (traLen) to a specific number of frames (0.2fps)
-        Data taken from "Forschungsverbund MINOSplus - Weiterführende Arbeiten an Seevögeln
-         und Meeressäugern zur Bewertung von Offshore - Windkraftanlagen Teilvorhaben TP6 
-         – „Seehunde in See“ – Untersuchungen zur räumlichen und zeitlichen Nutzung 
-        der Nordsee durch Seehunde im Zusammenhang mit der Entwicklung von 
-        OffshoreWindenergieanlagen" depth and pitch Data taken from figure 16.
-        '''
-        mode = ('uShape','vShape')
-        mode = random.choice(mode)
-        print(mode)
-        if mode == 'uShape':
-            self.traLen = 77 #frames -> 385 sec
-            self.uShapeDive()
-            
-        elif mode == 'vShape':
-            self.traLen = 37 #framse -> 185 sec
-            self.vShapeDive()
-            
-        else:
-            print('Unkown dive type: ' + mode)
-
-    def uShapeDive(self):
-        
-        '''
-        this function randomly choses pitch vectors according to the 4 
-        phases of a uShaped dive (data taken from figure 16 (see def.genrator
-        each phase is dicribed with an gaussian function by mean and std that 
-        were calculated from the dive data from figure 16. and for each 5 seconds
-        one random value is taken. 
-        '''
-        uShapeDiveSurfaceLen = 10 #frames (degree/0.2sec)
-        uShapeDiveDownLen = 4 #frames (degree/0.2sec)
-        uShapeDiveStraightLen = 51 #frames (degree/0.2sec)
-        uShapeDiveUpLen = 12 #frames (degree/0.2sec)
-        #print(uShapeDiveUpMean,uShapeDiveUpVar) 
-        #self.uShapeDiveSurfaceTra = np.random.normal(loc=-79.639515, scale=12.78034071, size=None)
-        #self.uShapeDiveDownTra = np.random.normal(loc=63.9146825, scale=8.36629103, size=None)
-        #self.uShapeDiveStraightTra = np.random.normal(loc=8.36629103, scale=5.5529812, size=None)
-        #self.uShapeDiveUpTra = np.random.normal(loc=-68.64291923, scale=15.63982373, size=None)
-        #print(uShapeDiveSurfaceTra)
-
-        while len(self.divePitch)<self.traLen:
-            if len(self.divePitch) < uShapeDiveSurfaceLen:
-                pitch = np.random.normal(loc=-79.639515, scale=12.78034071, size=None)
-            elif uShapeDiveSurfaceLen <= len(self.divePitch) < (uShapeDiveSurfaceLen+uShapeDiveDownLen):
-                pitch = np.random.normal(loc=63.9146825, scale=8.36629103, size=None)
-            elif (uShapeDiveSurfaceLen+uShapeDiveDownLen) <= len(self.divePitch) < (uShapeDiveSurfaceLen+uShapeDiveDownLen+uShapeDiveStraightLen):
-                pitch = np.random.normal(loc=8.36629103, scale=5.5529812, size=None) 
-            else: 
-                pitch = np.random.normal(loc=-68.64291923, scale=15.63982373, size=None) # get random size and position
-            self.divePitch.append(pitch)
-
-
-        print(self.divePitch)
-        print(len(self.divePitch))
-        #zProfileUShapedDive:
-
-        uShapeDive = np.genfromtxt ('uShapeDiveDepthPitch.csv',usecols=(1), delimiter=",") #0-10
-        uShapeDiveLift = uShapeDive[1:]- uShapeDive[:-1] #lift from frame to frame 0.2 m/s
-        print(uShapeDiveLift)
-        uShapeDiveThrustLiftPitch = np.c_[ np.zeros(len(uShapeDiveLift)),uShapeDiveLift,self.divePitch ] 
-        print(uShapeDiveThrustLiftPitch)
-
-        for row in uShapeDiveThrustLiftPitch:
-            theta = np.radians(row[2]) #how to call self.pitch for each colum ? 
-            c = np.cos(theta)
-            s = np.sin(theta)
-            R = np.array(((c, -s), (s, c)))
-            row[0:2] = np.dot(R,row[0:2])
-            #self.uShapeDiveThrustLiftRot = np.append(self.uShapeDiveThrustLiftRot, rotThrustLift)
-            #self.uShapeDiveThrustLiftRot.append(rotThrustLift)
-        print(uShapeDiveThrustLiftPitch)#
-        #thrust ist negativ warum ? weil pitch negativ nach unten? und positiv nach oben ?
-    
-    def vShapeDive(self):
-        vShapeDiveSurfaceLen = 11 #frames (degree/0.2sec)
-        vShapeDiveDownLen = 14 #frames (degree/0.2sec)
-        vShapeDiveUpLen = 12 #frames (degree/0.2sec)
-
-        #self.vShapeDiveSurfaceTra = np.random.normal(loc= -74.53024727, scale=7.65994214, size=None)
-        #self.vShapeDiveDownTra = np.random.normal(loc=17.04128714, scale=25.74478444, size=None)
-        #self.vShapeDiveUpTra = np.random.normal(loc=-49.06783, scale=28.94055575, size=None)
-        while len(self.divePitch)<self.traLen:
-            if len(self.divePitch) < vShapeDiveSurfaceLen:
-                self.pitch = np.random.normal(loc= -74.53024727, scale=7.65994214, size=None)
-            elif vShapeDiveSurfaceLen <= len(self.divePitch) < (vShapeDiveSurfaceLen+vShapeDiveDownLen):
-                self.pitch = np.random.normal(loc=17.04128714, scale=25.74478444, size=None)
-            else: 
-                self.pitch = np.random.normal(loc=-49.06783, scale=28.94055575, size=None) # get random size and position
-            self.divePitch.append(self.pitch)
-        print(self.divePitch)
-        
-        vShapeDive = np.genfromtxt ('vShapeDiveDepthPitch.csv',skip_header=1,usecols=(1), delimiter=",") #0-10
-        vShapeDiveLift = vShapeDive[1:]- vShapeDive[:-1] #lift from frame to frame 0.2 m/s
-
-        vShapeDiveThrusLift = np.c_[ np.zeros(len(vShapeDiveLift)),vShapeDiveLift ] 
-        print(vShapeDiveThrusLift)
-
-    #def rotate_via_numpy(self,i, divePitch):
-    #    """Use numpy to build a rotation matrix and take the dot product."""
-    #    x, y = i
-    #    c, s = np.cos(divePitch), np.sin(divePitch)
-    #    j = np.matrix([[c, s], [-s, c]])
-    #    m = np.dot(j, [x, y])
