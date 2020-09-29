@@ -8,10 +8,11 @@ class ProtMov:
     each frame beeing thrust, lift, slip, pitch and yaw 
     """
     def __init__(self,simObj):
-        self.simObj    = simObj
-        self.sps       = simObj.sps #shorthand
-        self.traIDX    = []
-        self.divePitch = []
+        self.simObj      = simObj
+        self.sps         = simObj.sps #shorthand
+        self.origDiveFPS = 0.2 # the orginal data was recorded every 5th second 
+        self.traIDX      = []
+        self.divePitch   = []
 
         # dive phases are keywords for a tupel consisting of 0) duration normalised to total duration
         # 1) mean pitch angle [deg]  2)  standard deviation of the mean [deg]
@@ -53,10 +54,10 @@ class ProtMov:
             raise ValueError  # shorthand for 'raise ValueError()'
 
 
-
-        self.traLen = 36 #frames -> 185 sec
-        self.vShapeDive()
+        # create a HMM based trajectory for thrust slip and yaw
         self.createThrustSlipYaw()
+
+
         self.createThrustLiftPitch(self.divePitch,'vShape',self.thrust)
 
 
@@ -167,7 +168,7 @@ class ProtMov:
         self.traIDX.append(protoMov[currentPM])
 
         '''get random new PM fitting to the transitionProbabilities'''
-        while len(self.traIDX)<(self.traLen*5): #length of dive in seconds 
+        while len(self.traIDX)<(self.traLen): #length of dive in seconds 
             randomTransitionNumber = random.random()
             newPM = np.where(transProbCS[currentPM,:]>= randomTransitionNumber)
             newPM = random.choice(newPM)[0]
