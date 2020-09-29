@@ -92,11 +92,11 @@ class ProtMov:
                 bonusDur      = 0
             
             elif currentPhase == 1 and zProfile[-1] <= self.oceanDepth+0.5:
-                currentPhase + =1
+                currentPhase += 1
                 bonus = currentDive[phases[currentPhase]][0]*self.sps -frameI
 
             elif currentPhase == 3 and zProfile[-1] >= 0:
-                currentPhase + =1
+                currentPhase += 1
                 bonus = currentDive[phases[currentPhase]][0]*self.sps -frameI
             
 
