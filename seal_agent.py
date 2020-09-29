@@ -13,7 +13,7 @@ class Seal:
         self.simObj = simObj
         self.sealPosition = np.zeros(shape = 3) #centre of the coordinate system of the Seal in disctance to (0,0,0) of world
         self.sealOrientation = np.zeros(shape = 3)  # orientation as yaw pitch roll
-        #self.sealStep = np.zeros(shape =6) # change of position and orientation
+        self.sealStep = np.zeros(shape =6) # change of position and orientation
         self.sealTrajectory = list()
         self.activeSealMovement = True
         self.minutes = 5
@@ -69,66 +69,7 @@ class Seal:
         else:
             print('Unkown step type: ' + mode)
 
-    def createThrustSlipYaw(self):
-        """
-        Taken Prototypical Movements from analyized video data by Frederike Hanke. 
-        Giving information about Thrust,Slip and Yaw.
-        """
-        '''import Prototypical Movements (k=200)'''
-        protoMov = np.genfromtxt ('protoMov.csv', delimiter=",")
-        '''import distribution percentage of the 200 clusters. Given as numbers from 0-1 (equal to 0-100%)'''
-        distributionCS = np.genfromtxt ('distributionCS.csv', delimiter=",")
-        '''import transition probability from each Prototypical Movement to another'''
-        transProbCS = np.genfromtxt ('transProbCS.csv', delimiter=",")        
-        '''preallocatio'''
-        
-
-        '''get start prototype'''
-        randomNumber = random.random() # defines number betwen 0 and 1. the corresponding distributionCS is taken as start PM
-        currentPM = np.where(distributionCS>= randomNumber)
-        currentPM = random.choice(currentPM)[0]
-        self.traIDX.append(protoMov[currentPM])
-
-        '''get random new PM fitting to the transitionProbabilities'''
-        while len(self.traIDX)<self.traLen:
-            randomTransitionNumber = random.random()
-            newPM = np.where(transProbCS[currentPM,:]>= randomTransitionNumber)
-            newPM = random.choice(newPM)[0]
-            currentPM = newPM 
-            self.traIDX.append(protoMov[newPM])
-        #print(self.traIDX[1:10])
-        print(len(self.traIDX))
-
-
-    def createLiftPitch(self):
-
-        """
-        creat downward movement discribed by lift and pitch. Data taken from "Forschungsverbund MINOSplus
-        - Weiterführende Arbeiten an Seevögeln und Meeressäugern zur Bewertung von Offshore - Windkraftanlagen
-        Teilvorhaben TP6 – „Seehunde in See“ – Untersuchungen zur räumlichen und zeitlichen Nutzung 
-        der Nordsee durch Seehunde im Zusammenhang mit der Entwicklung von OffshoreWindenergieanlagen"
-        Data were extractec from figure 16 with plotly. This dive distcribes a U-dive 
-        """
-        self.pitch = np.genfromtxt ('pitchData.csv', delimiter=",")
-        self.pitch = np.repeat(self.pitch, 25)
-        #print(pitch)
-        print(len(self.pitch))
-        
-        """
-        to create the lift values figure the seal_agend is moving down for the first 40sec (40*25frames=1000frames)
-        and up for the last 40 sec (100frames) in between its diving on a steady depth for 5500 frames (3min40sec) 
-        discribing a dive lenght of 5min. ff
-        """
-        #divingDown = np.repeat((((self.simObj.environment.oceanDepth)-2)/1000),1000) # diving down for the first 40sec -> 1000 frames,depth per frame depends on total depth to dive to 
-        divingDown = np.repeat(-0.02, 1000)
-        straightDive = np.repeat(0.0,5500)
-        divingUp= np.repeat(0.02, 1000)
-        self.lift = np.concatenate((divingDown,straightDive,divingUp), axis=None)
-        #print(self.lift)
-        print(len(self.lift))
-
-
-
+ 
     def createRandomStep(self):
         """
         creating random sealStep consisting of randomly choosen StepCoordinates x,y,z 
