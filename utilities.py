@@ -154,3 +154,15 @@ class mathUtils:
         s = np.sin(theta)
         return np.array(((c, -s), (s, c)))
         
+    
+    def getRotMatrix3D(self,yaw,pitch,roll):
+        # theta is in radians
+        c_yaw = np.cos(yaw)
+        s_yaw = np.sin(yaw)
+        c_pitch = np.cos(pitch)
+        s_pitch = np.sin(pitch)
+        c_roll = np.cos(roll)
+        s_roll = np.sin(roll)
+        return np.array(((c_yaw*c_pitch                     ,s_yaw*c_pitch                     ,c_pitch*-1),
+                         (c_yaw*s_pitch*s_roll-s_yaw*c_roll ,s_yaw*s_pitch*s_roll+c_yaw*c_roll ,c_pitch*s_roll),
+                         (c_yaw*s_pitch*c_roll+s_yaw*c_roll ,s_yaw*s_pitch*c_roll-c_yaw*s_roll ,c_pitch*c_roll)))
