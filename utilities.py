@@ -145,70 +145,12 @@ class mathUtils:
         """
         for pobject in self.partclObjList:
             pobject.cart2sphere()
-    #def sphere2cart (self): 
-    #    """
-    #    Converts spheric coordinates(r = pobject.positison[0],theta = pobject.positison[1],
-    #    phi = pobject.positison[2]) of pobjects in self.partclObjList to cartasian coordinates
-    #    and returns x,y,z coordinates as a list
-    #    """
-    #    # attempt to convert spheric coordinates of our pobjects in our self.partclObjList to cartasian coordinates 
-    #    #take list
-    #    x = self.position[0] * np.sin( self.position[1] ) * np.cos( self.position[2] )
-    #    y = self.position[0] * np.sin( self.position[1] ) * np.sin( self.position[2] )
-    #    z = self.position[0] * np.cos( self.position[1] )
-    #    self.position = [x,y,z]
-    #    #self.particleStateCheck()
-    #    return [x,y,z] # this is just giving me one set of changed Coordinates and is not changing the whole list 
 
-    #def multiplyBySphereMax(self,coordinate):
-    #    """
-    #    The multiplyBySphereMax function is creating the mathematic setting for the coordinats in 
-    #    the spheric coordinate system (0=radius,1=theta,2=phi). defining 
-    #        radius by radiusMax
-    #        theta by np.pi describing a range between (0-180°)
-    #        phi by np.pi*2-np.pi describing a range between ((-180°)-180°)
-    #    """
-    #    sphereCoord = np.empty(3)
-    #    sphereCoord[0] = coordinate[0]*self.radiusMax
-    #    sphereCoord[1] = coordinate[1]*np.pi
-    #    sphereCoord[2] = coordinate[2]*np.pi*2-np.pi
-    #    return sphereCoord
-
-################## Unused stuff
-    #def Cloudsphere2cart (self):
-    #    """
-    #    The Cloudsphere2cart function converts the postions of each particle from 
-    #    spheric coordinates (radius,theta,phi) to cartasian coordinates (x,y,z)
-    #    """
-    #    for pobject in self.partclObjList:
-    #        pobject.sphere2cart()   
-
-
-    # def CloudDepth2Temperature(self):
-    #    """
-    #    The CloudDepth2Temperature function calls all particle objects in the Cloud 
-    #    which are between surface and seafloor and calculates the temperature for
-    #    every particle. This information will be needed for the temperature dependent
-    #    brownian motion of the particles.
-    #    """
-    #    for pobject in self.partclObjList:
-    #        if pobject.activeMovement == True:
-    #            pobject.depth2Temperature()
-
-    ##    calculating mean,std for ProtMov
-     #   uShapeDiveSurface = np.genfromtxt ('uShapeDiveDepthPitch.csv', skip_footer=68,usecols=(1), delimiter=",") #0-10
-     #   uShapeDiveDown = np.genfromtxt ('uShapeDiveDepthPitch.csv', skip_header=10,skip_footer=64,usecols=(1), delimiter=",") #11-14
-     #   uShapeDiveStraight = np.genfromtxt ('uShapeDiveDepthPitch.csv', skip_header=14,skip_footer=13,usecols=(1), delimiter=",") #15.66
-     #   uShapeDiveUp = np.genfromtxt ('uShapeDiveDepthPitch.csv', skip_header=65,usecols=(1), delimiter=",") #67-87
-     #   '''import transition probability from each Prototypical Movement to another'''
-     #   vShapeDiveSurface = np.genfromtxt ('vShapeDiveDepthPitch.csv', skip_header=1,skip_footer=26,usecols=(1), delimiter=",") #0-12
-     #   vShapeDiveDown = np.genfromtxt ('vShapeDiveDepthPitch.csv', skip_header=12,skip_footer=12,usecols=(1), delimiter=",") #13-26
-     #   vShapeDiveUp = np.genfromtxt ('vShapeDiveDepthPitch.csv', skip_header=26,usecols=(1), delimiter=",") #27-38
-     #   '''preallocatio'''
-     #   print(vShapeDiveSurface)
-     #   print(vShapeDiveDown)
-     #   print(vShapeDiveUp)
-#
-     #   vShapeDiveUpMean = np.mean(vShapeDiveUp, axis=0) #time, depth(m), pitch(degree)
-     #   vShapeDiveUpVar = np.std(vShapeDiveUp, axis= 0)  #time, depth(m), pitch(degree)
-     #   print(vShapeDiveUpMean,vShapeDiveUpVar) 
+    
+    
+    def getRotMatrix2D(self,theta):
+        # theta is in radians
+        c = np.cos(theta)
+        s = np.sin(theta)
+        return np.array(((c, -s), (s, c)))
+        

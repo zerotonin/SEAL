@@ -1,5 +1,6 @@
 import numpy as np
 import random, copy
+from utilities import mathUtils
 from scipy.ndimage import gaussian_filter1d
 
 class ProtMov: 
@@ -82,7 +83,7 @@ class ProtMov:
 
         # rotate velocities accordingly
         for frameI in range(self.traLen):
-            R = self.getRotMatrix(np.deg2rad(pitchAngle[frameI]))
+            R = mathUtils.getRotMatrix2D(np.deg2rad(pitchAngle[frameI]))
             temp = np.dot(R,np.array([thrust[frameI],zVel[frameI]]))
             newThrust.append(temp[0])
             newLift.append(temp[1])
@@ -91,13 +92,6 @@ class ProtMov:
 
         
 
-    
-    def getRotMatrix(self,theta):
-        # theta is in radians
-        c = np.cos(theta)
-        s = np.sin(theta)
-        return np.array(((c, -s), (s, c)))
-        
 
 
     def createLiftPitch(self, currentDive):
@@ -131,6 +125,8 @@ class ProtMov:
                 currentPhase += 1
                 bonusDur = currentDive[phases[currentPhase]][0]*self.sps -frameI
                 print(currentPhase,frameI,zProfile[-1])
+            else: 
+                print(currentPhase,frameI,zProfile[-1],'done')
 
             currentPitch  =np.random.normal(loc=currentDive[phases[currentPhase]][1], scale=currentDive[phases[currentPhase]][2], size=None)
             currentZshift =np.random.normal(loc=currentDive[phases[currentPhase]][3], scale=currentDive[phases[currentPhase]][4], size=None)
