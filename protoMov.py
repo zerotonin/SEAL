@@ -1,5 +1,5 @@
 import numpy as np
-import random
+import random, copy
 from importlib import reload 
     
 class ProtMov: 
@@ -10,22 +10,26 @@ class ProtMov:
     def __init__(self,simObj):
         self.simObj      = simObj
         self.sps         = simObj.sps #shorthand
+        self.oceanDepth  = simObj.environment.oceanDepth #shorthand
         self.origDiveFPS = 0.2 # the orginal data was recorded every 5th second 
         self.traIDX      = []
         self.divePitch   = []
 
         # dive phases are keywords for a tupel consisting of 0) duration normalised to total duration
-        # 1) mean pitch angle [deg]  2)  standard deviation of the mean [deg]
-        self.diveShapeU = {'surfaceDur' :(10.0/77.0, -79.639515,12.78034071),
-                           'diveDownDur':( 4.0/77.0, 63.9146825,8.36629103),
-                           'straightDur':(51.0/77.0, 8.36629103,5.5529812),
-                           'diveUpDur'  :(12.0/77.0,-68.64291923,15.63982373)}
+        # 1) mean pitch angle [deg]  2)  standard deviation of the mean [deg] 3)  mean z-profil [m/s]
+        # 4) standard deviation of z-profile [m/s]
+        self.diveShapeU = {'surface'  :(10.0/77.0, -79.639515,12.78034071 ,0.003492857142857107  ,0.012394484328836674),
+                           'down'     :( 4.0/77.0, 63.9146825,8.36629103  ,-25,-0.99880133333333 ,0.05321871641526968),
+                           'straight' :(51.0/77.0, 8.36629103,5.5529812   ,0.0024724705882352887 ,0.029324291568831443),
+                           'up'       :(12.0/77.0,-68.64291923,15.63982373,0.24612163636363638   ,0.40711433143914316),
+                           'surface2' :(0.0, -79.639515,12.78034071 ,0.003492857142857107  ,0.012394484328836674)} # surface 2 is a bonus duration if up wards swimming ends before its duration
         
         
-        self.diveShapeV = {'surfaceDur' :(11.0/36.0, -74.53024727,7.65994214),        
-                           'diveDownDur':(14.0/36.0, 17.04128714 ,25.74478444),
-                           'straightDur':(0        ,0            ,0),
-                           'diveUpDur'  :(11.0/36.0,-49.06783    ,28.94055575)}
+        self.diveShapeV = {'surface'  :(11.0/36.0, -74.53024727,7.65994214, -0.005039636363636366,0.0280961935023646),        
+                           'down'     :(14.0/36.0, 17.04128714 ,25.74478444,-0.23516400000000004 ,0.17638583527291268),
+                           'straight' :(0        ,0            ,0          ,0                    ,0),
+                           'up'       :(11.0/36.0,-49.06783    ,28.94055575,0.301                ,0.28513959297018016),
+                           'surface2' :(0.0, -74.53024727,7.65994214, -0.005039636363636366,0.0280961935023646)} # surface 2 is a bonus duration if up wards swimming ends before its duration
 
 
     def generator2 (self,mode,traLenSec):
@@ -46,9 +50,9 @@ class ProtMov:
             mode = random.choice(mode)
 
         if  mode == 'uShape':
-            currentDive = self.diveShapeU
+            currentDive = copy.deepcopy(self.diveShapeU)
         elif mode == 'vShape':
-            currentDive = self.diveShapeV
+            currentDive = copy.deepcopy(self.diveShapeV)
         else:
             print('Unkown dive type: ' + mode)
             raise ValueError  # shorthand for 'raise ValueError()'
@@ -64,7 +68,40 @@ class ProtMov:
         self.diveProtoMov= np.c_[[i[0:2] for i in self.DiveThrustLiftPitch],self.slip,[i[2] for i in self.DiveThrustLiftPitch],self.yaw] # [thrust(m/s),lift(m/s),slip(m/s),pitch(degree/s),yaw(degree/s)]
         print(self.diveProtoMov)
         print(len(self.diveProtoMov))
-        
+
+
+    def generatorPitchLift(self, currentDive):
+
+        diveFPSinSPS = self.sps/self.origDiveFPS
+        phases = currentDive.keys()
+        currentPhase = 0
+        zProfile     = []
+        bonusDur     = 0
+
+        for frameI in range(self.traLen+1): # +1 to create z-profile that we can diff afterwards
+
+            # This if clause regulates the change of diving phases. A diving phase ends when
+            # either the duration runs out or the animals z-profile gets out of bounds (0, ocean
+            # depth). Because the dives have a certain angle, long trajectories might produce
+            # shorter than anticipated dive phases. The rest duration of the phase is carried
+            # as a bonus to the following phas (straight or surface2). Surface2 is only their
+            # to produce trajectories of properlength
+
+            if frameI > currentDive[phases[currentPhase]][0]*self.sps + bonusDur:
+                currentPhase += 1
+                bonusDur      = 0
+            
+            elif currentPhase == 1 and zProfile[-1] <= self.oceanDepth+0.5:
+                currentPhase + =1
+                bonus = currentDive[phases[currentPhase]][0]*self.sps -frameI
+
+            elif currentPhase == 3 and zProfile[-1] >= 0:
+                currentPhase + =1
+                bonus = currentDive[phases[currentPhase]][0]*self.sps -frameI
+            
+
+
+
 
     def generator (self,mode,traLenSec):
         '''
