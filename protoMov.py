@@ -1,7 +1,7 @@
 import numpy as np
 import random, copy
-from importlib import reload 
-    
+from scipy.ndimage import gaussian_filter1d
+
 class ProtMov: 
     """
     The ProtMov class generators prototypical movements discribed with 5 vectors inbtween 
@@ -58,27 +58,57 @@ class ProtMov:
             raise ValueError  # shorthand for 'raise ValueError()'
 
 
-        # create a HMM based trajectory for thrust slip and yaw
-        self.createThrustSlipYaw()
+        # create a HMM based trajectory for thrust slip and yaw VELOCITIES
+        thrust , slip , yaw = self.createThrustSlipYaw()
 
 
-        self.createThrustLiftPitch(self.divePitch,'vShape',self.thrust)
+        # Z-POSITION AND Pitch-ANGLE
+        zProfile ,pitchAngle = self.createLiftPitch(currentDive)
+
+        # combine both trajectories
+        self.velTra =mergeLiftPitch_ThrustYawSlip(zProfile,pitchAngle,thrust,slip,yaw)
 
 
-        self.diveProtoMov= np.c_[[i[0:2] for i in self.DiveThrustLiftPitch],self.slip,[i[2] for i in self.DiveThrustLiftPitch],self.yaw] # [thrust(m/s),lift(m/s),slip(m/s),pitch(degree/s),yaw(degree/s)]
-        print(self.diveProtoMov)
-        print(len(self.diveProtoMov))
+ 
+    
+    def mergeLiftPitch_ThrustYawSlip(self,zProfil,pitchAngle,thrust,slip,yaw):
+
+        #positional values to velocities in m/s or deg/s || filtered by 3 sigma gauss
+        zVel = np.diff(gaussian_filter1d(zProfil, 3))*self.sps 
+        pVel = np.diff(gaussian_filter1d(pitchAngle, 3))*self.sps
+
+        newThrust = list()
+        newLift   = list()
+
+        # rotate velocities accordingly
+        for frameI in range(self.traLen):
+            R = self.getRotMatrix(np.deg2rad(pitchAngle[frameI]))
+            temp = np.dot(R,np.array([thrust[frameI],zVel[frameI]]))
+            newThrust.append(temp[0])
+            newLift.append(temp[1])
+
+        return  np.transpose(np.vstack((np.array(newThrust),slip,np.array(newLift),yaw,pVel)))
+
+        
+
+    
+    def getRotMatrix(self,theta):
+        # theta is in radians
+        c = np.cos(theta)
+        s = np.sin(theta)
+        return np.array(((c, -s), (s, c)))
+        
 
 
-    def generatorPitchLift(self, currentDive):
+    def createLiftPitch(self, currentDive):
 
-        diveFPSinSPS = self.sps/self.origDiveFPS
         phases = currentDive.keys()
         currentPhase = 0
-        zProfile     = []
+        zProfile     = [0]# to create z-profile that we can diff afterwards
+        pitchAngle   = [0]
         bonusDur     = 0
 
-        for frameI in range(self.traLen+1): # +1 to create z-profile that we can diff afterwards
+        for frameI in range(self.traLen): 
 
             # This if clause regulates the change of diving phases. A diving phase ends when
             # either the duration runs out or the animals z-profile gets out of bounds (0, ocean
@@ -98,6 +128,23 @@ class ProtMov:
             elif currentPhase == 3 and zProfile[-1] >= 0:
                 currentPhase += 1
                 bonusDur = currentDive[phases[currentPhase]][0]*self.sps -frameI
+
+            currentPitch  =np.random.normal(loc=curentDive[currentPhase][1], scale=curentDive[currentPhase][2], size=None)
+            currentZshift =np.random.normal(loc=curentDive[currentPhase][3], scale=curentDive[currentPhase][4], size=None)
+
+            pitchAngle.append(pitchAngle[-1] + currentPitch/self.sps )
+            zProfile.append(zProfile[-1] + currentZshift/self.sps )
+
+            # extreme cases
+            if zProfile[-1] < self.oceanDepth:
+                zProfile[-1] = self.oceanDepth+0.1
+            elif zProfile[-1] > 0:
+                zProfile[-1] = 0
+        
+
+
+        return zProfile,pitchAngle
+
             
 
 
@@ -211,9 +258,8 @@ class ProtMov:
             newPM = random.choice(newPM)[0]
             currentPM = newPM 
             self.traIDX.append(protoMov[newPM]) #traIDX = [thrust(m),Slip(m),Yaw(m)]
-        self.thrust = [i[0] for i in self.traIDX]
-        self.slip = [i[1] for i in self.traIDX]
-        self.yaw = [i[2] for i in self.traIDX]
+
+        return  [i[0] for i in self.traIDX], [i[1] for i in self.traIDX],[i[2] for i in self.traIDX]
 
     def createThrustLiftPitch(self,divePitch,mode,thrust):
         '''
