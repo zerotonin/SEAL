@@ -4,16 +4,16 @@ from importlib import reload
     
 class ProtMov: 
     """
-    the seal class holds informations about the seal agent in the 3D cartisian world, simulating 
-    the ocean. It holds infomation about the seals position, orientation,and it active movement, 
-    defined by habor seal typical trajectories taken from video data.
+    The ProtMov class generators prototypical movements discribed with 5 vectors inbtween 
+    each frame beeing thrust, lift, slip, pitch and yaw 
     """
     def __init__(self,simObj):
         self.simObj = simObj
+        self.pitch
         self.traIDX = []
         self.divePitch = []
 
-    def generator (self):
+    def generator (self,mode):
         '''
         this function randomly chooses between uShape and vShapes dives.
         dependent on the diveType it sets the corresponding lenght
@@ -24,8 +24,9 @@ class ProtMov:
         der Nordsee durch Seehunde im Zusammenhang mit der Entwicklung von 
         OffshoreWindenergieanlagen" depth and pitch Data taken from figure 16.
         '''
-        mode = ('uShape','vShape')
-        mode = random.choice(mode)
+        if mode == 'random':
+            mode = ('uShape','vShape')
+            mode = random.choice(mode)
         print(mode)
         if mode == 'uShape':
             self.traLen = 77 #frames -> 385 sec
@@ -33,7 +34,7 @@ class ProtMov:
             self.createThrustSlipYaw()
             self.createThrustLiftPitch(self.divePitch,'uShape',self.thrust)  
         elif mode == 'vShape':
-            self.traLen = 36 #framse -> 185 sec
+            self.traLen = 36 #frames -> 185 sec
             self.vShapeDive()
             self.createThrustSlipYaw()
             self.createThrustLiftPitch(self.divePitch,'vShape',self.thrust)
@@ -52,10 +53,10 @@ class ProtMov:
         were calculated from the dive data from figure 16. and for each 5 seconds
         one random value is taken. 
         '''
-        uShapeDiveSurfaceLen = 10 #frames (degree/0.2sec)
-        uShapeDiveDownLen = 4 #frames (degree/0.2sec)
+        uShapeDiveSurfaceLen  = 10 #frames (degree/0.2sec)
+        uShapeDiveDownLen     = 4  #frames (degree/0.2sec)
         uShapeDiveStraightLen = 51 #frames (degree/0.2sec)
-        uShapeDiveUpLen = 12 #frames (degree/0.2sec)
+        uShapeDiveUpLen       = 12 #frames (degree/0.2sec)
 
         while len(self.divePitch)<self.traLen:
             if len(self.divePitch) < uShapeDiveSurfaceLen:
@@ -77,8 +78,8 @@ class ProtMov:
         one random value is taken. 
         '''
         vShapeDiveSurfaceLen = 11 #frames (degree/0.2sec)
-        vShapeDiveDownLen = 14 #frames (degree/0.2sec)
-        vShapeDiveUpLen = 11 #frames (degree/0.2sec)
+        vShapeDiveDownLen    = 14 #frames (degree/0.2sec)
+        vShapeDiveUpLen      = 11 #frames (degree/0.2sec)
 
         while len(self.divePitch)<self.traLen:
             if len(self.divePitch) < vShapeDiveSurfaceLen:
@@ -103,7 +104,7 @@ class ProtMov:
         distributionCS = np.genfromtxt ('distributionCS.csv', delimiter=",")
         '''import transition probability from each Prototypical Movement to another'''
         transProbCS = np.genfromtxt ('transProbCS.csv', delimiter=",")        
-        '''preallocatio'''
+        '''preallocation'''
         
         '''get start prototype'''
         randomNumber = random.random() # defines number betwen 0 and 1. the corresponding distributionCS is taken as start PM
