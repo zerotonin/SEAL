@@ -3,6 +3,6 @@ import SEAL_SIM,protoMov
 import numpy as np 
 
 reload(protoMov)
-
-P = protoMov.ProtMov('Test')
+simObj = SEAL_SIM.SEAL_SIM()
+P = protoMov.ProtMov(simObj)
 P.vShapeDive()
