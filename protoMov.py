@@ -8,12 +8,26 @@ class ProtMov:
     each frame beeing thrust, lift, slip, pitch and yaw 
     """
     def __init__(self,simObj):
-        self.simObj = simObj
-        self.pitch
-        self.traIDX = []
+        self.simObj    = simObj
+        self.sps       = simObj.sps #shorthand
+        self.traIDX    = []
         self.divePitch = []
 
-    def generator (self,mode):
+        # dive phases are keywords for a tupel consisting of 0) duration normalised to total duration
+        # 1) mean pitch angle [deg]  2)  standard deviation of the mean [deg]
+        self.diveShapeU = {'surfaceDur' :(10.0/77.0, -79.639515,12.78034071),
+                           'diveDownDur':( 4.0/77.0, 63.9146825,8.36629103),
+                           'straightDur':(51.0/77.0, 8.36629103,5.5529812),
+                           'diveUpDur'  :(12.0/77.0,-68.64291923,15.63982373)}
+        
+        
+        self.diveShapeV = {'surfaceDur' :(11.0/36.0, -74.53024727,7.65994214),        
+                           'diveDownDur':(14.0/36.0, 17.04128714 ,25.74478444),
+                           'straightDur':(0        ,0            ,0),
+                           'diveUpDur'  :(11.0/36.0,-49.06783    ,28.94055575)}
+
+
+    def generator2 (self,mode,traLenSec):
         '''
         this function randomly chooses between uShape and vShapes dives.
         dependent on the diveType it sets the corresponding lenght
@@ -24,10 +38,50 @@ class ProtMov:
         der Nordsee durch Seehunde im Zusammenhang mit der Entwicklung von 
         OffshoreWindenergieanlagen" depth and pitch Data taken from figure 16.
         '''
+        self.traLen = traLenSec*self.sps
+
         if mode == 'random':
             mode = ('uShape','vShape')
             mode = random.choice(mode)
-        print(mode)
+
+        if  mode == 'uShape':
+            currentDive = self.diveShapeU
+        elif mode == 'vShape':
+            currentDive = self.diveShapeV
+        else:
+            print('Unkown dive type: ' + mode)
+            raise ValueError  # shorthand for 'raise ValueError()'
+
+
+
+        self.traLen = 36 #frames -> 185 sec
+        self.vShapeDive()
+        self.createThrustSlipYaw()
+        self.createThrustLiftPitch(self.divePitch,'vShape',self.thrust)
+
+
+        self.diveProtoMov= np.c_[[i[0:2] for i in self.DiveThrustLiftPitch],self.slip,[i[2] for i in self.DiveThrustLiftPitch],self.yaw] # [thrust(m/s),lift(m/s),slip(m/s),pitch(degree/s),yaw(degree/s)]
+        print(self.diveProtoMov)
+        print(len(self.diveProtoMov))
+        
+
+    def generator (self,mode,traLenSec):
+        '''
+        this function randomly chooses between uShape and vShapes dives.
+        dependent on the diveType it sets the corresponding lenght
+        of the dive (traLen) to a specific number of frames (0.2fps)
+        Data taken from "Forschungsverbund MINOSplus - Weiterführende Arbeiten an Seevögeln
+        und Meeressäugern zur Bewertung von Offshore - Windkraftanlagen Teilvorhaben TP6 
+        – „Seehunde in See“ – Untersuchungen zur räumlichen und zeitlichen Nutzung 
+        der Nordsee durch Seehunde im Zusammenhang mit der Entwicklung von 
+        OffshoreWindenergieanlagen" depth and pitch Data taken from figure 16.
+        '''
+        self.traLen = traLenSec*self.sps
+
+        if mode == 'random':
+            mode = ('uShape','vShape')
+            mode = random.choice(mode)
+
         if mode == 'uShape':
             self.traLen = 77 #frames -> 385 sec
             self.uShapeDive()
@@ -40,6 +94,7 @@ class ProtMov:
             self.createThrustLiftPitch(self.divePitch,'vShape',self.thrust)
         else:
             print('Unkown dive type: ' + mode)
+            raise ValueError  # shorthand for 'raise ValueError()'
         self.diveProtoMov= np.c_[[i[0:2] for i in self.DiveThrustLiftPitch],self.slip,[i[2] for i in self.DiveThrustLiftPitch],self.yaw] # [thrust(m/s),lift(m/s),slip(m/s),pitch(degree/s),yaw(degree/s)]
         print(self.diveProtoMov)
         print(len(self.diveProtoMov))
@@ -89,7 +144,6 @@ class ProtMov:
             else: 
                 self.pitch = np.random.normal(loc=-49.06783, scale=28.94055575, size=None) # get random size and position
             self.divePitch.append(self.pitch)
-        
 
 
 
