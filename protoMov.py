@@ -12,6 +12,7 @@ class ProtMov:
         self.simObj      = simObj
         self.sps         = simObj.sps #shorthand
         self.oceanDepth  = simObj.environment.oceanDepth #shorthand
+        self.mathUtils   = mathUtils()
         self.origDiveFPS = 0.2 # the orginal data was recorded every 5th second 
         self.traIDX      = []
         self.divePitch   = []
@@ -64,10 +65,10 @@ class ProtMov:
 
 
         # Z-POSITION AND Pitch-ANGLE
-        zProfile ,pitchAngle = self.createLiftPitch(currentDive)
-
+        self.zProfile ,self.pitchAngle = self.createLiftPitch(currentDive)
+        
         # combine both trajectories
-        self.velTra =self.mergeLiftPitch_ThrustYawSlip(zProfile,pitchAngle,thrust,slip,yaw)
+        self.velTra =self.mergeLiftPitch_ThrustYawSlip(self.zProfile,self.pitchAngle,thrust,slip,yaw)
 
 
  
@@ -76,22 +77,35 @@ class ProtMov:
 
         #positional values to velocities in m/s or deg/s || filtered by 3 sigma gauss
         zVel = np.diff(gaussian_filter1d(zProfil, 3))*self.sps 
-        pVel = np.diff(gaussian_filter1d(pitchAngle, 3))*self.sps
+        pVel = np.diff(gaussian_filter1d(pitchAngle, 6)) # this is allready deg per frame
 
         newThrust = list()
         newLift   = list()
 
         # rotate velocities accordingly
-        for frameI in range(self.traLen):
-            R = mathUtils.getRotMatrix2D(np.deg2rad(pitchAngle[frameI]))
+        for frameI in range(self.traLen):s
+            R = self.mathUtils.getRotMatrix2D(np.deg2rad(pitchAngle[frameI]))
             temp = np.dot(R,np.array([thrust[frameI],zVel[frameI]]))
             newThrust.append(temp[0])
             newLift.append(temp[1])
 
         return  np.transpose(np.vstack((np.array(newThrust),slip,np.array(newLift),yaw,pVel)))
 
-        
+    
+    def getPositionAndAngelsFromVel(self):
 
+        angles = np.cumsum(self.velTra[:,3:]/self.sps,axis=0)
+        angles = np.deg2rad(angles)
+        positions = np.zeros(shape=(self.velTra.shape[0]+1,3))
+
+        for frameI in range(self.velTra.shape[0]):
+
+            R = self.mathUtils.getRotMatrix3D(angles[frameI,0]*-1,angles[frameI,1]*-1,0)
+            positions[frameI+1,:] = np.dot(R,np.array(self.velTra[frameI,0:3]))
+
+        self.positions = positions
+        self.angles    = angles
+            
 
 
     def createLiftPitch(self, currentDive):
@@ -131,7 +145,7 @@ class ProtMov:
             currentPitch  =np.random.normal(loc=currentDive[phases[currentPhase]][1], scale=currentDive[phases[currentPhase]][2], size=None)
             currentZshift =np.random.normal(loc=currentDive[phases[currentPhase]][3], scale=currentDive[phases[currentPhase]][4], size=None)
 
-            pitchAngle.append(pitchAngle[-1] + currentPitch/self.sps )
+            pitchAngle.append(currentPitch)
             zProfile.append(zProfile[-1] + currentZshift/self.sps )
             # extreme cases
             if zProfile[-1] < self.oceanDepth:
