@@ -166,25 +166,25 @@ class Particle:
         else:
             step  = np.zeros(shape = 3)
         
-        oldPosition = copy.deepcopy(self.position)
+        oldPosition    = copy.deepcopy(self.position)
         self.position += step
-        newPosition =copy.deepcopy(self.position)
-        status = copy.deepcopy(self.visible)
-
-        XsqPlusYsq = oldPosition[0]**2 + oldPosition[1]**2
-        r = m.sqrt(XsqPlusYsq + oldPosition[2]**2)               # r
-        theta = m.atan2(m.sqrt(XsqPlusYsq),oldPosition[2])     # theta 
-        phi = m.atan2(oldPosition[1],oldPosition[0])          # phi not correct 
-        oldPosition = [r,theta,phi]
-
-        XsqPlusYsq = newPosition[0]**2 + newPosition[1]**2
-        r = m.sqrt(XsqPlusYsq + newPosition[2]**2)               # r
-        theta = m.atan2(m.sqrt(XsqPlusYsq),newPosition[2])     # theta 
-        phi = m.atan2(newPosition[1],newPosition[0])          # phi not correct 
-        newPosition = [r,theta,phi]
-        # before saving the position have them converted to spherical coordinates
-        
+        newPosition    =copy.deepcopy(self.position)
+        status         = copy.deepcopy(self.visible)
+        #translate oldPosition from cartasian to spherical coordinate system
+        oldPosition = self.cart2sphere(oldPosition)
+        #translate newPosition from cartasian to spherical coordinate system
+        newPosition = self.cart2sphere(newPosition)
+    
         self.trajectory.append((oldPosition,newPosition,status))
+    
+    def cart2sphere(self,cartPosition):
+        
+        XsqPlusYsq  = cartPosition[0]**2 + cartPosition[1]**2
+        r           = m.sqrt(XsqPlusYsq + cartPosition[2]**2)              
+        theta       = m.atan2(m.sqrt(XsqPlusYsq),cartPosition[2])     
+        phi         = m.atan2(cartPosition[1],cartPosition[0])          
+        return r,theta,phi
+
 
 
 class Cloud:
