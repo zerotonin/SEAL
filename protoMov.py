@@ -197,8 +197,8 @@ class ProtMov:
         return  self.resampleData2TraLen([i[0] for i in self.traIDX]), self.resampleData2TraLen([i[1] for i in self.traIDX]), self.resampleData2TraLen([i[2] for i in self.traIDX])
 
 
-        def resampleData2TraLen(self,data):
-            '''Returns given data resampled into trajectory length '''
-            return signal.resample(data,self.traLen)
+    def resampleData2TraLen(self,data):
+        '''Returns given data resampled into trajectory length '''
+        return signal.resample(data,self.traLen)
 
 
