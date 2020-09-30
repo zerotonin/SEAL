@@ -39,15 +39,15 @@ class environment:
         @ param waterCurrentMode srt default: none
           the state of the water current in the ocean.         
         '''
-        self.simObj = simObj #name
-        self.oceanSurface = 0 # [m]
-        self.oceanDepth = -70 # [m]
-        self.oceanLimit = (-70,70) # [m]
-        self.activeMovement = True 
-        self.visible        = True 
-        self.waterCurrent = np.array([0.0,2.0,0.0]) # just a simple example will be changed later 
-        self.waterCurrentMode = 'static'
-        self.obstacleList = []
+        self.simObj                 = simObj #name
+        self.oceanSurface           = 0 # [m]
+        self.oceanDepth             = -70 # [m]
+        self.oceanLimit             = (-70,70) # [m]
+        self.activeMovement         = True 
+        self.visible                = True 
+        self.waterCurrent           = np.array([0.0,2.0,0.0]) # just a simple example will be changed later 
+        self.waterCurrentMode       = 'static'
+        self.obstacleList           = []
         self.observableObstacleList = []
 
     def getWaterCurrent(self):

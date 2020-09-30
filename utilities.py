@@ -131,10 +131,10 @@ class mathUtils:
         theta = atan2((x*x +y*y),z)
         phi = atan2(y,x)
         """
-        XsqPlusYsq = self.position[0]**2 + self.position[1]**2
-        r = m.sqrt(XsqPlusYsq + self.position[2]**2)               # r
-        theta = m.atan2(m.sqrt(XsqPlusYsq),self.position[2])     # theta 
-        phi = m.atan2(self.position[1],self.position[0])          # phi not correct 
+        XsqPlusYsq    = self.position[0]**2 + self.position[1]**2
+        r             = m.sqrt(XsqPlusYsq + self.position[2]**2)               # r
+        theta         = m.atan2(m.sqrt(XsqPlusYsq),self.position[2])     # theta 
+        phi           = m.atan2(self.position[1],self.position[0])          # phi not correct 
         self.position = [r,theta,phi]
         return [r,theta,phi]
 

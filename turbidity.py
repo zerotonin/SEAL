@@ -267,15 +267,15 @@ class Cloud:
         @param waterCurrent   default: np.zeros(shape=3)
             the list of water current vectors in the ocean space.
         """
-        self.simObj = simObj # string name
-        self.max_particles = max_particles # integer number of particles 
-        self.partclObjList = [] # list of particle objects
-        self.sizeRange = sizeRange # tuple with the min and max radius[µm]
+        self.simObj            = simObj # string name
+        self.max_particles     = max_particles # integer number of particles 
+        self.partclObjList     = [] # list of particle objects
+        self.sizeRange         = sizeRange # tuple with the min and max radius[µm]
         self.maxVectorMagnitue = maxVectorMagnitue # max radius of a cloud
-        self.sealPosition    = self.simObj.seal.sealPosition #centre of the coordinate system of a Seal
-        self.sealOrientation = self.simObj.seal.sealOrientation  # orientation as yaw pitch roll
-        self.sealStep        = self.simObj.seal.sealStep # change of position and orientation
-        self.waterCurrent    = np.zeros(shape=3) # water current 
+        self.sealPosition      = self.simObj.seal.sealPosition #centre of the coordinate system of a Seal
+        self.sealOrientation   = self.simObj.seal.sealOrientation  # orientation as yaw pitch roll
+        self.sealStep          = self.simObj.seal.sealStep # change of position and orientation
+        self.waterCurrent      = np.zeros(shape=3) # water current 
     
     def add_particles(self):
         """
