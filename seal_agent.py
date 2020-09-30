@@ -10,15 +10,15 @@ class Seal:
     """
     def __init__(self,simObj):
 
-        self.simObj = simObj
-        self.sealPosition = np.zeros(shape = 3) #centre of the coordinate system of the Seal in disctance to (0,0,0) of world
-        self.sealOrientation = np.zeros(shape = 3)  # orientation as yaw pitch roll
-        self.sealStep = np.zeros(shape =6) # change of position and orientation
-        self.sealTrajectory = list()
+        self.simObj             = simObj
+        self.sealPosition       = np.zeros(shape = 3) #centre of the coordinate system of the Seal in disctance to (0,0,0) of world
+        self.sealOrientation    = np.zeros(shape = 3)  # orientation as yaw pitch roll
+        self.sealStep           = np.zeros(shape =6) # change of position and orientation
+        self.sealTrajectory     = list()
         self.activeSealMovement = True
-        self.minutes = 5
-        self.traLen = self.minutes*60*25
-        self.traIDX = []
+        self.minutes            = 5
+        self.traLen             = self.minutes*60*25
+        self.traIDX             = []
         """
         @param simObj               string default: none
            string that gives a name: simulation object.           
