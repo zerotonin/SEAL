@@ -210,7 +210,6 @@ class ProtMov:
             self.traIDX.append(protoMov[newPM]) #traIDX = [thrust(m),Slip(m),Yaw(m)]
             self.pmIDX.append(currentPM)
 
-<<<<<<< HEAD
         self.traIDX = np.array(self.traIDX)
         #resampling from video fps to sps
         thrust = self.resample_by_interpolation(self.traIDX[:,0],self.origVideoFPS,self.sps), 
@@ -218,19 +217,22 @@ class ProtMov:
         yaw   = self.resample_by_interpolation(self.traIDX[:,2],self.origVideoFPS,self.sps)
         
         return thrust[0],slip[0],yaw
-=======
-        return  self.resampleData2TraLen([i[0] for i in self.traIDX]), self.resampleData2TraLen([i[1] for i in self.traIDX]), self.resampleData2TraLen([i[2] for i in self.traIDX])
->>>>>>> 71df4fa4947ac4b62fdcb77ab736c4be00b432df
 
 
     def resampleData2TraLen(self,data):
         '''Returns given data resampled into trajectory length '''
         return signal.resample(data,self.traLen)
-<<<<<<< HEAD
 
 
     def resample_by_interpolation(self,signal, input_fs, output_fs):
-
+        '''
+        The diving (depth sensor) and cruising data (Videos) were recorded af
+        0.2 Hz and respectively 25 Hz. Especially in the case of the prototypical
+        movements (PM), this renders each PM to be 40ms long. Therefore we have 
+        to create the PM sequence in 25 Hz and than resample the resulting trajectory
+        to a frequency of our simulation. Note the PM sequence cannot be resampled as
+        it is a quantized (classes) and not continues data format.
+        '''
         scale = output_fs / input_fs
         # calculate new length of sample
         n = round(len(signal) * scale)
@@ -248,8 +250,6 @@ class ProtMov:
             np.linspace(0.0, 1.0, len(signal), endpoint=False),  # known positions
             signal,  # known data points
         )
-        return self.resampleData2TraLen(resampled_signal)
-=======
->>>>>>> 71df4fa4947ac4b62fdcb77ab736c4be00b432df
+        return self.resampleData2TraLen(resampled_signal) # to assure trajectory length
 
 
