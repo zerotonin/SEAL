@@ -66,6 +66,11 @@ class ProtMov:
         # create a HMM based trajectory for thrust slip and yaw VELOCITIES
         self.thrust , self.slip , self.yaw = self.createThrustSlipYaw()
 
+        # yaw velocity to yaw angle
+        self.yawAngle = np.cumsum(self.yaw)
+
+        # get X-Y-positions
+        self.fromThrustSlip2XYcoordinates()
 
         # Z-POSITION AND Pitch-ANGLE
         self.zProfile ,self.pitchAngle = self.createLiftPitch(currentDive)
@@ -74,7 +79,16 @@ class ProtMov:
         self.velTra =self.mergeLiftPitch_ThrustYawSlip(self.zProfile,self.pitchAngle,self.thrust,self.slip,self.yaw)
 
 
- 
+    def fromThrustSlip2XYcoordinates(self):
+        self.xProfile = np.zeros(shape=(self.traLen,))
+        self.yProfile = np.zeros(shape=(self.traLen,))
+
+        for frameI in range(self.traLen-1):
+            R = self.mathUtils.getRotMatrix2D(np.deg2rad(self.yawAngle[frameI])*-1)
+            temp = np.dot(R,np.array([self.thrust[frameI],self.slip[frameI]]))
+            self.xProfile[frameI+1] = self.xProfile[frameI] + temp[0]/self.sps
+            self.yProfile[frameI+1] = self.yProfile[frameI] + temp[1]/self.sps
+            
     
     def mergeLiftPitch_ThrustYawSlip(self,zProfil,pitchAngle,thrust,slip,yaw):
 
@@ -149,7 +163,7 @@ class ProtMov:
             currentZshift =np.random.normal(loc=currentDive[phases[currentPhase]][3], scale=currentDive[phases[currentPhase]][4], size=None)
 
             pitchAngle.append(currentPitch)
-            zProfile.append(zProfile[-1] + currentZshift/self.sps )
+            zProfile.append(zProfile[-1] + currentZshift/self.origDiveFPS )
             # extreme cases
             if zProfile[-1] < self.oceanDepth:
                 zProfile[-1] = self.oceanDepth+0.1
