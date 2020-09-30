@@ -117,7 +117,9 @@ class ProtMov:
         pitchAngle   = [0]
         bonusDur     = 0
 
-        for frameI in range(self.traLen): 
+        diveLen = int(np.round(self.traDurSec * self.origDiveFPS))
+
+        for frameI in range(diveLen): 
 
             # This if clause regulates the change of diving phases. A diving phase ends when
             # either the duration runs out or the animals z-profile gets out of bounds (0, ocean
@@ -126,19 +128,19 @@ class ProtMov:
             # as a bonus to the following phas (straight or surface2). Surface2 is only their
             # to produce trajectories of properlength
 
-            if frameI > currentDive[phases[currentPhase]][0]*self.traLen + bonusDur and currentPhase < 5:
+            if frameI > currentDive[phases[currentPhase]][0]*diveLen + bonusDur and currentPhase < 5:
                 currentPhase += 1
                 bonusDur      = 0
                 print(currentPhase,frameI,zProfile[-1])
             
             elif currentPhase == 1 and zProfile[-1] <= self.oceanDepth+0.5:
                 currentPhase += 1
-                bonusDur = currentDive[phases[currentPhase]][0]*self.sps -frameI
+                bonusDur = currentDive[phases[currentPhase]][0]*self.origDiveFPS -frameI
                 print(currentPhase,frameI,zProfile[-1])
 
             elif currentPhase == 3 and zProfile[-1] >= 0:
                 currentPhase += 1
-                bonusDur = currentDive[phases[currentPhase]][0]*self.sps -frameI
+                bonusDur = currentDive[phases[currentPhase]][0]*self.origDiveFPS -frameI
                 print(currentPhase,frameI,zProfile[-1])
             else: 
                 print(currentPhase,frameI,zProfile[-1],'done')
@@ -156,7 +158,7 @@ class ProtMov:
         
 
 
-        return zProfile,pitchAngle
+        return self.resample_by_interpolation(zProfile,self.origDiveFPS,self.sps),self.resample_by_interpolation(pitchAngle,self.origDiveFPS,self.sps)
 
     def createThrustSlipYaw(self):
         """
@@ -173,7 +175,7 @@ class ProtMov:
         
         '''get start prototype'''
         
-        pmTraLen = self.traDurSec*self.origVideoFPS
+        pmTraLen = int(np.round(self.traDurSec*self.origVideoFPS))
 
         randomNumbers = np.random.rand(pmTraLen+1)   # defines number betwen 0 and 1. the corresponding distributionCS is taken as start PM
         currentPM = np.where(distributionCS>= randomNumbers[0])
@@ -194,11 +196,39 @@ class ProtMov:
             self.traIDX.append(protoMov[newPM]) #traIDX = [thrust(m),Slip(m),Yaw(m)]
             self.pmIDX.append(currentPM)
 
-        return  self.resampleData2TraLen([i[0] for i in self.traIDX]), self.resampleData2TraLen([i[1] for i in self.traIDX]), self.resampleData2TraLen([i[2] for i in self.traIDX])
+        self.traIDX = np.array(self.traIDX)
+        #resampling from video fps to sps
+        thrust = self.resample_by_interpolation(self.traIDX[:,0],self.origVideoFPS,self.sps), 
+        slip   = self.resample_by_interpolation(self.traIDX[:,1],self.origVideoFPS,self.sps), 
+        yaw   = self.resample_by_interpolation(self.traIDX[:,2],self.origVideoFPS,self.sps)
+        
+        return thrust[0],slip[0],yaw
 
 
-        def resampleData2TraLen(self,data):
-            '''Returns given data resampled into trajectory length '''
-            return signal.resample(data,self.traLen)
+    def resampleData2TraLen(self,data):
+        '''Returns given data resampled into trajectory length '''
+        return signal.resample(data,self.traLen)
+
+
+    def resample_by_interpolation(self,signal, input_fs, output_fs):
+
+        scale = output_fs / input_fs
+        # calculate new length of sample
+        n = round(len(signal) * scale)
+
+        # use linear interpolation
+        # endpoint keyword means than linspace doesn't go all the way to 1.0
+        # If it did, there are some off-by-one errors
+        # e.g. scale=2.0, [1,2,3] should go to [1,1.5,2,2.5,3,3]
+        # but with endpoint=True, we get [1,1.4,1.8,2.2,2.6,3]
+        # Both are OK, but since resampling will often involve
+        # exact ratios (i.e. for 44100 to 22050 or vice versa)
+        # using endpoint=False gets less noise in the resampled sound
+        resampled_signal = np.interp(
+            np.linspace(0.0, 1.0, n, endpoint=False),  # where to interpret
+            np.linspace(0.0, 1.0, len(signal), endpoint=False),  # known positions
+            signal,  # known data points
+        )
+        return self.resampleData2TraLen(resampled_signal)
 
 
