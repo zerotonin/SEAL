@@ -125,7 +125,8 @@ class ProtMov:
             
     def createLiftPitch(self, currentDive):
 
-        phases = list(currentDive.keys())
+        phaseKeys = list(currentDive.keys())
+        
         currentPhase = 0
         zProfile     = [0]# to create z-profile that we can diff afterwards
         pitchAngle   = [0]
@@ -141,26 +142,26 @@ class ProtMov:
             # shorter than anticipated dive phases. The rest duration of the phase is carried
             # as a bonus to the following phas (straight or surface2). Surface2 is only their
             # to produce trajectories of properlength
-
-            if frameI > currentDive[phases[currentPhase]][0]*diveLen + bonusDur and currentPhase < 5:
+            currentKey = phaseKeys[currentPhase]
+            if frameI > int(np.round(currentDive[currentKey][0]*diveLen + bonusDur)) and currentPhase < 5:
                 currentPhase += 1
                 bonusDur      = 0
-                print(currentPhase,frameI,zProfile[-1])
+                print(currentPhase,frameI,currentDive[currentKey][0]*diveLen,'frame out')
             
             elif currentPhase == 1 and zProfile[-1] <= self.oceanDepth+0.5:
                 currentPhase += 1
-                bonusDur = currentDive[phases[currentPhase]][0]*self.origDiveFPS -frameI
-                print(currentPhase,frameI,zProfile[-1])
+                bonusDur = currentDive[currentKey][0]*self.origDiveFPS -frameI
+                print(currentPhase,frameI,currentDive[currentKey][0]*diveLen,'depth out')
 
             elif currentPhase == 3 and zProfile[-1] >= 0:
                 currentPhase += 1
-                bonusDur = currentDive[phases[currentPhase]][0]*self.origDiveFPS -frameI
-                print(currentPhase,frameI,zProfile[-1])
+                bonusDur = currentDive[currentKey][0]*self.origDiveFPS -frameI
+                print(currentPhase,frameI,zProfile[-1],'surface out')
             else: 
-                print(currentPhase,frameI,zProfile[-1],'done')
+                print(currentPhase,frameI,zProfile[-1],'go on')
 
-            currentPitch  =np.random.normal(loc=currentDive[phases[currentPhase]][1], scale=currentDive[phases[currentPhase]][2], size=None)
-            currentZshift =np.random.normal(loc=currentDive[phases[currentPhase]][3], scale=currentDive[phases[currentPhase]][4], size=None)
+            currentPitch  =np.random.normal(loc=currentDive[currentKey][1], scale=currentDive[currentKey][2], size=None)
+            currentZshift =np.random.normal(loc=currentDive[currentKey][3], scale=currentDive[currentKey][4], size=None)
 
             pitchAngle.append(currentPitch)
             zProfile.append(zProfile[-1] + currentZshift/self.origDiveFPS )
