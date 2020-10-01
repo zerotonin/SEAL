@@ -134,7 +134,7 @@ class ProtMov:
 
         diveLen = int(np.round(self.traDurSec * self.origDiveFPS))
 
-        for frameI in range(diveLen): 
+        for frameI in range(diveLen+1): 
 
             # This if clause regulates the change of diving phases. A diving phase ends when
             # either the duration runs out or the animals z-profile gets out of bounds (0, ocean
@@ -142,23 +142,26 @@ class ProtMov:
             # shorter than anticipated dive phases. The rest duration of the phase is carried
             # as a bonus to the following phas (straight or surface2). Surface2 is only their
             # to produce trajectories of properlength
-            currentKey = phaseKeys[currentPhase]
-            if frameI > int(np.round(currentDive[currentKey][0]*diveLen + bonusDur)) and currentPhase < 5:
+            
+            currentKey          = phaseKeys[currentPhase]
+            currentPhaseTimeOut = int(np.ceil(currentDive[currentKey][0]*diveLen + bonusDur))
+
+            if frameI > currentPhaseTimeOut and currentPhase < 5:
                 currentPhase += 1
                 bonusDur      = 0
-                print(currentPhase,frameI,currentDive[currentKey][0]*diveLen,'frame out')
+                print(currentPhase,frameI,currentPhaseTimeOut,'frame out')
             
             elif currentPhase == 1 and zProfile[-1] <= self.oceanDepth+0.5:
                 currentPhase += 1
                 bonusDur = currentDive[currentKey][0]*self.origDiveFPS -frameI
-                print(currentPhase,frameI,currentDive[currentKey][0]*diveLen,'depth out')
+                print(currentPhase,frameI,currentPhaseTimeOut,'depth out')
 
             elif currentPhase == 3 and zProfile[-1] >= 0:
                 currentPhase += 1
                 bonusDur = currentDive[currentKey][0]*self.origDiveFPS -frameI
-                print(currentPhase,frameI,zProfile[-1],'surface out')
+                print(currentPhase,frameI,currentPhaseTimeOut,'surface out')
             else: 
-                print(currentPhase,frameI,zProfile[-1],'go on')
+                print(currentPhase,frameI,currentPhaseTimeOut,'go on')
 
             currentPitch  =np.random.normal(loc=currentDive[currentKey][1], scale=currentDive[currentKey][2], size=None)
             currentZshift =np.random.normal(loc=currentDive[currentKey][3], scale=currentDive[currentKey][4], size=None)
