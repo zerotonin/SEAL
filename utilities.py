@@ -155,14 +155,23 @@ class mathUtils:
         return np.array(((c, -s), (s, c)))
         
     
-    def getRotMatrix3D(self,yaw,pitch,roll):
+    def getRotMatrix3D(self,yaw,pitch,roll,mode='active'):
         # theta is in radians
-        c_yaw = np.cos(yaw)
-        s_yaw = np.sin(yaw)
-        c_pitch = np.cos(pitch)
-        s_pitch = np.sin(pitch)
-        c_roll = np.cos(roll)
-        s_roll = np.sin(roll)
-        return np.array(((c_yaw*c_pitch                     ,s_yaw*c_pitch                     ,c_pitch*-1),
-                         (c_yaw*s_pitch*s_roll-s_yaw*c_roll ,s_yaw*s_pitch*s_roll+c_yaw*c_roll ,c_pitch*s_roll),
-                         (c_yaw*s_pitch*c_roll+s_yaw*c_roll ,s_yaw*s_pitch*c_roll-c_yaw*s_roll ,c_pitch*c_roll)))
+        cosYaw = np.cos(yaw)
+        sinYaw = np.sin(yaw)
+        cosPitch = np.cos(pitch)
+        sinPitch = np.sin(pitch)
+        cosRoll = np.cos(roll)
+        sinRoll = np.sin(roll)
+        if mode == 'active':
+            return np.array(((cosYaw*cosPitch                        , -sinYaw*cosPitch                       , sinPitch         ),
+                             (cosYaw*sinPitch*sinRoll+sinYaw*cosRoll , -sinYaw*sinPitch*sinRoll+cosYaw*cosRoll, -cosPitch*sinRoll), 
+                             (-cosYaw*sinPitch*cosRoll+sinYaw*sinRoll,  sinYaw*sinPitch*cosRoll+cosYaw*sinRoll, cosPitch*cosRoll)))
+        elif mode == 'passive':
+            return np.array(((cosYaw*cosPitch,  cosYaw*sinPitch*sinRoll-sinYaw*cosRoll,  cosYaw*sinPitch*cosRoll+sinYaw*sinRoll),
+                            (sinYaw*cosPitch ,  sinYaw*sinPitch*sinRoll+cosYaw*cosRoll, sinYaw*sinPitch*cosRoll-cosYaw*sinRoll ),
+                            (-sinPitch       ,          cosPitch*sinRoll              ,          cosPitch*cosRoll              )))
+
+        else:
+            print('Unknown mode for generating Fick Rotational Matrix:' + str(mode))
+            raise ValueError
