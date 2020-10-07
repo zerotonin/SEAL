@@ -39,13 +39,14 @@ class ProtMov:
     def generator2(self,mode,traLenSec):
         '''
         this function randomly chooses between uShape and vShapes dives.
-        dependent on the diveType it sets the corresponding lenght
-        of the dive (traLen) to a specific number of frames (0.2fps)
-        Data taken from "Forschungsverbund MINOSplus - Weiterführende Arbeiten an Seevögeln
+        dependent on the diveType it sets the corresponding phases (surface, down, straight
+        up,surface2) to their percentage of time each of the phases last.
+        Data taken from "Forschungsverbund MINOSplus - Weiterführender Arbeiten an Seevögeln
         und Meeressäugern zur Bewertung von Offshore - Windkraftanlagen Teilvorhaben TP6 
         – „Seehunde in See“ – Untersuchungen zur räumlichen und zeitlichen Nutzung 
         der Nordsee durch Seehunde im Zusammenhang mit der Entwicklung von 
         OffshoreWindenergieanlagen" depth and pitch Data taken from figure 16.
+
         '''
         self.traLen    = traLenSec*self.sps
         self.traDurSec = traLenSec
@@ -76,13 +77,17 @@ class ProtMov:
         self.zProfile ,self.pitchAngle = self.createLiftPitch(currentDive)
         
         # combine both trajectories
-        self.velTra =self.mergeLiftPitch_ThrustYawSlip(self.zProfile,self.pitchAngle,self.thrust,self.slip,self.yaw)
-
+        self.velTra =self.mergeLiftPitch_ThrustYawSlip(self.zProfile,self.pitchAngle,self.thrust,self.slip,self.yaw)#(thurst,slip,lift,yaw,pitch)
+        print(self.velTra[0:10])
 
     def fromThrustSlip2XYcoordinates(self):
+        '''
+        This function creates the x and y profiles by rotating the 2D thrust and slip vector with 
+        a rotation matrix of yaw.
+        '''
         self.xProfile = np.zeros(shape=(self.traLen,))
         self.yProfile = np.zeros(shape=(self.traLen,))
-
+ 
         for frameI in range(self.traLen-1):
             R = self.mathUtils.getRotMatrix2D(np.deg2rad(self.yawAngle[frameI])*-1)
             temp = np.dot(R,np.array([self.thrust[frameI],self.slip[frameI]]))
@@ -91,6 +96,14 @@ class ProtMov:
             
     
     def mergeLiftPitch_ThrustYawSlip(self,zProfil,pitchAngle,thrust,slip,yaw):
+        '''
+        this function merges the before calculates values for thrust, slip,
+        lift, yaw and pitch. Roll is considered to be 0. Since lift(zProfile)
+        values are taken from the coordinate system point of view, the thrust and lift
+        values need to be rotated by a rotation matrix arround the pitch angle in order 
+        to get the movement from the seals point of view.
+        WHY did we set sigma to 3 for zProfile and to 6 fpr pitch values?
+        '''
 
         #positional values to velocities in m/s or deg/s || filtered by 3 sigma gauss
         zVel = np.diff(gaussian_filter1d(zProfil, 3))*self.sps 
@@ -106,10 +119,17 @@ class ProtMov:
             newThrust.append(temp[0])
             newLift.append(temp[1])
 
-        return  np.transpose(np.vstack((np.array(newThrust),slip,np.array(newLift),yaw,pVel)))
+        return  np.transpose(np.vstack((np.array(newThrust),slip,np.array(newLift),yaw,pVel))) #(thurst,slip,lift,yaw,pitch)
 
     
     def getPositionAndAngelsFromVel(self):
+        '''
+        this function the angle(deg) and postion(m) data from the angleVelocity(deg/s) and 
+        directionVelocity(m/s) data. For the angles the cumulative sum of the angleVelocities
+        over the time of the dive is calculates. As for the positions the directionVectors from 
+        seal point of view needed to be rotated around yaw and pitch in order to get the position 
+        values in the world coordinates system(x,y,z)
+        '''
 
         angles = np.cumsum(self.velTra[:,3:]/self.sps,axis=0)
         angles = np.deg2rad(angles)
@@ -118,12 +138,18 @@ class ProtMov:
         for frameI in range(self.velTra.shape[0]):
 
             R = self.mathUtils.getRotMatrix3D(angles[frameI,0]*-1,angles[frameI,1]*-1,0)
-            positions[frameI+1,:] = np.dot(R,np.array(self.velTra[frameI,0:3]))
+            positions[frameI+1,:] = np.dot(R,np.array(self.velTra[frameI,0:3])) 
 
-        self.positions = positions
-        self.angles    = angles
+        self.positions = positions # how are we considering the start position of the seal in relation to the ocean coordinate system?
+        self.angles    = angles #now in rad instead of degree ? 
             
     def createLiftPitch(self, currentDive):
+        '''
+        dependent on the before definde phases and their duration the dive simulation 
+        defines number of frame to run in each phase. Dependent on the phase the pitch 
+        and zProfile values are calculates based on the mean and standard deviation defined
+        in the diveShapeU and diveShapeV tuple
+        '''
 
         phaseKeys = list(currentDive.keys())
         
@@ -181,9 +207,11 @@ class ProtMov:
     def createThrustSlipYaw(self):
         """
         Taken Prototypical Movements from analyized video data by Frederike Hanke. 
-        Giving information about Thrust,Slip and Yaw.
+        Giving information about Thrust,Slip and Yaw. The data from the videos were
+        used to creat clusters of prototypical movements. This was done with k-means 
+        clustering and the number of clusters was set to 150.
         """
-        '''import Prototypical Movements (k=200)'''
+        '''import Prototypical Movements (k=200),giving information about thrust,slip,yaw'''
         protoMov = np.genfromtxt ('protoMov.csv', delimiter=",")
         '''import distribution percentage of the 200 clusters. Given as numbers from 0-1 (equal to 0-100%)'''
         distributionCS = np.genfromtxt ('distributionCS.csv', delimiter=",")
@@ -224,13 +252,16 @@ class ProtMov:
 
 
     def resampleData2TraLen(self,data):
-        '''Returns given data resampled into trajectory length '''
-        return signal.resample(data,self.traLen)
+        '''Returns given data resampled into trajectory length.Resamples x to num samples using
+         Fourier method along the given axis.The resampled signal starts at the same value as x 
+         but is sampled with a spacing of len(x) / num * (spacing of x). Because a Fourier method
+          is used, the signal is assumed to be periodic. '''
+        return signal.resample(data,self.traLen) #which data ? 
 
 
     def resample_by_interpolation(self,signal, input_fs, output_fs):
         '''
-        The diving (depth sensor) and cruising data (Videos) were recorded af
+        The diving (depth sensor) and cruising data (Videos) were recorded at
         0.2 Hz and respectively 25 Hz. Especially in the case of the prototypical
         movements (PM), this renders each PM to be 40ms long. Therefore we have 
         to create the PM sequence in 25 Hz and than resample the resulting trajectory
@@ -257,3 +288,9 @@ class ProtMov:
         return self.resampleData2TraLen(resampled_signal) # to assure trajectory length
 
 
+
+#    def getSealHeading(self):
+#
+#        for frameI in range(self.velTra.shape[0]):
+#
+#            R = self.mathUtils.getRotMatrix3D(self.velTra[frameI,],angles[frameI,1]*-1,0)
