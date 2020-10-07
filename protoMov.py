@@ -107,7 +107,9 @@ class ProtMov:
 
         #positional values to velocities in m/s or deg/s || filtered by 3 sigma gauss
         zVel = np.diff(gaussian_filter1d(zProfil, 3))*self.sps 
+        zVel = np.append(0,zVel) # added a start value of 0 to have a length of self.traLen again
         pVel = np.diff(gaussian_filter1d(pitchAngle, 6)) # this is allready deg per frame
+        pVel = np.append(0,pVel )# added a start value of 0 to have a length of self.traLen again
 
         newThrust = list()
         newLift   = list()
@@ -137,7 +139,7 @@ class ProtMov:
 
         for frameI in range(self.velTra.shape[0]):
 
-            R = self.mathUtils.getRotMatrix3D(angles[frameI,0]*-1,angles[frameI,1]*-1,0)
+            R = self.mathUtils.getRotMatrix3D(angles[frameI,0]*-1,angles[frameI,1]*-1,0)#why -1 ?
             positions[frameI+1,:] = np.dot(R,np.array(self.velTra[frameI,0:3])) 
 
         self.positions = positions # how are we considering the start position of the seal in relation to the ocean coordinate system?
@@ -289,8 +291,17 @@ class ProtMov:
 
 
 
-#    def getSealHeading(self):
-#
-#        for frameI in range(self.velTra.shape[0]):
-#
-#            R = self.mathUtils.getRotMatrix3D(self.velTra[frameI,],angles[frameI,1]*-1,0)
+    def getSealHeading(self):
+
+        sealHeading = np.zeros(shape=(self.velTra.shape[0],3))
+        for frameI in range(self.velTra.shape[0]):
+
+            R = self.mathUtils.getRotMatrix3D(self.angles[frameI,0],self.angles[frameI,1],0)
+            v = np.dot(R,np.array([10,0,0])) 
+            sealHeading = self.positions+v
+        self.sealHeading = sealHeading
+        #print(self.sealHeading[0:10])
+        #print(len(self.sealHeading)) #is 60001 this is too big 
+        self.xheading = self.sealHeading[0]
+        self.yheading = self.sealHeading[1]
+        self.zheading = self.sealHeading[2]
