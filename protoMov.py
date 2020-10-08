@@ -75,7 +75,7 @@ class ProtMov:
 
         # Z-POSITION AND Pitch-ANGLE
         self.zProfile ,self.pitchAngle = self.createLiftPitch(currentDive)
-        
+      
         # combine both trajectories
         self.velTra =self.mergeLiftPitch_ThrustYawSlip(self.zProfile,self.pitchAngle,self.thrust,self.slip,self.yaw)#(thurst,slip,lift,yaw,pitch)
         print(self.velTra[0:10])
@@ -108,7 +108,7 @@ class ProtMov:
         #positional values to velocities in m/s or deg/s || filtered by 3 sigma gauss
         zVel = np.diff(gaussian_filter1d(zProfil, 3))*self.sps 
         zVel = np.append(0,zVel) # added a start value of 0 to have a length of self.traLen again
-        pVel = np.diff(gaussian_filter1d(pitchAngle, 6)) # this is allready deg per frame
+        pVel = np.diff(pitchAngle) # this is allready deg per frame
         pVel = np.append(0,pVel )# added a start value of 0 to have a length of self.traLen again
 
         newThrust = list()
@@ -139,8 +139,8 @@ class ProtMov:
 
         for frameI in range(self.velTra.shape[0]):
 
-            R = self.mathUtils.getRotMatrix3D(angles[frameI,0]*-1,angles[frameI,1]*-1,0)#why -1 ?
-            positions[frameI+1,:] = np.dot(R,np.array(self.velTra[frameI,0:3])) 
+            R = self.mathUtils.getRotMatrix3D(angles[frameI,0],angles[frameI,1],0)#why -1 ?
+            positions[frameI+1,:] = np.dot(R,np.array(self.velTra[frameI,0:3]/self.sps)) 
 
         self.positions = positions # how are we considering the start position of the seal in relation to the ocean coordinate system?
         self.angles    = angles #now in rad instead of degree ? 
@@ -201,8 +201,6 @@ class ProtMov:
                 zProfile[-1] = self.oceanDepth+0.1
             elif zProfile[-1] > 0:
                 zProfile[-1] = 0
-        
-
 
         return self.resample_by_interpolation(zProfile,self.origDiveFPS,self.sps),self.resample_by_interpolation(pitchAngle,self.origDiveFPS,self.sps)
 
@@ -293,13 +291,13 @@ class ProtMov:
 
     def getSealHeading(self):
 
-        sealHeading = np.zeros(shape=(self.velTra.shape[0],3))
+        sealHeading =list()
         for frameI in range(self.velTra.shape[0]):
 
             R = self.mathUtils.getRotMatrix3D(self.angles[frameI,0],self.angles[frameI,1],0)
-            v = np.dot(R,np.array([10,0,0])) 
-            sealHeading = self.positions+v
-        self.sealHeading = sealHeading
+            sealHeading.append(np.dot(R,np.array([10,0,0]))) 
+            
+        self.sealHeading = np.array(sealHeading)
         #print(self.sealHeading[0:10])
         #print(len(self.sealHeading)) #is 60001 this is too big 
         self.xheading = self.sealHeading[0]
