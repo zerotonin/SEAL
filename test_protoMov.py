@@ -73,6 +73,8 @@ ax = fig.add_subplot(111, projection='3d')
 #ax.set_ylim(-70,70)# same here 
 #ax.set_zlim(-70,10)
 ax.plot(list(P.xProfile),list(P.yProfile),list(P.zProfile),color='red')
+ax.scatter3D(P.xProfile[0],P.yProfile[0],P.zProfile[0], color = 'green')
+ax.scatter3D(P.xProfile[-1],P.yProfile[-1],P.zProfile[-1], color = 'red')
 for i in range(P.traLen):
 
     X = P.xProfile[i]
