@@ -49,12 +49,23 @@ from mpl_toolkits.mplot3d import Axes3D
 reload(protoMov) 
 simObj = SEAL_SIM.SEAL_SIM() 
 P = protoMov.ProtMov(simObj) 
-P.generator2('vShape',600)  
+P.generator2('uShape',600)  
 
 P.getPositionAndAngelsFromVel()
 
 P.getSealHeading()
 
+
+fig2 = plt.figure()
+ax =fig2.add_subplot(311)
+ax.plot(np.rad2deg(P.angles[:,0]))
+ax =fig2.add_subplot(312)
+ax.plot(np.rad2deg(P.angles[:,1]))
+ax =fig2.add_subplot(313)
+ax.plot(P.zProfile)
+fig3 = plt.figure()
+ax = fig3.add_subplot(111)
+ax.plot(P.xProfile,P.yProfile)
 
 fig = plt.figure() 
 ax = fig.add_subplot(111, projection='3d') 
