@@ -294,7 +294,7 @@ class ProtMov:
         sealHeading =list()
         for frameI in range(self.velTra.shape[0]):
 
-            R = self.mathUtils.getRotMatrix3D(self.angles[frameI,0],self.angles[frameI,1],0)
+            R = self.mathUtils.getRotMatrix3D(self.angles[frameI,0],self.angles[frameI,1],0, mode='passive')
             sealHeading.append(np.dot(R,np.array([10,0,0]))) 
             
         self.sealHeading = np.array(sealHeading)
