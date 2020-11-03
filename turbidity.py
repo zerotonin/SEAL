@@ -181,16 +181,21 @@ class Particle:
     def cart2cylindric(self,cartPosition):
         """
         https://pypi.org/project/ai.cs/
+        r = axial distance or radial distance
+        phi = angle between the reference dircetion on the choosen plane and the line from the origin to the porjection of point P on the plane
+        z = hight
         """
         r, phi, z = cs.cart2cyl(x=cartPosition[0], y=cartPosition[1], z=cartPosition[2])
         return r, phi, z
 
-    def cart2cylindric(self,cartPosition):
-
-        r   = np.sqrt(cartPosition[0]**2+cartPosition[1]**2)
-        phi = np.arctan2(cartPosition[1],cartPosition[0]) # https://en.wikipedia.org/wiki/Cylindrical_coordinate_system depending on x value differen function ?
-        return r, phi
+    #def cart2cylindric(self,cartPosition):
+    #
+    #    r   = np.sqrt(cartPosition[0]**2+cartPosition[1]**2)
+    #    phi = np.arctan2(cartPosition[1],cartPosition[0]) # https://en.wikipedia.org/wiki/Cylindrical_coordinate_system depending on x value differen function ?
+    #    z = cartPosition[2] 
+    #    return r, phi, z
     
+
     #def cart2sphere(self,cartPosition):
     #    
     #    XsqPlusYsq  = cartPosition[0]**2 + cartPosition[1]**2
