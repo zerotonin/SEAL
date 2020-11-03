@@ -26,5 +26,6 @@ class SEAL_SIM:
             print(po.position)
         # move da seal
         self.seal.MoveSeal()
+    
 
         # particle.trajectory saves the old and new position of the particles after every sealMovement, how to apply cart2sphere function on this list ?)

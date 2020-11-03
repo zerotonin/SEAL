@@ -1,6 +1,7 @@
 import numpy as np
 import math as m 
 import copy 
+from ai import cs
 #from sympy import *
 
 class Particle:
@@ -171,19 +172,32 @@ class Particle:
         newPosition    =copy.deepcopy(self.position)
         status         = copy.deepcopy(self.visible)
         #translate oldPosition from cartasian to spherical coordinate system
-        oldPosition = self.cart2sphere(oldPosition)
+        oldPosition = self.cart2cylindric(oldPosition)
         #translate newPosition from cartasian to spherical coordinate system
-        newPosition = self.cart2sphere(newPosition)
+        newPosition = self.cart2cylindric(newPosition)
     
         self.trajectory.append((oldPosition,newPosition,status))
+
+    def cart2cylindric(self,cartPosition):
+        """
+        https://pypi.org/project/ai.cs/
+        """
+        r, phi, z = cs.cart2cyl(x=cartPosition[0], y=cartPosition[1], z=cartPosition[2])
+        return r, phi, z
+
+    def cart2cylindric(self,cartPosition):
+
+        r   = np.sqrt(cartPosition[0]**2+cartPosition[1]**2)
+        phi = np.arctan2(cartPosition[1],cartPosition[0]) # https://en.wikipedia.org/wiki/Cylindrical_coordinate_system depending on x value differen function ?
+        return r, phi
     
-    def cart2sphere(self,cartPosition):
-        
-        XsqPlusYsq  = cartPosition[0]**2 + cartPosition[1]**2
-        r           = m.sqrt(XsqPlusYsq + cartPosition[2]**2)              
-        theta       = m.atan2(m.sqrt(XsqPlusYsq),cartPosition[2])     
-        phi         = m.atan2(cartPosition[1],cartPosition[0])          
-        return r,theta,phi
+    #def cart2sphere(self,cartPosition):
+    #    
+    #    XsqPlusYsq  = cartPosition[0]**2 + cartPosition[1]**2
+    #    r           = m.sqrt(XsqPlusYsq + cartPosition[2]**2)              
+    #    theta       = m.atan2(m.sqrt(XsqPlusYsq),cartPosition[2])     
+    #    phi         = m.atan2(cartPosition[1],cartPosition[0])          
+    #    return r,theta,phi
 
 
 

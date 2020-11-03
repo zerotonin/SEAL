@@ -85,3 +85,13 @@ for i in range(P.traLen):
     W = P.sealHeading[i,2] 
     ax.quiver(X,Y,Z,U,V,W,arrow_length_ratio=0.01)
 plt.show()     
+
+import numpy as np
+from ai import cs
+cartPosition = [1,1,1]
+
+def cart2cylindric(self,cartPosition):
+    r, phi, z = cs.cart2cyl(x=1, y=1, z=1)
+    return r, phi, z
+
+t= cart2cylindric(cartPosition[1,1,1])
