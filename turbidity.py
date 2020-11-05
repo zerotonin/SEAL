@@ -174,7 +174,7 @@ class Particle:
         newPosition    =copy.deepcopy(self.position)
         status         = copy.deepcopy(self.visible)
     
-        self.trajectory.append(np.array([oldPosition,newPosition,status]))
+        self.trajectory.append((oldPosition,newPosition,status))
         
 
 
