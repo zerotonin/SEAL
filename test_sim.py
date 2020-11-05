@@ -4,6 +4,9 @@ import numpy as np
 
 reload(SEAL_SIM)
 simObj = SEAL_SIM.SEAL_SIM()
+simObj.simulate_sample()
+simObj.createOpticFlow()
+
 
 
 currentSys = np.zeros(shape=(8,3))
