@@ -155,10 +155,11 @@ class Particle:
         in bool if the particle is visible or not.
 
         """
-        
+        # absolute position is soley needed for environment checks (soil, sky, etc)
         self.absPosition = self.position + sealPosition
         self.cloudObj.simObj.environment.particleStateCheck(self)
         
+        # depending on environment checks a step is calculated
         if self.activeMovement == True and self.visible == True:
             # perform Brownian motion
             step  = self.randomWalk() + waterCurrent - sealStep[0:3]
@@ -167,27 +168,16 @@ class Particle:
         else:
             step  = np.zeros(shape = 3)
         
+        # get old and new position
         oldPosition    = copy.deepcopy(self.position)
         self.position += step
         newPosition    =copy.deepcopy(self.position)
         status         = copy.deepcopy(self.visible)
-        #translate oldPosition from cartasian to cylindircal coordinate system
-        oldPosition = self.cart2cylindric(oldPosition)
-        #translate newPosition from cartasian to cylindrical coordinate system
-        newPosition = self.cart2cylindric(newPosition)
     
         self.trajectory.append(np.array([oldPosition,newPosition,status]))
         
 
-    def cart2cylindric(self,cartPosition):
-        """
-        https://pypi.org/project/ai.cs/
-        r = axial distance or radial distance
-        phi = angle between the reference dircetion on the choosen plane and the line from the origin to the porjection of point P on the plane
-        z = height
-        """
-        r, phi, z = cs.cart2cyl(x=cartPosition[0], y=cartPosition[1], z=cartPosition[2])
-        return np.array([r, phi, z]) #depth r can be ignore. 
+
 
     #def cart2cylindric(self,cartPosition):
     #
