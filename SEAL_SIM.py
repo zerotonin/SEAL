@@ -1,7 +1,5 @@
 import turbidity, seal_agent,copy,environment,utilities
 import numpy as np
-import matplotlib
-import matplotlib.pyplot as plt 
 
 class SEAL_SIM:
     def __init__(self):
