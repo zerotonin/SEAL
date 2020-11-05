@@ -1,12 +1,11 @@
 from importlib import reload 
-import SEAL_SIM
+import SEAL_SIM, opticFlowAna
 import numpy as np 
 
 reload(SEAL_SIM)
 simObj = SEAL_SIM.SEAL_SIM()
 simObj.simulate_sample()
-simObj.createOpticFlow()
-
+simObj.simulate_sample()
 
 
 currentSys = np.zeros(shape=(8,3))
@@ -20,15 +19,3 @@ currentSys[6,:] = [8,0,0]
 currentSys[7,:] = [5,7,0]     
 
 simObj.environment.setCurrents(currentSys)
-
-# This test can be later used to find resolutable particles
-# for the optic flow calculationq
-#         a                         / a \
-#    b = ----------  alpha = arctan|  - |
-#        tan(alpha)                 \ b/
-for particle in simObj.pCloud.partclObjList:
-    print
-    vecNorm = np.linalg.norm(particle.position) 
-    
-    angleSize = np.rad2deg(np.arctan(particle.size/vecNorm)) 
-    print(angleSize> 0.86,vecNorm,angleSize)
