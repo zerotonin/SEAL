@@ -2,11 +2,13 @@ from importlib import reload
 import SEAL_SIM, opticFlowAna
 import numpy as np 
 
-reload(SEAL_SIM)
+reload(opticFlowAna)
 simObj = SEAL_SIM.SEAL_SIM()
 simObj.simulate_sample()
 simObj.simulate_sample()
 
+OFA = opticFlowAna.opticFlowAnalysis(simObj)
+x   = OFA.cartTra2cylTra(OFA.particleList[32].trajectory)
 
 currentSys = np.zeros(shape=(8,3))
 currentSys[0,:] = [10,0,0]      

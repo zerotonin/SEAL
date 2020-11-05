@@ -95,13 +95,20 @@ class opticFlowAnalysis:
         return np.array([r, phi, z]) #depth r can be ignore. 
 
     def particlePos2OFvector(self,particlePosition):
-        # get cartesian particle positions
-        oldPosition = particlePosition[0]
-        newPosition = particlePosition[1]
-        #translate oldPosition from cartasian to cylindircal coordinate system
-        oldPosition = self.cart2cylindric(oldPosition)
-        #translate newPosition from cartasian to cylindrical coordinate system
-        newPosition = self.cart2cylindric(newPosition)
+        pass
+    
+    def cartTra2cylTra(self,cartTra):
+        '''
+        This function 
+        '''
+        cylTra = list()
+        for frame in cartTra:
+            #translate oldPosition from cartasian to cylindircal coordinate system
+            oldPosition = self.cart2cylindric(frame[0])
+            #translate newPosition from cartasian to cylindrical coordinate system
+            newPosition = self.cart2cylindric(frame[1])
+            cylTra.append((oldPosition,newPosition,frame[2]))
+        return cylTra
 
     
     def rotateFlowField2SealHeading(self):
