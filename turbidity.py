@@ -1,7 +1,6 @@
 import numpy as np
 import math as m 
 import copy 
-from ai import cs
 #from sympy import *
 
 class Particle:
