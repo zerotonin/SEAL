@@ -1,8 +1,9 @@
 import numpy as np 
 from scipy.interpolate import RegularGridInterpolator
 #from scipy import interpolate
-import copy
-from ai.cs import cs
+import copy, matplotlib
+import matplotlib.pyplot as plt 
+from ai import cs
 
 class opticFlowAnalysis:
     '''
@@ -10,7 +11,7 @@ class opticFlowAnalysis:
 
     def __init__(self,simObj):
         self.simObj = simObj
-        self.pCould = simObj.pCloud
+        self.particleList = simObj.pCloud.partclObjList
     
     def createOpticFlow(self):
         fig = plt.figure() 
