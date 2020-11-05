@@ -1,6 +1,8 @@
 import numpy as np 
 from scipy.interpolate import RegularGridInterpolator
 #from scipy import interpolate
+import copy
+from ai.cs import cs
 
 class opticFlowAnalysis:
     '''
@@ -8,6 +10,7 @@ class opticFlowAnalysis:
 
     def __init__(self,simObj):
         self.simObj = simObj
+        self.pCould = simObj.pCloud
     
     def createOpticFlow(self):
         fig = plt.figure() 
@@ -89,6 +92,16 @@ class opticFlowAnalysis:
         """
         r, phi, z = cs.cart2cyl(x=cartPosition[0], y=cartPosition[1], z=cartPosition[2])
         return np.array([r, phi, z]) #depth r can be ignore. 
+
+    def particlePos2OFvector(self,particlePosition):
+        # get cartesian particle positions
+        oldPosition = particlePosition[0]
+        newPosition = particlePosition[1]
+        #translate oldPosition from cartasian to cylindircal coordinate system
+        oldPosition = self.cart2cylindric(oldPosition)
+        #translate newPosition from cartasian to cylindrical coordinate system
+        newPosition = self.cart2cylindric(newPosition)
+
     
     def rotateFlowField2SealHeading(self):
         """
