@@ -1,0 +1,23 @@
+# seal.yaml 
+# 
+# Download and install first the deeplabcut yaml file from http://www.mousemotorlab.org/deeplabcut 
+# It contains all nescessary stuff to run DLC and to analyse their file format. 
+# You do not need GPU acceleration:
+#
+# conda env create -f DLC-CPU.yaml or conda env create -f DLC-GPU.yaml
+#
+#
+# Then istall our packages
+#
+# install: conda env create -f seal.yaml 
+# update:  conda env update -f seal.yaml 
+name: seal 
+dependencies:   
+- python=3.7
+- numpy
+- scipy
+- matplotlib   
+- pip   
+- pip:
+    - ai
+    
