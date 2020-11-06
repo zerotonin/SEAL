@@ -8,16 +8,33 @@ This is a python project designed to simulate hydrodynamic and optic sensation o
                         SEAL SIM OBJECT
                         /     |       \ 
                 sealAgent turbidity environment
+                    |
+                protoMov
+
+
+# ToDo
 
 - turbidity
     - sizes to 0.5 to 20 mm  
 - environment
-    - collision avoidance -> paramecium
+    - done
 - seal Agent
     - movement classes
-        - protoypical movements
-        - syntax
-        - probablistic
+        - orientation
+    - combine steps of seal movement to sim Obj
+- SIM Obj
+    - implementation:
+        1) decide for dive type, length etc.
+        2) decide for environment (currents,depth,objects)
+        3) compose trajectory
+        4) run turbidty cloud through trajectory
+
+- analyse
+    - completion of OpticFlowAna
+        - implementation of r_querr vs R ranking 
+        - plot routine for optic flow
+
+
 
 
 

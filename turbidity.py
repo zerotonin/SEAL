@@ -154,10 +154,11 @@ class Particle:
         in bool if the particle is visible or not.
 
         """
-        
+        # absolute position is soley needed for environment checks (soil, sky, etc)
         self.absPosition = self.position + sealPosition
         self.cloudObj.simObj.environment.particleStateCheck(self)
         
+        # depending on environment checks a step is calculated
         if self.activeMovement == True and self.visible == True:
             # perform Brownian motion
             step  = self.randomWalk() + waterCurrent - sealStep[0:3]
@@ -166,24 +167,31 @@ class Particle:
         else:
             step  = np.zeros(shape = 3)
         
+        # get old and new position
         oldPosition    = copy.deepcopy(self.position)
         self.position += step
         newPosition    =copy.deepcopy(self.position)
         status         = copy.deepcopy(self.visible)
-        #translate oldPosition from cartasian to spherical coordinate system
-        oldPosition = self.cart2sphere(oldPosition)
-        #translate newPosition from cartasian to spherical coordinate system
-        newPosition = self.cart2sphere(newPosition)
     
         self.trajectory.append((oldPosition,newPosition,status))
-    
-    def cart2sphere(self,cartPosition):
         
-        XsqPlusYsq  = cartPosition[0]**2 + cartPosition[1]**2
-        r           = m.sqrt(XsqPlusYsq + cartPosition[2]**2)              
-        theta       = m.atan2(m.sqrt(XsqPlusYsq),cartPosition[2])     
-        phi         = m.atan2(cartPosition[1],cartPosition[0])          
-        return r,theta,phi
+
+
+
+    #def cart2cylindric(self,cartPosition):
+    #
+    #    r   = np.sqrt(cartPosition[0]**2+cartPosition[1]**2)
+    #    phi = np.arctan2(cartPosition[1],cartPosition[0]) # https://en.wikipedia.org/wiki/Cylindrical_coordinate_system depending on x value differen function ?
+    #    return r, phi, z
+    
+
+    #def cart2sphere(self,cartPosition):
+    #    
+    #    XsqPlusYsq  = cartPosition[0]**2 + cartPosition[1]**2
+    #    r           = m.sqrt(XsqPlusYsq + cartPosition[2]**2)              
+    #    theta       = m.atan2(m.sqrt(XsqPlusYsq),cartPosition[2])     
+    #    phi         = m.atan2(cartPosition[1],cartPosition[0])          
+    #    return r,theta,phi
 
 
 
