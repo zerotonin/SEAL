@@ -12,8 +12,11 @@ class SEAL_SIM:
         self.math        = utilities.mathUtils()
         self.turbidity   = turbidity
         self.protoMove   = protoMov.ProtMov(self)
-        self.simParameterDict = {'diveType': 'vShape',
-                                 'durSec'  : 240,
+        self.simParameterDict = {'diveType'          : 'vShape',
+                                 'durSec'            : 240,
+                                 'currentType'       : 'static',
+                                 'oceanDepth'        : -70,
+                                 'amountOfObstacles' : 100
                                  }
         
             
@@ -39,37 +42,20 @@ class SEAL_SIM:
     #    3) compose trajectory
     #    4) run turbidty cloud through tra
     def simulationImplementation (self):
-        self.simParameterDict = dict()
-        diveType = input ('What type of dive should be simulated? (uShape/vShape)')
-        if diveType == 'uShape':
-            self.protoMove.mode = 'uShape'
-        elif diveType == 'vShape':
-            self.protoMove.mode = 'vShape'   
-        else:
-            print('Unkown  diveType: ' + diveType)
-        
-        diveDuration = input ('How long should the dive last in seconds?')
-        self.protoMove.traLenSec = diveDuration
 
-        currentType = input ('What type of current should be simulated? (currentType(static/interpolated)')
-        if currentType == 'static':
-            self.environment.waterCurrentMode = 'static'
-        elif currentType == 'interpolated':
-            self.environment.waterCurrentMode = 'interp'
-        else:
-            print('unknown currentType: '+ currentType)
-
-        oceanDepth = input ('How deep should the simulated ocean be?')
-        self.simParameterDict['oceanDepth'] = oceanDepth
-        
-        self.environment.oceanDepth = oceanDepth
-
-        amountOfObstacle = input ('How many obstacle should be simulated?')
-        self.environment.maxObstacles = amountOfObstacle
+        self.simParameterDict['diveType']          = self.CLI_dialg_text('What dive Type schould be simulated ?', 'vShape', ['uShape','vShape'])
+        self.simParameterDict['durSec']            = int(self.CLI_dialg_text('How long should the dive simulation last?', 240, ['60','120','180','240','300']))    
+        self.simParameterDict['currentType']       = self.CLI_dialg_text('What kind of current should be simulates? ', 'static', ['static','interp'])
+        self.simParameterDict['oceanDepth']        = int(self.CLI_dialg_text('Set a depth of the oceans', -70, ['-20','-30','-40','-50','-60','-70','-80']))
+        self.simParameterDict['amountOfObstacles'] = self.CLI_dialg_text('How many obstacle should be simulates in the environment? ', 100, ['50','100','150','200'])
 
     def setParameters(self):
-        self.protoMove.traLenSec = self.simParameterDict['durSec']
-
+        self.protoMove.mode               = self.simParameterDict['diveType']
+        self.protoMove.traDurSec          = self.simParameterDict['durSec']
+        self.environment.waterCurrentMode = self.simParameterDict['currentType']
+        self.environment.oceanDepth       = self.simParameterDict['oceanDepth']
+        self.environment.maxObstacles     = self.simParameterDict['amountOfObstacles']
+        
     def CLI_dialg_text(self,question,default = False,answers=["yes","no"]):
 
         userAnswer = self.CLI_quest(question,answers,default)
