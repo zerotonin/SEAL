@@ -6,8 +6,18 @@ import matplotlib.pyplot as plt
 reload(protoMov)
 simObj = SEAL_SIM.SEAL_SIM()
 P = protoMov.ProtMov(simObj)
-P.generator2('vShape',600)
-P.getPositionAndAngels
+P.generator2('uShape',60)
+
+ends = [P.diveShapeU['surface'][0]*P.traDurSec*P.origDiveFPS,
+       P.diveShapeU['down'][0]*P.traDurSec*P.origDiveFPS,
+       P.diveShapeU['straight'][0]*P.traDurSec*P.origDiveFPS,
+       P.diveShapeU['up'][0]*P.traDurSec*P.origDiveFPS,
+       P.diveShapeU['surface2'][0]*P.traDurSec*P.origDiveFPS]
+print((np.ceil(np.array(ends))))
+#P.getPositionAndAngels
+
+
+
 
 fig = plt.figure() 
 ax = fig.gca()   
