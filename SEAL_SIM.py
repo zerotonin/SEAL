@@ -1,4 +1,4 @@
-import turbidity, seal_agent,copy,environment,utilities
+import turbidity, seal_agent,copy,environment,utilities,protoMov
 import numpy as np
 
 class SEAL_SIM:
@@ -12,6 +12,9 @@ class SEAL_SIM:
         self.math        = utilities.mathUtils()
         self.turbidity   = turbidity
         self.protoMove   = protoMov.ProtMov(self)
+        self.simParameterDict = {'diveType': 'vShape',
+                                 'durSec'  : 240,
+                                 }
         
             
     def meterPerSecond2meterPerSample(self,velocity):
@@ -36,7 +39,7 @@ class SEAL_SIM:
     #    3) compose trajectory
     #    4) run turbidty cloud through tra
     def simulationImplementation (self):
-
+        self.simParameterDict = dict()
         diveType = input ('What type of dive should be simulated? (uShape/vShape)')
         if diveType == 'uShape':
             self.protoMove.mode = 'uShape'
@@ -57,9 +60,35 @@ class SEAL_SIM:
             print('unknown currentType: '+ currentType)
 
         oceanDepth = input ('How deep should the simulated ocean be?')
+        self.simParameterDict['oceanDepth'] = oceanDepth
+        
         self.environment.oceanDepth = oceanDepth
 
         amountOfObstacle = input ('How many obstacle should be simulated?')
         self.environment.maxObstacles = amountOfObstacle
+
+    def setParameters(self):
+        self.protoMove.traLenSec = self.simParameterDict['durSec']
+
+    def CLI_dialg_text(self,question,default = False,answers=["yes","no"]):
+
+        userAnswer = self.CLI_quest(question,answers,default)
+        while userAnswer not in answers:
+            print(str(userAnswer) + " unrecognised, please answer with: " + str(answers))
+            userAnswer = self.CLI_quest(question,answers,default)
+        return userAnswer
+
+    def CLI_quest(self,question, answers,default):
+
+        if default != False:
+            userAnswer = input(question + " [" + str(answers) +" | default: "+ str(default)+"] :")
+            if userAnswer == "":
+                userAnswer = default
+        else:
+            userAnswer = input(question + " [" + str(answers)+ "] :")
+
+        return userAnswer
+
+
 
 
