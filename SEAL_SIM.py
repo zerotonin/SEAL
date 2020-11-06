@@ -44,10 +44,10 @@ class SEAL_SIM:
     def simulationImplementation (self):
 
         self.simParameterDict['diveType']          = self.CLI_dialg_text('What dive Type schould be simulated ?', 'vShape', ['uShape','vShape'])
-        self.simParameterDict['durSec']            = int(self.CLI_dialg_text('How long should the dive simulation last?', 240, ['60','120','180','240','300']))    
+        self.simParameterDict['durSec']            = int(self.CLI_dialg_text('How long should the dive simulation last?', '240', ['60','120','180','240','300']))    
         self.simParameterDict['currentType']       = self.CLI_dialg_text('What kind of current should be simulates? ', 'static', ['static','interp'])
-        self.simParameterDict['oceanDepth']        = int(self.CLI_dialg_text('Set a depth of the oceans', -70, ['-20','-30','-40','-50','-60','-70','-80']))
-        self.simParameterDict['amountOfObstacles'] = self.CLI_dialg_text('How many obstacle should be simulates in the environment? ', 100, ['50','100','150','200'])
+        self.simParameterDict['oceanDepth']        = int(self.CLI_dialg_text('Set a depth of the oceans', '-70', ['-20','-30','-40','-50','-60','-70','-80']))
+        self.simParameterDict['amountOfObstacles'] = self.CLI_dialg_text('How many obstacle should be simulates in the environment? ', '100', ['50','100','150','200'])
 
     def setParameters(self):
         self.protoMove.mode               = self.simParameterDict['diveType']
