@@ -37,7 +37,7 @@ class SEAL_SIM:
     #    4) run turbidty cloud through tra
     def simulationImplementation (self):
 
-        diveType = input ('What type of dive should be simulates? (uShape/vShape)')
+        diveType = input ('What type of dive should be simulated? (uShape/vShape)')
         if diveType == 'uShape':
             self.protoMove.mode = 'uShape'
         elif diveType == 'vShape':
@@ -48,7 +48,7 @@ class SEAL_SIM:
         diveDuration = input ('How long should the dive last in seconds?')
         self.protoMove.traLenSec = diveDuration
 
-        currentType = input ('What type of current should be simulates? (currentType(static/interpolated)')
+        currentType = input ('What type of current should be simulated? (currentType(static/interpolated)')
         if currentType == 'static':
             self.environment.waterCurrentMode = 'static'
         elif currentType == 'interpolated':

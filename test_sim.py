@@ -21,3 +21,11 @@ currentSys[6,:] = [8,0,0]
 currentSys[7,:] = [5,7,0]     
 
 simObj.environment.setCurrents(currentSys)
+
+from importlib import reload 
+import SEAL_SIM, opticFlowAna
+import numpy as np 
+reload(SEAL_SIM)
+reload(opticFlowAna)
+simObj = SEAL_SIM.SEAL_SIM()
+simObj.simulationImplementation()
