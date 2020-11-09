@@ -49,6 +49,7 @@ class environment:
         self.waterCurrentMode       = 'static'
         self.obstacleList           = []
         self.observableObstacleList = []
+        self.maxObstacles           = 200
 
     def getWaterCurrent(self):
         """
@@ -107,7 +108,6 @@ class environment:
         obstacle(initialCoord[x,y],r,ri)
         """
     
-        self.maxObstacles = 200
         
         while len(self.obstacleList)<self.maxObstacles:
                obstacle = self.randomInit() # get random x,y,radius and innerradius

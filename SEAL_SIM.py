@@ -1,4 +1,5 @@
 import turbidity, seal_agent,copy,environment,utilities,protoMov
+from tqdm import tqdm
 import numpy as np
 
 class SEAL_SIM:
@@ -12,12 +13,17 @@ class SEAL_SIM:
         self.math        = utilities.mathUtils()
         self.turbidity   = turbidity
         self.protoMove   = protoMov.ProtMov(self)
-        self.simParameterDict = {'diveType'          : 'vShape',
-                                 'durSec'            : 240,
+        self.simParameterDict = {'diveType'          : 'vShape', # description and unit if av
+                                 'durSec'            : 240, # duration of the simulation in seconds
                                  'currentType'       : 'static',
+                                 'currentStaticVel'  : (0.0,2.0,0.0),
                                  'oceanDepth'        : -70,
-                                 'amountOfObstacles' : 100
+                                 'amountOfObstacles' : 100,
+                                 'max_particles'     : 270,
+                                 'particleSizeRange' : (.00002,0.00016),
+                                 'cloudRadius'       : 0.0018,
                                  }
+        self.sealTra = list()
         
             
     def meterPerSecond2meterPerSample(self,velocity):
@@ -37,15 +43,36 @@ class SEAL_SIM:
 
     #- SIM Objm
     #- implementation:
-    #    1) decide for dive type, length etc.
-    #    2) decide for environment (currents,depth,objects)
+    #    1) done decide for dive type, length etc.
+    #    2) done decide for environment (currents,depth,objects)
     #    3) compose trajectory
     #    4) run turbidty cloud through tra
+
+    def runSimulation(self):
+        #set environment and particle cloud
+        self.setParameters()
+        self.environment.creatObstacles() #create obstacle if maxObsticales >0
+
+        #get trajectory
+        self.protoMove.generator2(self.simParameterDict['durSec'])
+        self.sealTra = self.protoMove.velTra
+
+        #run trajectory through particle cloud
+        
+
     def userDefParametersCLI(self):
 
         self.simParameterDict['diveType']          = self.CLI_dialg_choiceText('What dive Type schould be simulated ?', 'vShape', ['uShape','vShape'])
         self.simParameterDict['durSec']            = float(self.CLI_dialg_num('How long should the dive simulation last?', '240'))    
         self.simParameterDict['currentType']       = self.CLI_dialg_choiceText('What kind of current should be simulates? ', 'static', ['static','interp'])
+        if self.simParameterDict['currentType'] == 'static':
+            current_X = float(self.CLI_dialg_num('Set x-velocity in m/s:','0.0'))
+            current_Y = float(self.CLI_dialg_num('Set y-velocity in m/s:','2.0'))
+            current_Z = float(self.CLI_dialg_num('Set z-velocity in m/s:','0.0'))
+            self.simParameterDict['currentStaticVel'] = (current_X,current_Y,current_Z)
+        else:
+            # add standard cases after intial tests
+            print("For the interpolated type, you need to define the different currents in a tetraheder or choose one of the standard cases")
         self.simParameterDict['oceanDepth']        = float(self.CLI_dialg_num('Set a depth of the oceans', '-70'))
         self.simParameterDict['amountOfObstacles'] = int(self.CLI_dialg_num('How many obstacle should be simulates in the environment? ', '100'))
         print(self.simParameterDict)
@@ -55,8 +82,13 @@ class SEAL_SIM:
         self.protoMove.mode               = self.simParameterDict['diveType']
         self.protoMove.traDurSec          = self.simParameterDict['durSec']
         self.environment.waterCurrentMode = self.simParameterDict['currentType']
+        if self.simParameterDict['currentType'] == 'static':
+            self.environment.waterCurrent     = self.simParameterDict['currentStaticVel']
         self.environment.oceanDepth       = self.simParameterDict['oceanDepth']
         self.environment.maxObstacles     = self.simParameterDict['amountOfObstacles']
+        self.pCloud.max_particles         = self.simParameterDict['max_particles']
+        self.pCloud.sizeRange             = self.simParameterDict['particleSizeRange']
+        self.pCloud.maxVectorMagnitue     = self.simParameterDict['cloudRadius']
         
     def CLI_dialg_choiceText(self,question,default = False,answers=["yes","no"]):
 

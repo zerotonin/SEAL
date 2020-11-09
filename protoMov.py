@@ -18,6 +18,7 @@ class ProtMov:
         self.origVideoFPS = 25
         self.traIDX       = []
         self.divePitch    = []
+        self.mode         = 'random'
 
         # dive phases are keywords for a tupel consisting of 0) duration normalised to total duration
         # 1) mean pitch angle [deg]  2)  standard deviation of the mean [deg] 3)  mean z-profil [m/s]
@@ -36,7 +37,7 @@ class ProtMov:
                            'surface2' :(36.0/36.0 -74.53024727 ,7.65994214  ,-0.005039636363636366 ,0.0280961935023646)} # surface 2 is a bonus duration if up wards swimming ends before its duration
 
 
-    def generator2(self,mode,traLenSec):
+    def generator2(self,traLenSec):
         '''
         this function randomly chooses between uShape and vShapes dives.
         dependent on the diveType it sets the corresponding phases (surface, down, straight
@@ -51,16 +52,15 @@ class ProtMov:
         self.traLen    = traLenSec*self.sps
         self.traDurSec = traLenSec
 
-        if mode == 'random':
-            mode = ('uShape','vShape')
-            mode = random.choice(mode)
+        if self.mode == 'random':
+            self.mode = random.choice(('uShape','vShape'))
 
-        if  mode == 'uShape':
+        if  self.mode == 'uShape':
             currentDive = copy.deepcopy(self.diveShapeU)
-        elif mode == 'vShape':
+        elif self.mode == 'vShape':
             currentDive = copy.deepcopy(self.diveShapeV)
         else:
-            print('Unkown dive type: ' + mode)
+            print('Unkown dive type: ' + self.mode)
             raise ValueError  # shorthand for 'raise ValueError()'
 
 
@@ -78,7 +78,7 @@ class ProtMov:
       
         # combine both trajectories
         self.velTra =self.mergeLiftPitch_ThrustYawSlip(self.zProfile,self.pitchAngle,self.thrust,self.slip,self.yaw)#(thurst,slip,lift,yaw,pitch)
-        print(self.velTra[0:10])
+        #print(self.velTra[0:10])
 
     def fromThrustSlip2XYcoordinates(self):
         '''
