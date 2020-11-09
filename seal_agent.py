@@ -16,8 +16,6 @@ class Seal:
         self.sealStep           = np.zeros(shape =6) # change of position and orientation
         self.sealTrajectory     = list()
         self.activeSealMovement = True
-        self.minutes            = 5
-        self.traLen             = self.minutes*60*25
         self.traIDX             = []
         """
         @param simObj               string default: none
