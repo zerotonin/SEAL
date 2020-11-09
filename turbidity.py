@@ -265,11 +265,7 @@ class Cloud:
             sight area resolution of the habor seal underwater.
         @param partclObjList     list default: none  
             list of particle objects within the turbidity cloud. Length of the list defined by max_particles. 
-        @param sealPosition    default: (0,0,0)
-            seal position as a center of the cloud of particles.
-        @param sealOrientation    default: (0,0,0)
-            orientation of a seal in the ocean as yaw, pitch, roll in radians.
-        @param sealStep    default: (0,0,0,0,0,0)
+         @param sealStep    default: (0,0,0,0,0,0)
             the combined list of values of coordinates pasitions (x,y,z) and orientations (yaw, pitch, roll) 
             of a seal that defines the change of step position when seal moves in the ocean. 
         @param waterCurrent   default: np.zeros(shape=3)
@@ -280,8 +276,6 @@ class Cloud:
         self.partclObjList     = [] # list of particle objects
         self.sizeRange         = sizeRange # tuple with the min and max radius[µm]
         self.maxVectorMagnitue = maxVectorMagnitue # max radius of a cloud
-        self.sealPosition      = self.simObj.seal.sealPosition #centre of the coordinate system of a Seal
-        self.sealOrientation   = self.simObj.seal.sealOrientation  # orientation as yaw pitch roll
         self.sealStep          = self.simObj.seal.sealStep # change of position and orientation
         self.waterCurrent      = np.zeros(shape=3) # water current 
     
