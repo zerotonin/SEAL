@@ -4,7 +4,7 @@ import numpy as np
 
 class SEAL_SIM:
     def __init__(self):
-        self.sps         = 1 # samples per second
+        self.sps         = 20 # samples per second
         self.environment = environment.environment(self) # velocity in meter per second will be transformed into an evironment object
         self.seal        = seal_agent.Seal(self)
         self.pCloud      = turbidity.Cloud(self)
@@ -55,10 +55,16 @@ class SEAL_SIM:
 
         #get trajectory
         self.protoMove.generator2(self.simParameterDict['durSec'])
-        self.sealTra = self.protoMove.velTra
+        self.sealVelTra = self.protoMove.velTra
 
         #run trajectory through particle cloud
+        for stepI in tqdm(range(self.sealVelTra),'running simulation'):
+            self.seal.sealStep = np.hstack((self.sealVelTra[stepI,:],0.0))/self.sps
+            self.seal.MoveSeal()
+            self.pCloud.moveParticles()
         
+        # save results
+
 
     def userDefParametersCLI(self):
 
