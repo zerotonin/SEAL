@@ -100,8 +100,8 @@ class Seal:
             self.sealOrientation += self.sealStep[3:6] # new sealOrientation after each sealStep (should be the same as during the   step?)
             SealOrientation = copy.deepcopy(self.sealOrientation)
 
-            print(self.sealStep,SealPosition,SealOrientation)
-            print("=======================================================")
+            #print(self.sealStep,SealPosition,SealOrientation)
+            #print("=======================================================")
 
             self.sealTrajectory.append((SealPosition,SealOrientation))
         else :
