@@ -81,6 +81,11 @@ class SEAL_SIM:
             print("For the interpolated type, you need to define the different currents in a tetraheder or choose one of the standard cases")
         self.simParameterDict['oceanDepth']        = float(self.CLI_dialg_num('Set a depth of the oceans', '-70'))
         self.simParameterDict['amountOfObstacles'] = int(self.CLI_dialg_num('How many obstacle should be simulates in the environment? ', '100'))
+        self.simParameterDict['max_particles']     = int(self.CLI_dialg_num('How many particles should be simulates in the particleCloud? ', '270'))
+        self.simParameterDict['particleSizeRange'] = (float(self.CLI_dialg_num('Set smallest Particle Size', '.00002')), float(self.CLI_dialg_num('Set biggest Particel Size', '0.00016')))
+        self.simParameterDict['cloudRadius']       = float(self.CLI_dialg_num('Set radius of the Cloud', '-70'))
+     
+
         print(self.simParameterDict)
         self.setParameters()
 
