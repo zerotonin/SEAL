@@ -58,8 +58,8 @@ class SEAL_SIM:
         self.sealVelTra = self.protoMove.velTra
 
         #run trajectory through particle cloud
-        for stepI in tqdm(range(self.sealVelTra),'running simulation'):
-            self.seal.sealStep = np.hstack((self.sealVelTra[stepI,:],0.0))/self.sps
+        for step in tqdm(self.sealVelTra,'running simulation'):
+            self.seal.sealStep = np.hstack((step,0.0))/self.sps
             self.seal.MoveSeal()
             self.pCloud.moveParticles()
         
