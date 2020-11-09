@@ -41,13 +41,15 @@ class SEAL_SIM:
     #    2) decide for environment (currents,depth,objects)
     #    3) compose trajectory
     #    4) run turbidty cloud through tra
-    def simulationImplementation (self):
+    def userDefParametersCLI(self):
 
-        self.simParameterDict['diveType']          = self.CLI_dialg_text('What dive Type schould be simulated ?', 'vShape', ['uShape','vShape'])
-        self.simParameterDict['durSec']            = int(self.CLI_dialg_text('How long should the dive simulation last?', '240', ['60','120','180','240','300']))    
-        self.simParameterDict['currentType']       = self.CLI_dialg_text('What kind of current should be simulates? ', 'static', ['static','interp'])
-        self.simParameterDict['oceanDepth']        = int(self.CLI_dialg_text('Set a depth of the oceans', '-70', ['-20','-30','-40','-50','-60','-70','-80']))
-        self.simParameterDict['amountOfObstacles'] = int(self.CLI_dialg_text('How many obstacle should be simulates in the environment? ', '100', ['50','100','150','200']))
+        self.simParameterDict['diveType']          = self.CLI_dialg_choiceText('What dive Type schould be simulated ?', 'vShape', ['uShape','vShape'])
+        self.simParameterDict['durSec']            = float(self.CLI_dialg_num('How long should the dive simulation last?', '240'))    
+        self.simParameterDict['currentType']       = self.CLI_dialg_choiceText('What kind of current should be simulates? ', 'static', ['static','interp'])
+        self.simParameterDict['oceanDepth']        = float(self.CLI_dialg_num('Set a depth of the oceans', '-70'))
+        self.simParameterDict['amountOfObstacles'] = int(self.CLI_dialg_num('How many obstacle should be simulates in the environment? ', '100'))
+        print(self.simParameterDict)
+        self.setParameters()
 
     def setParameters(self):
         self.protoMove.mode               = self.simParameterDict['diveType']
@@ -56,13 +58,21 @@ class SEAL_SIM:
         self.environment.oceanDepth       = self.simParameterDict['oceanDepth']
         self.environment.maxObstacles     = self.simParameterDict['amountOfObstacles']
         
-    def CLI_dialg_text(self,question,default = False,answers=["yes","no"]):
+    def CLI_dialg_choiceText(self,question,default = False,answers=["yes","no"]):
 
         userAnswer = self.CLI_quest(question,answers,default)
         while userAnswer not in answers:
             print(str(userAnswer) + " unrecognised, please answer with: " + str(answers))
             userAnswer = self.CLI_quest(question,answers,default)
         return userAnswer
+    
+    def CLI_dialg_num(self,question,default = False):
+        userAnswer = self.CLI_quest(question,[],default)
+        while userAnswer.strip('-').replace('.','',1).isdigit() ==False:
+            print(str(userAnswer) + " unrecognised, this is not a number")
+            userAnswer = self.CLI_quest(question,[],default) 
+        return userAnswer
+
 
     def CLI_quest(self,question, answers,default):
 
