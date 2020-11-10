@@ -12,6 +12,7 @@ class opticFlowAnalysis:
     def __init__(self,simObj):
         self.simObj = simObj
         self.particleList = simObj.pCloud.partclObjList
+        self.sealTrajectories = simObj.seal.sealTrajectory
     
     def createOpticFlow(self):
         fig = plt.figure() 
@@ -132,3 +133,13 @@ class opticFlowAnalysis:
             
             angleSize = np.rad2deg(np.arctan(particle.size/vecNorm)) 
             print(angleSize> 0.86,vecNorm,angleSize)
+
+
+
+#to do :
+#P_t0 = (x,y,z)
+#P_t1 =()
+#P_t1(x,y,z) * RotMat(-yw,)
+#P_t1(x,y,z) * RotMat(-yaw,-pitch,-roll)
+#-yaw = YAW SEEHUND ZEIT X+1 - YAW SEEHUND ZEIT X
+#-YAW = velStep/sps

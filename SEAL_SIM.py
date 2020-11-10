@@ -3,7 +3,44 @@ from tqdm import tqdm
 import numpy as np
 
 class SEAL_SIM:
+    '''
+    Class 'SEAL_SIM' connects all other classes to run the simulation. As masterregulator 
+    sets the user parameters for the simulation and runs the simulation accordingly. As
+    an output it saves a sealVelTra list with the trajectroies of the seal-agent throughout the 
+    dive simulation and the simulation parameter dictionary saving all usere settings for the simulation
+    '''
     def __init__(self):
+        '''
+        This function initialises the sample per seconds,and connects the environment class, 
+        the particle class, the particle cloud class , the seal agent class and the protoMov class,
+        in order to transfor all important information between the classes to simulate a seal dive 
+        and gain information about the optic flow perception at any point during the dive.
+
+        @param sps                  float default: none
+            defines the number of samples simulated per second
+        @param environment          ? default: none
+            creates a shortcut to the environment class stored in 
+            environment.py
+        @param seal                 ? default: none
+            creates a shortcut to the Seal class stored in 
+            seal_agent.py
+        @param pCloud               ? default: none
+            creates a shortcut to the Cloud class stored in 
+            turbidity.py
+        @param plot                 ? default: True
+            creates a shortcut to the plotUtils class stored in 
+            utilities.py
+        @param math                 ? default: True
+            creates a shortcut to the mathUtils class stored in 
+            utilities.py
+        @param simParameterDict     ? default: none 
+            creates a Dictionary with default values for the type of dive (u or v shape), 
+            the dive duration, the current type (static or interpolated), the depth of the ocean,
+            the amount of obstacles, maximal number of particles beeing simulated, size range of 
+            theses particles and the radius of the particle cloud.
+        @param sealVelTra              ? default:none
+            the created seal trajectories in the protomov class are stored in a list
+        '''
         self.sps         = 20 # samples per second
         self.environment = environment.environment(self) # velocity in meter per second will be transformed into an evironment object
         self.seal        = seal_agent.Seal(self)
@@ -11,7 +48,6 @@ class SEAL_SIM:
         self.pCloud.add_particles()
         self.plot        = utilities.plotUtils()
         self.math        = utilities.mathUtils()
-        self.turbidity   = turbidity
         self.protoMove   = protoMov.ProtMov(self)
         self.simParameterDict = {'diveType'          : 'vShape', # description and unit if av
                                  'durSec'            : 240, # duration of the simulation in seconds
@@ -21,53 +57,72 @@ class SEAL_SIM:
                                  'amountOfObstacles' : 100,
                                  'max_particles'     : 270,
                                  'particleSizeRange' : (.00002,0.00016),
-                                 'cloudRadius'       : 0.0018,
+                                 'cloudRadius'       : 0.0018, 
                                  }
-        self.sealTra = list()
+        self.sealVelTra = list()
         
-            
     def meterPerSecond2meterPerSample(self,velocity):
+        """
+        this function calculates the velocity per sample with the velocity per second,
+        to be used for the simulation
+        """
         # THis function should be inherited
         return copy.deepcopy(velocity/self.sps)
     
-    def simulate_sample(self):
-        # create a step
-        self.seal.createSealStep('45down')
-        print(self.seal.sealStep)
-        # move da particles
-        self.pCloud.moveParticles()
-        for po in self.pCloud.partclObjList:  
-            print(po.position)
-        # move da seal
-        self.seal.MoveSeal()
-
-    #- SIM Objm
-    #- implementation:
-    #    1) done decide for dive type, length etc.
-    #    2) done decide for environment (currents,depth,objects)
-    #    3) compose trajectory
-    #    4) run turbidty cloud through tra
+    #def simulate_sample(self):
+    #    """
+    #    can be deleted ? wAS JUST TO TRY THE SIMULATION
+    #    """
+    #    # create a step
+    #    self.seal.createSealStep('45down')
+    #    print(self.seal.sealStep)
+    #    # move da particles
+    #    self.pCloud.moveParticles()
+    #    for po in self.pCloud.partclObjList:  
+    #        print(po.position)
+    #    # move da seal
+    #    self.seal.MoveSeal()
 
     def runSimulation(self):
+        """
+        this function initiates the simulation to run. It calls the setParameters 
+        function to set the environment and the particle cloud. Next it creates the
+        obstacles in the environment class acording to the user setting.
+        Next it generates seal trajectories to simulate a typical seal dive and saves 
+        them in the sealVelTra list. for each step of the seal_agent the particles
+        in the particle Cloud are moving in the opposite direction.
+        """
         #set environment and particle cloud
         self.setParameters()
         self.environment.creatObstacles() #create obstacle if maxObsticales >0
-
         #get trajectory
         self.protoMove.generator2(self.simParameterDict['durSec'])
         self.sealVelTra = self.protoMove.velTra
-
         #run trajectory through particle cloud
         for step in tqdm(self.sealVelTra,'running simulation'):
             self.seal.sealStep = np.hstack((step,0.0))/self.sps
             self.seal.MoveSeal()
             self.pCloud.moveParticles()
-        
-        # save results
+        # save results, per step it need to save a data list of all particles with the old and new position information 
+        # use hdf5 ?
 
 
     def userDefParametersCLI(self):
-
+        """
+        this function opens a command line interface, asking the user to set 9 parameters,
+        which are a needed to simulate specified seal dives.
+        1. diveType, choosing between vShape and uShape dives
+        2. dive duration, defining the duration of the dive in seconds
+        3. currentType, choosing between static or interpolated currents
+        4. currentStaticVal, defining x,y,and z velocities for static currents
+        5. oceanDepth, setting the depth of the ocean
+        6. amount of Obstacles, setting the number of obstacles simulated in the enviornment
+        7. max_Particles, setting the number of particles simulated in the particleCloud
+        8. particleSizeRange, setting the lower and upper limits for the size of particles in mm ?
+        9. cloudRadius, setting the Radius of the particleCloud surrounding the seal_agent
+        Next, it sets the user defined parameters in the specidifc classes, needed for the 
+        simulation.
+        """
         self.simParameterDict['diveType']          = self.CLI_dialg_choiceText('What dive Type schould be simulated ?', 'vShape', ['uShape','vShape'])
         self.simParameterDict['durSec']            = float(self.CLI_dialg_num('How long should the dive simulation last?', '240'))    
         self.simParameterDict['currentType']       = self.CLI_dialg_choiceText('What kind of current should be simulates? ', 'static', ['static','interp'])
@@ -85,11 +140,14 @@ class SEAL_SIM:
         self.simParameterDict['particleSizeRange'] = (float(self.CLI_dialg_num('Set smallest Particle Size', '.00002')), float(self.CLI_dialg_num('Set biggest Particel Size', '0.00016')))
         self.simParameterDict['cloudRadius']       = float(self.CLI_dialg_num('Set radius of the Cloud', '-70'))
      
-
         print(self.simParameterDict)
         self.setParameters()
 
     def setParameters(self):
+        """
+        this function sets the user defined parameter to the according parameters in the different classes
+        needed to run the simulation
+        """
         self.protoMove.mode               = self.simParameterDict['diveType']
         self.protoMove.traDurSec          = self.simParameterDict['durSec']
         self.environment.waterCurrentMode = self.simParameterDict['currentType']
@@ -102,6 +160,9 @@ class SEAL_SIM:
         self.pCloud.maxVectorMagnitue     = self.simParameterDict['cloudRadius']
         
     def CLI_dialg_choiceText(self,question,default = False,answers=["yes","no"]):
+        """
+        this function creates a command line interface for the user to choose between text choice.
+        """
 
         userAnswer = self.CLI_quest(question,answers,default)
         while userAnswer not in answers:
@@ -110,14 +171,19 @@ class SEAL_SIM:
         return userAnswer
     
     def CLI_dialg_num(self,question,default = False):
+        """
+        this function creates a command line interface for the user to choose any number.
+        """
         userAnswer = self.CLI_quest(question,[],default)
         while userAnswer.strip('-').replace('.','',1).isdigit() ==False:
             print(str(userAnswer) + " unrecognised, this is not a number")
             userAnswer = self.CLI_quest(question,[],default) 
         return userAnswer
 
-
     def CLI_quest(self,question, answers,default):
+        """
+        this function defines the command line interface to set the parameters.
+        """
 
         if default != False:
             userAnswer = input(question + " [" + str(answers) +" | default: "+ str(default)+"] :")
