@@ -131,6 +131,30 @@ class opticFlowAnalysis:
         """
         This function rotates/assures particle cloud so that the seal orientation is az = 0 el 0
         """
+        #to do :
+        #P_t0 = (x,y,z)
+        #P_t1 =(x1,y1,z1)
+        #P_t1(x,y,z) * RotMat(-yaw,-pitch,-roll)
+        for pObject in self.particleList:
+
+            oldPosition = pObject.trajectory[0][0] # (radius, phi, z)
+            newPosition = pObject.trajectory[0][1] # (radius, phi, z)
+
+            #rotate newPosition negative to seal rotation
+            for i in self.sealTrajectories:
+                #sealRotation
+                sealYaw = (self.sealTrajectories[i+1][1][0])-(self.sealTrajectories[i][1][0]) # seal trajectory in sample i, SealOrientation, yaw
+                sealPitch = (self.sealTrajectories[i+1][1][1])-(self.sealTrajectories[i][1][1])
+                sealRoll = 0
+
+                R = self.mathUtils.getRotMatrix3D(sealYaw,sealPitch,sealRoll)
+            
+            newPosition = newPosition*R
+
+
+        #-yaw = YAW SEEHUND ZEIT X+1 - YAW SEEHUND ZEIT X
+        #-YAW = velStep/sps
+
 
         pass
 
@@ -151,10 +175,4 @@ class opticFlowAnalysis:
 
 
 
-#to do :
-#P_t0 = (x,y,z)
-#P_t1 =()
-#P_t1(x,y,z) * RotMat(-yw,)
-#P_t1(x,y,z) * RotMat(-yaw,-pitch,-roll)
-#-yaw = YAW SEEHUND ZEIT X+1 - YAW SEEHUND ZEIT X
-#-YAW = velStep/sps
+
