@@ -6,18 +6,40 @@ import matplotlib.pyplot as plt
 from ai import cs
 
 class opticFlowAnalysis:
-    '''
+    ''' 
+    this class takes the created particlesList with its trajectory information from every particle,
+    and the seal trajectories in order to analyze the ability of the seal to perceive optic flow 
+    at any given timepoint during the dive. Additionally it plots optic flow field during single 
+    seal steps.
     '''
 
     def __init__(self,simObj):
+        """
+        this class takes the trajectroy data from the particles and seal_agent to analyze the optic flow
+
+        @param simObj                  ? default= none
+        @param particleList            ? default= none
+            the particleList is a shortcut to the particleObjectList creates in the 
+            Cloud class stored in turbidity.py
+        @param sealTrajectories        ? default= none
+            the sealTrajectories is a shortcut to the sealTrajectories stores in the 
+            seal class in SEAL_SIM stored in SEAL_SIM.py
+        """
         self.simObj = simObj
         self.particleList = simObj.pCloud.partclObjList
         self.sealTrajectories = simObj.seal.sealTrajectory
+        self.r_querrList = []
+        self.rMagnitudeList  = []
     
     def createOpticFlow(self):
+        """
+        this function plotts a 2D optic flow field for a single sealStep, by calculating the 
+        magnitute ot the movement vector from the oldPosition of the particle to the newPosition 
+        for phi and z (ignoring the radius, since the retina only has 2 dimensions)
+        """
         fig = plt.figure() 
         ax = fig.add_subplot(111) 
-        for pObject in self.pCloud.partclObjList: # po should be (oldPosition, newPosition, status) of particle per movement
+        for pObject in self.particleList: # po should be (oldPosition, newPosition, status) of particle per movement
             oldPosition = pObject.trajectory[0][0]
             print('oldPosition is ', oldPosition)
             newPosition = pObject.trajectory[0][1]
@@ -29,8 +51,6 @@ class opticFlowAnalysis:
             V = direct[2] # z direction
             ax.quiver(X,Y,U,V)
         plt.show()     
-        
-        # particle.trajectory saves the old and new position of the particles after every sealMovement, how to apply cart2sphere function on this list ?)s
 
     def opticFlowAbility(self):
         """
@@ -45,23 +65,22 @@ class opticFlowAnalysis:
         Thus, (r_0+r_1)/2 - R should be minimal for situations in which the animal can detect depth through optic flow
         p0 = (r_0,phi_0,z_0)
         p1 = (r_1,phi_1,z_1)
-        The optimising functio of the evolution of optic flow analysis is min((r_0+r_1)/2 - R)
-        The optimising functio of the evolution of optic flow analysis is min(|(r_0+r_1)/2 - R|)
+        The optimising function of the evolution of optic flow analysis is min((r_0+r_1)/2 - R)
         (r0+r1)/2 = r_querr
-        So we sort our particle according to r_querr and R (derivedR) than for each particle we determin their difference in distance rank
-        if particle x is zthe 212th furthes away from the seal in the r_querr ranking and the 150th furthest away in the R ranking this makes an error of 62
+        So we sort our particle according to r_querr and R (derivedR) 
+        than for each particle we determin their difference in distance rank
+        if particle x is the 212th furthes away from the seal in the r_querr ranking 
+        and the 150th furthest away in the R ranking this makes an error of 62
         for this seal step the median error of all particles will be our quality value
-        R = norm(pih1_-phi_0, z_1-z_0)
+        R = norm(phi1_-phi_0, z_1-z_0)
         """
-        self.r_querrList = []
-        self.rMagnitudeList  = []
-        print(len(self.pCloud.partclObjList))
-        for pObject in self.pCloud.partclObjList:
+
+        for pObject in self.particleList:
             """
             (r0+r1)/2 = r_querr
             """
-            oldPosition = pObject.trajectory[0][0]
-            newPosition = pObject.trajectory[0][1]
+            oldPosition = pObject.trajectory[0][0] # (radius, phi, z)
+            newPosition = pObject.trajectory[0][1] # (radius, phi, z)
             r_querr = (oldPosition[0]-newPosition[0])/2
             self.r_querrList.append(r_querr)
             self.r_querrList.sort()
@@ -84,17 +103,13 @@ class opticFlowAnalysis:
     def cart2cylindric(self,cartPosition):
         """
         https://pypi.org/project/ai.cs/
-        r = axial distance or radial distance
+        r   = axial distance or radial distance
         phi = angle between the reference dircetion on the choosen plane and the line from the origin to the porjection of point P on the plane
-        z = height
-        #translate oldPosition from cartasian to cylindircal coordinate system
-        oldPosition = self.cart2cylindric(oldPosition)
-        #translate newPosition from cartasian to cylindrical coordinate system
-        newPosition = self.cart2cylindric(newPosition)
+        z   = height
         """
         r, phi, z = cs.cart2cyl(x=cartPosition[0], y=cartPosition[1], z=cartPosition[2])
-        return np.array([r, phi, z]) #depth r can be ignore. 
-
+        return np.array([r, phi, z]) 
+        
     def particlePos2OFvector(self,particlePosition):
         pass
     
