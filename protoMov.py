@@ -19,6 +19,8 @@ class ProtMov:
         self.traIDX       = []
         self.divePitch    = []
         self.mode         = 'random'
+        self.traLen       = None 
+        self.traDurSec    = None 
 
         # dive phases are keywords for a tupel consisting of 0) duration normalised to total duration
         # 1) mean pitch angle [deg]  2)  standard deviation of the mean [deg] 3)  mean z-profil [m/s]
