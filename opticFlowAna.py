@@ -28,7 +28,7 @@ class opticFlowAnalysis:
         """
         self.simObj = simObj
         self.particleList = simObj.pCloud.partclObjList
-        self.sealTrajectories = simObj.seal.sealTrajectory
+        self.sealTrajectory = simObj.seal.sealTrajectory
         self.r_querrList = []
         self.rMagnitudeList  = []
     
@@ -110,34 +110,58 @@ class opticFlowAnalysis:
         """
         r, phi, z = cs.cart2cyl(x=cartPosition[0], y=cartPosition[1], z=cartPosition[2])
         return np.array([r, phi, z]) 
+
+    def analyseSingleParticleOF(self,frameNo,partclNo):
+
+        #get particle step position
+        particleTrajEntry = self.particleList[partclNo].trajectory[frameNo]
+
+        if particleTrajEntry[2] == True:
+            #get seal step orientations
+            if frameNo == 0:
+                sealOrientationStep=(self.sealTrajectory[frameNo][1],self.sealTrajectory[frameNo][1])
+            else:
+                sealOrientationStep=(self.sealTrajectory[frameNo-1][1],self.sealTrajectory[frameNo][1])
+
+            # in this function the particle position are rotated so that they align with the animals 
+            # orientation. Furthermore they transfer from a 3-D cartesian coordinate sytem into a 3-D
+            # cylindirical coordinate system
+            cylParticle = self.absParticlePos2cylsealCoord(particleTrajEntry,sealOrientationStep)
+
+            #now calculate the OF vector and the resulting distance and distance estimate
+
+            OFvector,distance,OFdistanceEst = self.analyseSingleParticleOF(cylParticle)
+
+            return cylParticle, OFvector, distance, OFdistanceEst 
+        else:
+            return None
+        # rotat
+
+    def rotateParticleStep2SealHeading(self,particleTrajStep,sealOrientationStep):
         
-    def rotateParticleStep2SealHeading(self,particleTrajStep,sealPositionStep):
-        
-        sealPositionOld = sealPositionStep[0]
-        sealPositionNew = sealPositionStep[1]
+        sealOrientationOld = sealOrientationStep[0]
+        sealOrientationNew = sealOrientationStep[1]
         
         # This rotation matrix rotates the particle from world coordinates
         # into a position relative to the seals orientation
-        rotMatOld = mathUtils.getRotMatrix3D(sealPositionOld[4],sealPositionOld[5],0) # because we have no roll
+        rotMatOld = mathUtils.getRotMatrix3D(sealOrientationOld[0],sealOrientationOld[1],0) # because we have no roll
         # This rotation matrix does the same but after performing the seal step
         # Warning maybe use negative angles unsure ...
-        rotMatNew = mathUtils.getRotMatrix3D(sealPositionNew[4],sealPositionNew[5],0) # because we have no roll
+        rotMatNew = mathUtils.getRotMatrix3D(sealOrientationNew[0],sealOrientationNew[1],0) # because we have no roll
 
         # getting correctly position particle pre seal step
-        partclPosOld = np.dot(rotMatOld,particleTrajStep[0]))
+        partclPosOld = np.dot(rotMatOld,particleTrajStep[0])
         # getting correctly position particle pre seal step
-        partclPosNew = np.dot(rotMatNew,particleTrajStep[1]))
+        partclPosNew = np.dot(rotMatNew,particleTrajStep[1])
 
         return (partclPosOld,partclPosNew)
     
     def absParticlePos2cylsealCoord(self,particleTrajEntry,sealTrajEntry):
-        if particleTrajEntry[2] == True:
-            # rotate 3D cartesian coordinates to seal orientation
-            relPartPosCart = self.rotateParticleStep2SealHeading(particleTrajEntry,sealTrajEntry)
-            # transfrom from cartesian into cylindrical
-            return (self.cart2cylindric((relPartPosCart[0]),self.cart2cylindric((relPartPosCart[1]))
-        else: 
-            return None
+        # rotate 3D cartesian coordinates to seal orientation
+        relPartPosCart = self.rotateParticleStep2SealHeading(particleTrajEntry,sealTrajEntry)
+        # transfrom from cartesian into cylindrical
+        return (self.cart2cylindric((relPartPosCart[0]),self.cart2cylindric((relPartPosCart[1]))
+
 
     def getDistancesFromCylParticles(self,cylParticles) 
             
@@ -151,7 +175,7 @@ class opticFlowAnalysis:
             OFvector = np.subtract(newPosition[1:3],oldPosition[1:3]) # magnitude of 2D vector p1(phi,z) to p2(phi,z)
             distance_OFestimate = np.linalg.norm(OFvector)
             
-            return (OFvector,distance_groundTruth,distance_OFestimate)
+            return OFvector,distance_groundTruth,distance_OFestimate
          
     def cartTra2cylTra(self,cartTra):
         '''
