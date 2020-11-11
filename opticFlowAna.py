@@ -1,4 +1,5 @@
 import numpy as np 
+from utilities import mathUtils
 from scipy.interpolate import RegularGridInterpolator
 #from scipy import interpolate
 import copy, matplotlib
@@ -110,8 +111,34 @@ class opticFlowAnalysis:
         r, phi, z = cs.cart2cyl(x=cartPosition[0], y=cartPosition[1], z=cartPosition[2])
         return np.array([r, phi, z]) 
         
-    def particlePos2OFvector(self,particlePosition):
-        pass
+    def rotateParticleStep2SealHeading(self,particleTrajStep,sealPositionStep):
+        
+        sealPositionOld = sealPositionStep[0]
+        sealPositionNew = sealPositionStep[1]
+        
+        # This rotation matrix rotates the particle from world coordinates
+        # into a position relative to the seals orientation
+        rotMatOld = mathUtils.getRotMatrix3D(sealPositionOld[4],sealPositionOld[5],0) # because we have no roll
+        # This rotation matrix does the same but after performing the seal step
+        # Warning maybe use negative angles unsure ...
+        rotMatNew = mathUtils.getRotMatrix3D(sealPositionNew[4],sealPositionNew[5],0) # because we have no roll
+
+        # getting correctly position particle pre seal step
+        partclPosOld = np.dot(rotMatOld,particleTrajStep[0]))
+        # getting correctly position particle pre seal step
+        partclPosNew = np.dot(rotMatNew,particleTrajStep[1]))
+
+        return (partclPosOld,partclPosNew)
+    
+    def absParticlePos2cylsealCoord(self,particleTrajEntry,sealTrajEntry):
+        if particleTrajEntry[2] == True:
+            # rotate 3D cartesian coordinates to seal orientation
+            relPartPosCart = self.rotateParticleStep2SealHeading(particleTrajEntry,sealTrajEntry)
+            # transfrom from cartesian into cylindrical
+            return (self.cartTra2cylTra(relPartPosCart[0]),self.cartTra2cylTra(relPartPosCart[1]))
+        else: 
+            return None
+
     
     def cartTra2cylTra(self,cartTra):
         '''
@@ -127,7 +154,7 @@ class opticFlowAnalysis:
         return cylTra
 
     
-    def rotateFlowField2SealHeading(self):
+    def articlePos2OFvector(self): # rename
         """
         This function rotates/assures particle cloud so that the seal orientation is az = 0 el 0
         """
