@@ -277,6 +277,7 @@ class Cloud:
         self.sizeRange         = sizeRange # tuple with the min and max radius[µm]
         self.maxVectorMagnitue = maxVectorMagnitue # max radius of a cloud
         self.sealStep          = self.simObj.seal.sealStep # change of position and orientation
+        self.sealPosition      = self.simObj.seal.sealPosition # change of position and orientation
         self.waterCurrent      = np.zeros(shape=3) # water current 
     
     def add_particles(self):
