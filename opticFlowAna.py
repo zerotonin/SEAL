@@ -75,7 +75,8 @@ class opticFlowAnalysis:
         for this seal step the median error of all particles will be our quality value
         R = norm(phi1_-phi_0, z_1-z_0)
         """
-        self.anaDataList = list()
+        self.anaDataList  = list()
+        self.distRankDiff = list()
         for frameI in range(self.simObj.protoMove.traLen):
             distTrueList  = list()
             distOFestList = list()
@@ -91,9 +92,13 @@ class opticFlowAnalysis:
                 OFvectorList.append(OFvector)
 
             self.anaDataList.append([distTrueList,distOFestList,partCylList,OFvectorList])                
-            
+            self.distRankDiff.append(self.calcDistanceRankDiff(distance,OFdistanceEst))
 
-
+    def calcDistanceRankDiff(self,distTrue,distEstOF):
+        # These functions return the indices of a sorted list Therefore it is the relative distance rank
+        estIDX = np.argsort(distEstOF)
+        trueIDX = np.argsort(distTrue)
+        rankDiff = abs(estIDX -trueIDX)
     
     def cart2cylindric(self,cartPosition):
         """
