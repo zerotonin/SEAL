@@ -135,10 +135,27 @@ class opticFlowAnalysis:
             # rotate 3D cartesian coordinates to seal orientation
             relPartPosCart = self.rotateParticleStep2SealHeading(particleTrajEntry,sealTrajEntry)
             # transfrom from cartesian into cylindrical
-            return (self.cartTra2cylTra(relPartPosCart[0]),self.cartTra2cylTra(relPartPosCart[1]))
+            return (self.cart2cylindric((relPartPosCart[0]),self.cart2cylindric((relPartPosCart[1]))
         else: 
             return None
+
+    def getDistancesFromCylParticles(self,cylParticles) 
             
+            r_querr = (oldPosition[0]-newPosition[0])/2
+            self.r_querrList.append(r_querr)
+            self.r_querrList.sort()
+            
+            """
+            magnitude between the particle before and after sealMovement,
+            describing the shift on the retina for optic flow
+            """
+
+            direct = np.subtract(newPosition[1:3],oldPosition[1:3]) # magnitude of 2D vector p1(phi,z) to p2(phi,z)
+            rMagnitude = np.linalg.norm(direct)
+            self.rMagnitudeList.append(rMagnitude)
+            self.rMagnitudeList.sort()
+
+         
     def cartTra2cylTra(self,cartTra):
         '''
         This function 
