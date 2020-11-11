@@ -75,31 +75,25 @@ class opticFlowAnalysis:
         for this seal step the median error of all particles will be our quality value
         R = norm(phi1_-phi_0, z_1-z_0)
         """
+        self.anaDataList = list()
+        for frameI in range(self.simObj.protoMove.traLen):
+            distTrueList  = list()
+            distOFestList = list()
+            partCylList   = list()
+            OFvectorList  = list()
 
-        for pObject in self.particleList:
-            """
-            (r0+r1)/2 = r_querr
-            """
-            oldPosition = pObject.trajectory[0][0] # (radius, phi, z)
-            newPosition = pObject.trajectory[0][1] # (radius, phi, z)
-            r_querr = (oldPosition[0]-newPosition[0])/2
-            self.r_querrList.append(r_querr)
-            self.r_querrList.sort()
+            for pObjectI in range(len(self.particleList)):
+                # calculate OpticFlow data            
+                cylParticle, OFvector, distance, OFdistanceEst = self.analyseSingleParticleOF(frameI,pObjectI)
+                distTrueList.append(distance)
+                distOFestList.append(OFdistanceEst)
+                partCylList.append(cylParticle)
+                OFvectorList.append(OFvector)
+
+            self.anaDataList.append([distTrueList,distOFestList,partCylList,OFvectorList])                
             
-            """
-            magnitude between the particle before and after sealMovement,
-            describing the shift on the retina for optic flow
-            """
 
-            direct = np.subtract(newPosition[1:3],oldPosition[1:3]) # magnitude of 2D vector p1(phi,z) to p2(phi,z)
-            rMagnitude = np.linalg.norm(direct)
-            self.rMagnitudeList.append(rMagnitude)
-            self.rMagnitudeList.sort()
 
-        print(self.r_querrList)
-        print(len(self.r_querrList))
-        print('##############################################')
-        print(self.rMagnitudeList) 
     
     def cart2cylindric(self,cartPosition):
         """
@@ -129,7 +123,6 @@ class opticFlowAnalysis:
             cylParticle = self.absParticlePos2cylsealCoord(particleTrajEntry,sealOrientationStep)
 
             #now calculate the OF vector and the resulting distance and distance estimate
-
             OFvector,distance,OFdistanceEst = self.analyseSingleParticleOF(cylParticle)
 
             return cylParticle, OFvector, distance, OFdistanceEst 
