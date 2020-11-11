@@ -141,20 +141,17 @@ class opticFlowAnalysis:
 
     def getDistancesFromCylParticles(self,cylParticles) 
             
-            r_querr = (oldPosition[0]-newPosition[0])/2
-            self.r_querrList.append(r_querr)
-            self.r_querrList.sort()
+            distance_groundTruth = (cylParticles[0][0]-cylParticles[1][0])/2
             
             """
             magnitude between the particle before and after sealMovement,
             describing the shift on the retina for optic flow
             """
 
-            direct = np.subtract(newPosition[1:3],oldPosition[1:3]) # magnitude of 2D vector p1(phi,z) to p2(phi,z)
-            rMagnitude = np.linalg.norm(direct)
-            self.rMagnitudeList.append(rMagnitude)
-            self.rMagnitudeList.sort()
-
+            OFvector = np.subtract(newPosition[1:3],oldPosition[1:3]) # magnitude of 2D vector p1(phi,z) to p2(phi,z)
+            distance_OFestimate = np.linalg.norm(OFvector)
+            
+            return (OFvector,distance_groundTruth,distance_OFestimate)
          
     def cartTra2cylTra(self,cartTra):
         '''
