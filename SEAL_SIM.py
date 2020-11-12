@@ -96,7 +96,7 @@ class SEAL_SIM:
         self.setParameters()
         self.environment.creatObstacles() #create obstacle if maxObsticales >0
         #get trajectory
-        self.protoMove.generator2(self.simParameterDict['durSec'])
+        self.protoMove.generator2()
         self.sealVelTra = self.protoMove.velTra
         #run trajectory through particle cloud
         for step in tqdm(self.sealVelTra,'running simulation'):
@@ -149,7 +149,7 @@ class SEAL_SIM:
         needed to run the simulation
         """
         self.protoMove.mode               = self.simParameterDict['diveType']
-        self.protoMove.traDurSec          = self.simParameterDict['durSec']
+        self.protoMove.traLenSec          = self.simParameterDict['durSec']
         self.environment.waterCurrentMode = self.simParameterDict['currentType']
         if self.simParameterDict['currentType'] == 'static':
             self.environment.waterCurrent     = self.simParameterDict['currentStaticVel']

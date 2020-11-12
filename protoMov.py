@@ -19,7 +19,8 @@ class ProtMov:
         self.traIDX       = []
         self.divePitch    = []
         self.mode         = 'random'
-        self.traLen       = None 
+        self.traLenSec    = 240
+        self.traLen       = self.traLenSec*self.sps 
         self.traDurSec    = None 
 
         # dive phases are keywords for a tupel consisting of 0) duration normalised to total duration
@@ -39,7 +40,7 @@ class ProtMov:
                            'surface2' :(36.0/36.0 -74.53024727 ,7.65994214  ,-0.005039636363636366 ,0.0280961935023646)} # surface 2 is a bonus duration if up wards swimming ends before its duration
 
 
-    def generator2(self,traLenSec):
+    def generator2(self):
         '''
         this function randomly chooses between uShape and vShapes dives.
         dependent on the diveType it sets the corresponding phases (surface, down, straight
@@ -51,8 +52,8 @@ class ProtMov:
         OffshoreWindenergieanlagen" depth and pitch Data taken from figure 16.
 
         '''
-        self.traLen    = traLenSec*self.sps
-        self.traDurSec = traLenSec
+        
+        self.traDurSec = self.traLenSec
 
         if self.mode == 'random':
             self.mode = random.choice(('uShape','vShape'))

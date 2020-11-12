@@ -22,11 +22,23 @@ currentSys[7,:] = [5,7,0]
 
 simObj.environment.setCurrents(currentSys)
 
+# run Simulation with user settings
+
 from importlib import reload 
 import SEAL_SIM, opticFlowAna
 import numpy as np 
 reload(SEAL_SIM)
 reload(opticFlowAna)
 simObj = SEAL_SIM.SEAL_SIM()
-simObj.runSimulation()
 simObj.userDefParametersCLI()
+simObj.runSimulation()
+
+# analyse OpticFlow ability
+
+O = opticFlowAna.opticFlowAnalysis(simObj) 
+O.opticFlowAbility()
+
+O.anaDataList[0:10]
+len(O.anaDataList)
+O.distRankDiff[0:10]
+len(O.distRankDiff)
