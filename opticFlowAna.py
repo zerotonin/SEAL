@@ -5,6 +5,7 @@ from scipy.interpolate import RegularGridInterpolator
 import copy, matplotlib
 import matplotlib.pyplot as plt 
 from ai import cs
+from tqdm import tqdm
 
 class opticFlowAnalysis:
     ''' 
@@ -78,7 +79,7 @@ class opticFlowAnalysis:
         """
         self.anaDataList  = list()
         self.distRankDiff = list()
-        for frameI in range(self.simObj.protoMove.traLen):
+        for frameI in tqdm(range(self.simObj.protoMove.traLen),desc='calculating OF'):
             distTrueList  = list()
             distOFestList = list()
             partCylList   = list()
@@ -93,7 +94,7 @@ class opticFlowAnalysis:
                 OFvectorList.append(OFvector)
 
             self.anaDataList.append([distTrueList,distOFestList,partCylList,OFvectorList])                
-            self.distRankDiff.append(self.calcDistanceRankDiff(distance,OFdistanceEst))
+            self.distRankDiff.append(self.calcDistanceRankDiff(distTrueList,distOFestList))
 
     def calcDistanceRankDiff(self,distTrue,distEstOF):
         # clear list of None and build np.array

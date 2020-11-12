@@ -35,6 +35,7 @@ simObj.runSimulation()
 
 # analyse OpticFlow ability
 
+reload(opticFlowAna)
 O = opticFlowAna.opticFlowAnalysis(simObj) 
 O.opticFlowAbility()
 
