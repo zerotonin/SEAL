@@ -96,9 +96,12 @@ class opticFlowAnalysis:
             self.distRankDiff.append(self.calcDistanceRankDiff(distance,OFdistanceEst))
 
     def calcDistanceRankDiff(self,distTrue,distEstOF):
+        # clear list of None and build np.array
+        distEstOF_clean = np.array([dist for dist in distEstOF if dist])
+        distTrue_clean = np.array([dist for dist in distTrue if dist])
         # These functions return the indices of a sorted list Therefore it is the relative distance rank
-        estIDX = np.argsort(distEstOF)
-        trueIDX = np.argsort(distTrue)
+        estIDX = np.argsort(distEstOF_clean)
+        trueIDX = np.argsort(distTrue_clean)
         rankDiff = abs(estIDX -trueIDX)
         return rankDiff
     def cart2cylindric(self,cartPosition):
