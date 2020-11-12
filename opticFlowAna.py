@@ -100,9 +100,13 @@ class opticFlowAnalysis:
         # clear list of None and build np.array
         distEstOF_clean = np.array([dist for dist in distEstOF if dist])
         distTrue_clean = np.array([dist for dist in distTrue if dist])
-        # These functions return the indices of a sorted list Therefore it is the relative distance rank
-        estIDX = np.argsort(distEstOF_clean)
+        # These functions return the indices of a sorted list Therefore it is the relative distance rank. 
+        # Note that the closest particle is ranked on 1st place in the true distance, but it will elicit 
+        # the largest optic flow vector, therefore we have to flip the ranks of one list. We decided to do
+        # so by inverting the distance estimated by the norm of the OF vector. Thereby the largest OF vector
+        # norm (OFN) becomes the smallest value (1/OFN).
         trueIDX = np.argsort(distTrue_clean)
+        estIDX = np.argsort(distEstOF_clean**-1) 
         rankDiff = abs(estIDX -trueIDX)
         return rankDiff
     def cart2cylindric(self,cartPosition):
