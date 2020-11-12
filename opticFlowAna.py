@@ -164,7 +164,7 @@ class opticFlowAnalysis:
 
     def getDistancesFromCylParticles(self,cylParticles): 
             
-            distance_groundTruth = (cylParticles[0][0]-cylParticles[1][0])/2
+            distance_groundTruth = (cylParticles[0][0]+cylParticles[1][0])/2
             
             """
             magnitude between the particle before and after sealMovement,
