@@ -138,7 +138,7 @@ class SEAL_SIM:
         self.simParameterDict['amountOfObstacles'] = int(self.CLI_dialg_num('How many obstacle should be simulates in the environment? ', '100'))
         self.simParameterDict['max_particles']     = int(self.CLI_dialg_num('How many particles should be simulates in the particleCloud? ', '270'))
         self.simParameterDict['particleSizeRange'] = (float(self.CLI_dialg_num('Set smallest Particle Size', '.00002')), float(self.CLI_dialg_num('Set biggest Particel Size', '0.00016')))
-        self.simParameterDict['cloudRadius']       = float(self.CLI_dialg_num('Set radius of the Cloud', '-70'))
+        self.simParameterDict['cloudRadius']       = float(self.CLI_dialg_num('Set radius of the Cloud', '0.0018'))
      
         print(self.simParameterDict)
         self.setParameters()

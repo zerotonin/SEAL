@@ -242,12 +242,7 @@ class Cloud:
     R3) Miroslaw Jonasz (1983) Particle-size distributions in the Baltic, Tellus B:Chemical and Physical Meteorology, 35:5, 346-358, DOI: 10.3402/tellusb.v35i5.14624
     """
 
-    def __init__(self,
-                simObj,
-                max_particles = 270,
-                sizeRange = (.00002,0.00016), # in meter
-                maxVectorMagnitue= 0.0018):
-                #super()__init__(self) # needs to be vector magnitute , discribing the length of a vector
+    def __init__(self, simObj): 
         """ 
         This function initialises a list of random sized particles[µm] with a random x,y,z position, limited by
         radius of the visual field of a seal (@ param maxVectorMagnitue). Particles are in cartesian 3D space 
@@ -272,12 +267,15 @@ class Cloud:
             the list of water current vectors in the ocean space.
         """
         self.simObj            = simObj # string name
-        self.max_particles     = max_particles # integer number of particles 
-        self.partclObjList     = [] # list of particle objects
-        self.sizeRange         = sizeRange # tuple with the min and max radius[µm]
-        self.maxVectorMagnitue = maxVectorMagnitue # max radius of a cloud
+        #from simulation parameters dictionary
+        self.max_particles     = self.simObj.simParameterDict['max_particles'] # integer number of particles 
+        self.sizeRange         = self.simObj.simParameterDict['particleSizeRange'] # tuple with the min and max radius[µm]
+        self.maxVectorMagnitue = self.simObj.simParameterDict['cloudRadius'] # max radius of a cloud
+        #from seal object of the simulation object
         self.sealStep          = self.simObj.seal.sealStep # change of position and orientation
         self.sealPosition      = self.simObj.seal.sealPosition # change of position and orientation
+
+        self.partclObjList     = [] # list of particle objects
         self.waterCurrent      = np.zeros(shape=3) # water current 
     
     def add_particles(self):
