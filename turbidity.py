@@ -245,7 +245,7 @@ class Cloud:
     def __init__(self, simObj): 
         """ 
         This function initialises a list of random sized particles[µm] with a random x,y,z position, limited by
-        radius of the visual field of a seal (@ param maxVectorMagnitue). Particles are in cartesian 3D space 
+        radius of the visual field of a seal (@ param maxVectorMagnitude). Particles are in cartesian 3D space 
         form a cloud with the seal as a center (0,0,0). 
 
         @param simObj      string default: none
@@ -268,9 +268,9 @@ class Cloud:
         """
         self.simObj            = simObj # string name
         #from simulation parameters dictionary
-        self.max_particles     = self.simObj.simParameterDict['max_particles'] # integer number of particles 
-        self.sizeRange         = self.simObj.simParameterDict['particleSizeRange'] # tuple with the min and max radius[µm]
-        self.maxVectorMagnitue = self.simObj.simParameterDict['cloudRadius'] # max radius of a cloud
+        self.max_particles      = self.simObj.simParameterDict['max_particles'] # integer number of particles 
+        self.sizeRange          = self.simObj.simParameterDict['particleSizeRange'] # tuple with the min and max radius[µm]
+        self.maxVectorMagnitude = self.simObj.simParameterDict['cloudRadius'] # max radius of a cloud
         #from seal object of the simulation object
         self.sealStep          = self.simObj.seal.sealStep # change of position and orientation
         self.sealPosition      = self.simObj.seal.sealPosition # change of position and orientation
@@ -305,10 +305,10 @@ class Cloud:
     def getRandomVectorMagnitude(self,coordinate):
         """
         The function 'getRandomVectorMagnitude' returns the madnitude of the random vector,
-        limited by the size of 'maxVectorMagnitue', which is radius of particles' cloud.
+        limited by the size of 'maxVectorMagnitude', which is radius of particles' cloud.
         """
         normCoord = np.empty(3)
-        normCoord = coordinate*(np.random.rand(1)*self.maxVectorMagnitue/np.linalg.norm(coordinate))
+        normCoord = coordinate*(np.random.rand(1)*self.maxVectorMagnitude/np.linalg.norm(coordinate))
         return normCoord
         
 
@@ -320,9 +320,9 @@ class Cloud:
          with a offset of 5 percent.
          @return new vector discribing the opposite position of the particle to the seal.
         """
-        newMagnitude = self.maxVectorMagnitue-(relPariclePosNorm%self.maxVectorMagnitue) # new magnitute of reset position for the particle
-        offSet = (np.random.rand(3)-0.5)*(self.maxVectorMagnitue/10)/self.maxVectorMagnitue # offset by 5 % 
-        newVector = (relPariclePos+offSet)*-1*newMagnitude/relPariclePosNorm 
+        newMagnitude = np.random.uniform(low=0.2,high=1.3)   # new magnitute of reset position for the particle
+        offSet       = (np.random.rand(3)-0.5)*(self.maxVectorMagnitude/10)/self.maxVectorMagnitude # offset by 5 % 
+        newVector    = (relPariclePos+offSet)*-1*newMagnitude/relPariclePosNorm 
         return newVector
 
     def moveParticles(self):
@@ -340,9 +340,9 @@ class Cloud:
             pObject.particleMovement(self.sealPosition,self.waterCurrent,self.simObj.seal.sealStep)# for all Particles in List run randomwalk
             # checking if particle norm is still in range
             relParticlePosNorm = np.linalg.norm(pObject.position)
-            if  relParticlePosNorm > self.maxVectorMagnitue: # if the magnitude of the particle vector is bigger than 0.3, 
+            if  relParticlePosNorm > self.maxVectorMagnitude: # if the magnitude of the particle vector is bigger than 0.3, 
                 #respawing particles that drifted away
-                pObject.position = self.resetParticles(pObject.position,relParticlePosNorm)
+                pObject.position = self.resetParticles(pObject.trajectory[-1][0],relParticlePosNorm)
 
    # We need to safe the start and end postion of all particles before and after
    #the movement. This is safed as oldPosition and newPosition (see particle Movement)

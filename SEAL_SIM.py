@@ -158,7 +158,7 @@ class SEAL_SIM:
         self.environment.maxObstacles     = self.simParameterDict['amountOfObstacles']
         self.pCloud.max_particles         = self.simParameterDict['max_particles']
         self.pCloud.sizeRange             = self.simParameterDict['particleSizeRange']
-        self.pCloud.maxVectorMagnitue     = self.simParameterDict['cloudRadius']
+        self.pCloud.maxVectorMagnitude    = self.simParameterDict['cloudRadius']
         
     def CLI_dialg_choiceText(self,question,default = False,answers=["yes","no"]):
         """
