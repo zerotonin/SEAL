@@ -90,6 +90,8 @@ class Seal:
         in correct order. sealStep holding information for x,y,z direction of MovingVector as well as
         yaw,pitch,roll (orientation of the seal)
         """    
+        self.SealStateCheck()
+        
         if self.activeSealMovement == True:
 
             

@@ -103,7 +103,11 @@ class SEAL_SIM:
         for step in tqdm(self.sealVelTra,'running simulation'):
             self.seal.sealStep = np.hstack((step,0.0))/self.sps
             self.seal.MoveSeal()
-            self.pCloud.moveParticles()
+            if self.seal.activeSealMovement == False:
+                print("Seal left simulation environment! o.O")
+                break
+            else:
+                self.pCloud.moveParticles()
         # save results, per step it need to save a data list of all particles with the old and new position information 
         # use hdf5 ?
 
