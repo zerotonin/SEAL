@@ -313,17 +313,26 @@ class Cloud:
         
 
 
-    def resetParticles(self,relPariclePos,relPariclePosNorm):
+    def resetParticles(self,lastInitialPosition):
         """
         The 'resetParticles' function resets those particles that moved out of the sphere
         (MaxVectorMagnitute) by having them reappear on the opposite site of the sphere,
          with a offset of 5 percent.
          @return new vector discribing the opposite position of the particle to the seal.
         """
-        newMagnitude = np.random.uniform(low=0.0,high=self.maxVectorMagnitude)   # new magnitute of reset position for the particle
-        offSet       = (np.random.rand(3)-0.5)*(self.maxVectorMagnitude/10)/self.maxVectorMagnitude # offset by 5 % 
-        newVector    = (relPariclePos+offSet)*-1*newMagnitude/relPariclePosNorm 
-        return newVector
+        randomCoord = np.random.uniform(-1,1,size = (3)) # random vector (x,y,z) from -1 to 1
+        initialCoord = self.getRandomVectorMagnitude(randomCoord)
+        # To respawn the particle in the opposing quandrant of its last intial position we invert those
+        # axis
+        for i in range(3):
+            if lastInitialPosition[i] <0:
+                if initialCoord[i] < 0:
+                    initialCoord[i] = initialCoord[i]*-1
+            else:
+                if initialCoord[i] >0:
+                    initialCoord[i] = initialCoord[i]*-1
+
+        return initialCoord
 
     def moveParticles(self):
         """
@@ -342,7 +351,7 @@ class Cloud:
             relParticlePosNorm = np.linalg.norm(pObject.position)
             if  relParticlePosNorm > self.maxVectorMagnitude: # if the magnitude of the particle vector is bigger than 0.3, 
                 #respawing particles that drifted away
-                pObject.position = self.resetParticles(pObject.trajectory[-1][0],relParticlePosNorm)
+                pObject.position = self.resetParticles(pObject.trajectory[-1][0])
 
    # We need to safe the start and end postion of all particles before and after
    #the movement. This is safed as oldPosition and newPosition (see particle Movement)
