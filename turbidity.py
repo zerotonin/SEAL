@@ -320,7 +320,7 @@ class Cloud:
          with a offset of 5 percent.
          @return new vector discribing the opposite position of the particle to the seal.
         """
-        newMagnitude = np.random.uniform(low=0.2,high=1.3)   # new magnitute of reset position for the particle
+        newMagnitude = np.random.uniform(low=0.0,high=self.maxVectorMagnitude)   # new magnitute of reset position for the particle
         offSet       = (np.random.rand(3)-0.5)*(self.maxVectorMagnitude/10)/self.maxVectorMagnitude # offset by 5 % 
         newVector    = (relPariclePos+offSet)*-1*newMagnitude/relPariclePosNorm 
         return newVector
