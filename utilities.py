@@ -18,7 +18,7 @@ class plotUtils:
         Cloud to plot each particle in respective size into a squared coordinate system.
          '''
 
-    def particleObjList2CoordList(self,partclObjList):
+    def particleObjList2CoordList(self,frame,partclObjList):
         '''
         This function returns lists of position values x,y,z and size value s of all particles from
         partclObjList.
@@ -31,9 +31,9 @@ class plotUtils:
 
 
         for particle in partclObjList :
-            xdata.append(particle.position[0])
-            ydata.append(particle.position[1])
-            zdata.append(particle.position[2])
+            xdata.append(particle.trajectory[frame][0][0])
+            ydata.append(particle.trajectory[frame][0][1])
+            zdata.append(particle.trajectory[frame][0][2])
             sdata.append(particle.size[0])
         
         return (xdata,ydata,zdata,sdata)
@@ -52,13 +52,13 @@ class plotUtils:
         return fig,ax
         
 
-    def plot3D_positionSizeColorCoded(self,partclObjList):
+    def plot3D_positionSizeColorCoded(self,frame, partclObjList):
         '''
         This function finally returns particles plotted in a 3D coordinate system according to 
         their position and size. Where z - is the depth of the ocean where cloud is located.
         '''
         
-        coordinates = self.particleObjList2CoordList(partclObjList)
+        coordinates = self.particleObjList2CoordList(frame, partclObjList)
         fig,ax = self.makeSquare3DAxis()
         h = ax.scatter3D(coordinates[0], coordinates[1], coordinates[2], c=coordinates[3], cmap='brg')
         ax.set_xlabel('X')
