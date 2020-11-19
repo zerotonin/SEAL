@@ -68,7 +68,7 @@ class SEAL_SIM:
         to be used for the simulation
         """
         # THis function should be inherited
-        return copy.deepcopy(velocity/self.sps)
+        return copy.deepcopy(np.array(velocity)/self.sps)
     
     #def simulate_sample(self):
     #    """
