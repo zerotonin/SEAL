@@ -43,12 +43,15 @@ class opticFlowAnalysis:
         fig = plt.figure() 
         ax = fig.add_subplot(111) 
         for i in range(len(self.particleList)): # po should be (oldPosition, newPosition, status) of particle per movement
-            direct = self.anaDataList[frame][3][i] # richtungsvector between frames
+            direct = self.anaDataList[frame][3][i]
+            if  self.anaDataList[frame][2][i] != None: # richtungsvector between frames
             X = self.anaDataList[frame][2][i][0][1] # phi
             Y = self.anaDataList[frame][2][i][0][2] # z
             U = direct[0] # phi direction
             V = direct[1] # z direction
-            ax.quiver(X,Y,U,V, scale_units='xy', scale =1)
+            else:
+                pass
+            ax.quiver(X,Y,U,V, angles ='xy',scale_units='xy', scale =1)
         plt.show() 
 
 
