@@ -116,8 +116,8 @@ class ProtMov:
         WHY did we set sigma to 3 for zProfile and to 6 fpr pitch values?
         '''
 
-        #positional values to velocities in m/s or deg/s || filtered by 3 sigma gauss
-        zVel = np.diff(gaussian_filter1d(zProfil, 3))*self.sps 
+        #positional values to velocities in m/sample or deg/sample || filtered by 3 sigma gauss
+        zVel = np.diff(gaussian_filter1d(zProfil, 3)) 
         zVel = np.append(0,zVel) # added a start value of 0 to have a length of self.traLen again
         pVel = np.diff(pitchAngle) # this is allready deg per frame
         pVel = np.append(0,pVel )# added a start value of 0 to have a length of self.traLen again
