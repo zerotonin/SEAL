@@ -34,27 +34,41 @@ class opticFlowAnalysis:
         self.r_querrList    = []
         self.rMagnitudeList = []
     
-    def createOpticFlow(self):
-        """
-        this function plotts a 2D optic flow field for a single sealStep, by calculating the 
-        magnitute ot the movement vector from the oldPosition of the particle to the newPosition 
-        for phi and z (ignoring the radius, since the retina only has 2 dimensions)
-        """
-        fig = plt.figure() 
-        ax = fig.add_subplot(111) 
-        for pObject in self.particleList: # po should be (oldPosition, newPosition, status) of particle per movement
-            oldPosition = pObject.trajectory[0][0]
-            print('oldPosition is ', oldPosition)
-            newPosition = pObject.trajectory[0][1]
-            print('new position is ', newPosition)
-            direct = np.subtract(newPosition,oldPosition) # richtungsvector between frames
-            X = oldPosition[1] # phi
-            Y = oldPosition[2] # z
-            U = direct[1] # phi direction
-            V = direct[2] # z direction
-            ax.quiver(X,Y,U,V)
-        plt.show()     
+   
 
+    def create2DParticleDistributionList(self,prePost, frame):
+        """
+        this function creaty x and y list fpr the azimuth(x) and z(height) values of the particles from
+        the cylindric particle positions at a given fram for either the oldPosition (prePost = 0)
+        or the nwe Position (prePost = 1)
+        """
+        xList = list()
+        yList = list()
+
+        for i in range(1,len(self.particleList)):
+            if self.anaDataList[frame][2][i] != None:
+                    xList.append(self.anaDataList[frame][2][i][prePost][1])
+                    yList.append(self.anaDataList[frame][2][i][prePost][2])
+            else: 
+                xList.append(None)
+                yList.append(None)
+        return xList, yList
+
+    def plot2DparticleDist(self, frame):
+        """
+        this function plots the old and new positions of particles for a given frame
+        it creates x and y list of the cylindric coordinates of the particles 
+        with the create2DparticleDistributionList and plots the old positions
+        in red and the new positions in green
+        """
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        xList, yList = self.create2DParticleDistributionList(0,frame)
+        ax.scatter(xList, yList, color = 'red')
+        postxList, postyList = self.create2DParticleDistributionList(1,frame)
+        ax.scatter(postxList, postyList, color='green')
+        plt.show()
+    
     def opticFlowAbility(self):
         """
         The particle position is denoted in a cylindrical coordinate system.
@@ -79,12 +93,13 @@ class opticFlowAnalysis:
         """
         self.anaDataList  = list()
         self.distRankDiff = list()
+        self.opticFlowField = list
         for frameI in tqdm(range(self.simObj.protoMove.traLen),desc='calculating OF'):
             distTrueList  = list()
             distOFestList = list()
             partCylList   = list()
             OFvectorList  = list()
-    
+            
             for pObjectI in range(len(self.particleList)):
                 # calculate OpticFlow data            
                 cylParticle, OFvector, distance, OFdistanceEst = self.analyseSingleParticleOF(frameI,pObjectI)
@@ -92,12 +107,13 @@ class opticFlowAnalysis:
                 distOFestList.append(OFdistanceEst)
                 partCylList.append(cylParticle)
                 OFvectorList.append(OFvector)
-
+                
             self.anaDataList.append([distTrueList,distOFestList,partCylList,OFvectorList])                
             self.distRankDiff.append(self.calcDistanceRankDiff(distTrueList,distOFestList))
+            
 
     def calcDistanceRankDiff(self,distTrue,distEstOF):
-        # clear list of None and build np.array
+        # clear list of None and build np.arry
         distEstOF_clean = np.array([dist for dist in distEstOF if dist])
         distTrue_clean = np.array([dist for dist in distTrue if dist])
         # These functions return the indices of a sorted list Therefore it is the relative distance rank. 
