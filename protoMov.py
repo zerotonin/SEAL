@@ -84,7 +84,7 @@ class ProtMov:
         self.velTra =self.mergeLiftPitch_ThrustYawSlip(self.zProfile,self.pitchAngle,self.thrust,self.slip,self.yaw)#(thurst,slip,lift,yaw,pitch)
         #print(self.velTra[0:10])
 
-        self.velTra*self.sps
+        self.velTra =self.velTra*self.sps
 
     def fromThrustSlip2XYcoordinates(self):
         '''
