@@ -79,7 +79,12 @@ class ProtMov:
 
         # Z-POSITION AND Pitch-ANGLE in meter or angle with sps frequency
         self.zProfile ,self.pitchAngle = self.createLiftPitch(currentDive)
-      
+        print(self.zProfile)
+        # check for flying seals!
+        self.zProfile[np.where(self.zProfile >0)] = -0.00001
+        print(self.zProfile)
+        
+
         # combine both trajectories
         self.velTra =self.mergeLiftPitch_ThrustYawSlip(self.zProfile,self.pitchAngle,self.thrust,self.slip,self.yaw)#(thurst,slip,lift,yaw,pitch)
         #print(self.velTra[0:10])
