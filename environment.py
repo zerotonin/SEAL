@@ -203,8 +203,9 @@ class environment:
             sealObj.activeSealMovement = False
             #seal steps needs to go down (self.sealStep[2])
         else:
-            sealObj.activeSealMovement == True
+            sealObj.activeSealMovement = True
             sealObstacleDist = np.linalg.norm(sealObj.position[0:2]-obstacle[0])
             if sealObstacleDist <= obstacle[1]:
-                sealObj.activeSealMovement == False 
+                sealObj.activeSealMovement = False 
+                print([seal in object)
     
