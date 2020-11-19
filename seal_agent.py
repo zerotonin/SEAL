@@ -95,12 +95,12 @@ class Seal:
         if self.activeSealMovement == True:
 
             # calculate m/s to m/sample
-            
+            presentStep = self.simObj.meterPerSecond2meterPerSample(self.sealStep)
         
             #self.sealPosition = self.sealPosition+self.sealStep[0:3]
-            self.sealPosition += self.sealStep[0:3] # new Seal Position after one sealStep/Movement
+            self.sealPosition += presentStep[0:3] # new Seal Position after one sealStep/Movement
             SealPosition = copy.deepcopy(self.sealPosition)
-            self.sealOrientation += self.sealStep[3:6] # new sealOrientation after each sealStep (should be the same as during the   step?)
+            self.sealOrientation += presentStep[3:6] # new sealOrientation after each sealStep (should be the same as during the   step?)
             SealOrientation = copy.deepcopy(self.sealOrientation)
 
             #print(self.sealStep,SealPosition,SealOrientation)
