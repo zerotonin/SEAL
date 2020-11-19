@@ -67,7 +67,8 @@ class ProtMov:
             raise ValueError  # shorthand for 'raise ValueError()'
 
 
-        # create a HMM based trajectory for thrust slip and yaw VELOCITIES
+        # create a HMM based trajectory for thrust slip and yaw VELOCITIES!
+        # the resulting data is already in meters per sample
         self.thrust , self.slip , self.yaw = self.createThrustSlipYaw()
 
         # yaw velocity to yaw angle
@@ -76,12 +77,14 @@ class ProtMov:
         # get X-Y-positions
         self.fromThrustSlip2XYcoordinates()
 
-        # Z-POSITION AND Pitch-ANGLE
+        # Z-POSITION AND Pitch-ANGLE in meter or angle with sps frequency
         self.zProfile ,self.pitchAngle = self.createLiftPitch(currentDive)
       
         # combine both trajectories
         self.velTra =self.mergeLiftPitch_ThrustYawSlip(self.zProfile,self.pitchAngle,self.thrust,self.slip,self.yaw)#(thurst,slip,lift,yaw,pitch)
         #print(self.velTra[0:10])
+
+        self.velTra*self.sps
 
     def fromThrustSlip2XYcoordinates(self):
         '''

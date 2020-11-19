@@ -94,6 +94,7 @@ class Seal:
         
         if self.activeSealMovement == True:
 
+            # calculate m/s to m/sample
             
         
             #self.sealPosition = self.sealPosition+self.sealStep[0:3]
