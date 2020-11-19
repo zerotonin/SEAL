@@ -345,8 +345,11 @@ class Cloud:
         #update water current
         self.waterCurrent = self.simObj.environment.getWaterCurrent()
         for pObject in self.partclObjList:
+            # transform from meter per second to meter per sample
+            presentSealStep    = self.simObj.meterPerSecond2meterPerSample(self.sealStep)
+            presentCurrentStep = self.simObj.meterPerSecond2meterPerSample(self.waterCurrent)
             # we move particles relative to seal and save vector in p-object trajectory
-            pObject.particleMovement(self.sealPosition,self.waterCurrent,self.sealStep)# for all Particles in List run randomwalk
+            pObject.particleMovement(self.sealPosition,presentCurrentStep,presentSealStep)# for all Particles in List run randomwalk
             # checking if particle norm is still in range
             relParticlePosNorm = np.linalg.norm(pObject.position)
             if  relParticlePosNorm > self.maxVectorMagnitude: # if the magnitude of the particle vector is bigger than 0.3, 
