@@ -34,7 +34,23 @@ class opticFlowAnalysis:
         self.r_querrList    = []
         self.rMagnitudeList = []
     
-   
+    def createOpticFlow(self,frame):
+        """
+        this function plotts a 2D optic flow field for a single sealStep, by calculating the 
+        magnitute ot the movement vector from the oldPosition of the particle to the newPosition 
+        for phi and z (ignoring the radius, since the retina only has 2 dimensions)
+        """
+        fig = plt.figure() 
+        ax = fig.add_subplot(111) 
+        for i in range(len(self.particleList)): # po should be (oldPosition, newPosition, status) of particle per movement
+            direct = self.anaDataList[frame][3][i] # richtungsvector between frames
+            X = self.anaDataList[frame][2][i][0][1] # phi
+            Y = self.anaDataList[frame][2][i][0][2] # z
+            U = direct[0] # phi direction
+            V = direct[1] # z direction
+            ax.quiver(X,Y,U,V, scale_units='xy', scale =1)
+        plt.show() 
+
 
     def create2DParticleDistributionList(self,prePost, frame):
         """
@@ -45,7 +61,7 @@ class opticFlowAnalysis:
         xList = list()
         yList = list()
 
-        for i in range(1,len(self.particleList)):
+        for i in range(len(self.particleList)):
             if self.anaDataList[frame][2][i] != None:
                     xList.append(self.anaDataList[frame][2][i][prePost][1])
                     yList.append(self.anaDataList[frame][2][i][prePost][2])
