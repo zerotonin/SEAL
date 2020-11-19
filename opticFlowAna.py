@@ -67,6 +67,8 @@ class opticFlowAnalysis:
         ax.scatter(xList, yList, color = 'red')
         postxList, postyList = self.create2DParticleDistributionList(1,frame)
         ax.scatter(postxList, postyList, color='green')
+        ax.set_xlim(min(min(xList),min(postxList)),max(max(xList),max(postxList)))
+        ax.set_ylim(min(min(yList),min(postyList)),max(max(yList),max(postyList)))
         plt.show()
     
     def opticFlowAbility(self):
