@@ -43,7 +43,7 @@ class Seal:
         This is needed to imply active movement of the seal agent.
         """
         if self.sealPosition[2] > 0 or self.sealPosition[2] <= -70:
-            self.activeSealMovement = False
+            self.activeSealMovement == False
             #seal steps needs to go down (self.sealStep[2])
         else:
             self.activeSealMovement == True
