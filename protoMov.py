@@ -117,7 +117,7 @@ class ProtMov:
         '''
 
         #positional values to velocities in m/sample or deg/sample || filtered by 3 sigma gauss
-        zVel = np.diff(gaussian_filter1d(zProfil, 3)) 
+        zVel = np.diff(gaussian_filter1d(zProfil, 3))
         zVel = np.append(0,zVel) # added a start value of 0 to have a length of self.traLen again
         pVel = np.diff(pitchAngle) # this is allready deg per frame
         pVel = np.append(0,pVel )# added a start value of 0 to have a length of self.traLen again

@@ -96,7 +96,7 @@ class Seal:
 
             # calculate m/s to m/sample
             presentStep = self.simObj.meterPerSecond2meterPerSample(self.sealStep)
-        
+            
             #self.sealPosition = self.sealPosition+self.sealStep[0:3]
             self.sealPosition += presentStep[0:3] # new Seal Position after one sealStep/Movement
             SealPosition = copy.deepcopy(self.sealPosition)
