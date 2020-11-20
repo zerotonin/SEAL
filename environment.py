@@ -207,5 +207,5 @@ class environment:
             sealObstacleDist = np.linalg.norm(sealObj.position[0:2]-obstacle[0])
             if sealObstacleDist <= obstacle[1]:
                 sealObj.activeSealMovement = False 
-                print([seal in object)
+                print([seal in object])
     
