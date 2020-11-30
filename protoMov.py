@@ -21,7 +21,6 @@ class ProtMov:
         self.mode         = 'random'
         self.traLenSec    = 240
         self.traLen       = self.traLenSec*self.sps 
-        self.traDurSec    = None 
 
         # dive phases are keywords for a tupel consisting of 0) duration normalised to total duration
         # 1) mean pitch angle [deg]  2)  standard deviation of the mean [deg] 3)  mean z-profil [m/s]
@@ -53,7 +52,6 @@ class ProtMov:
 
         '''
         
-        self.traDurSec = self.traLenSec
 
         if self.mode == 'random':
             self.mode = random.choice(('uShape','vShape'))
@@ -171,7 +169,7 @@ class ProtMov:
         pitchAngle   = [0]
         bonusDur     = 0
 
-        diveLen = int(np.round(self.traDurSec * self.origDiveFPS))
+        diveLen = int(np.round(self.traLenSec * self.origDiveFPS))
 
         for frameI in range(diveLen+1): 
 
@@ -232,7 +230,7 @@ class ProtMov:
         
         '''get start prototype'''
         
-        pmTraLen = int(np.round(self.traDurSec*self.origVideoFPS))
+        pmTraLen = int(np.round(self.traLenSec*self.origVideoFPS))
 
         randomNumbers = np.random.rand(pmTraLen+1)   # defines number betwen 0 and 1. the corresponding distributionCS is taken as start PM
         currentPM = np.where(distributionCS>= randomNumbers[0])
