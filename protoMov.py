@@ -78,17 +78,17 @@ class ProtMov:
 
         # Z-POSITION AND Pitch-ANGLE in meter or angle with sps frequency
         self.zProfile ,self.pitchAngle = self.createLiftPitch(currentDive)
-        print(self.zProfile)
+        #print(self.zProfile)
+        
         # check for flying seals!
         self.zProfile[np.where(self.zProfile >0)] = -0.00001
-        print(self.zProfile)
+        #print(self.zProfile)
         
 
         # combine both trajectories
-        self.velTra =self.mergeLiftPitch_ThrustYawSlip(self.zProfile,self.pitchAngle,self.thrust,self.slip,self.yaw)#(thurst,slip,lift,yaw,pitch)
+        self.mergeLiftPitch_ThrustYawSlip()#(thurst,slip,lift,yaw,pitch)
         #print(self.velTra[0:10])
 
-        self.velTra =self.velTra*self.sps
 
     def fromThrustSlip2XYcoordinates(self):
         '''
@@ -105,7 +105,7 @@ class ProtMov:
             self.yProfile[frameI+1] = self.yProfile[frameI] + temp[1]/self.sps # this is done because the values are in m/sec and should be in m/sample
             
     
-    def mergeLiftPitch_ThrustYawSlip(self,zProfil,pitchAngle,thrust,slip,yaw):
+    def mergeLiftPitch_ThrustYawSlip(self):
         '''
         this function merges the before calculates values for thrust, slip,
         lift, yaw and pitch. Roll is considered to be 0. Since lift(zProfile)
@@ -114,24 +114,27 @@ class ProtMov:
         to get the movement from the seals point of view.
         WHY did we set sigma to 3 for zProfile and to 6 fpr pitch values?
         '''
+        # filter zProfile as the original data had low temporal resolution
+        self.zProfile = gaussian_filter1d(self.zProfile, 3)
 
-        #positional values to velocities in m/sample or deg/sample || filtered by 3 sigma gauss
-        zVel = np.diff(gaussian_filter1d(zProfil, 3))
-        zVel = np.append(0,zVel) # added a start value of 0 to have a length of self.traLen again
-        pVel = np.diff(pitchAngle) # this is allready deg per frame
-        pVel = np.append(0,pVel )# added a start value of 0 to have a length of self.traLen again
+        # Make positional trajectory in m, rad, witrh all six degrees of freedom. Roll is set to zero as it ix not defined.
+        self.posTrajectory = np.vstack((self.xProfile,self.yProfile,self.zProfile,self.yawAngle,self.pitchAngle, np.zeros(shape=self.traLen)))  
+        self.posTrajectory = self.posTrajectory.transpose()
 
-        newThrust = list()
-        newLift   = list()
+        # Now we have to calculate the velocity step trajectory, both,  in seal coordinates and per second.
+        self.velTra = list()
+        for frameI in np.arange(1,self.traLen):
+            rawSpeeds = np.diff(self.posTrajectory[frameI-1:frameI+1,:],axis= 0) # get difference of position and orientation per frame        
+            rotVel  = rawSpeeds[0][3:]*self.sps  # change to angle velocity from rad/frame to rad/sec
+            # calculate rotation matrix for animal orientation. So that we can calculate thrust slip lift from the difference of X,Y,Z coordinates
+            R = self.mathUtils.getRotMatrix3D(self.posTrajectory[frameI-1,3],self.posTrajectory[frameI-1,4],self.posTrajectory[frameI-1,5],mode='passive') 
+            transVel = np.dot(R,rawSpeeds[0][0:3]) # diff x,y,z -> thrust slip lift
+            transVel = transVel*self.sps # change to angle velocity from m/frame to m/sec
+            # save everything to vel tra
+            self.velTra.append(np.hstack((transVel,rotVel)))
+            
 
-        # rotate velocities accordingly
-        for frameI in range(self.traLen):
-            R = self.mathUtils.getRotMatrix2D(np.deg2rad(pitchAngle[frameI]))
-            temp = np.dot(R,np.array([thrust[frameI],zVel[frameI]]))
-            newThrust.append(temp[0])
-            newLift.append(temp[1])
-
-        return  np.transpose(np.vstack((np.array(newThrust),slip,np.array(newLift),yaw,pVel))) #(thurst,slip,lift,yaw,pitch)
+        self.velTra = np.array(self.velTra)
 
     
     def getPositionAndAngelsFromVel(self):
