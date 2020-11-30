@@ -70,7 +70,7 @@ class ProtMov:
         self.thrust , self.slip , self.yaw = self.createThrustSlipYaw()
 
         # yaw velocity to yaw angle
-        self.yawAngle = np.cumsum(self.yaw)
+        self.yawAngle = np.cumsum(self.yaw/self.sps)
 
         # get X-Y-positions
         self.fromThrustSlip2XYcoordinates()
