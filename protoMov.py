@@ -73,6 +73,7 @@ class ProtMov:
         self.yawAngle = np.cumsum(self.yaw/self.sps)
 
         # get X-Y-positions
+        # this transforms self.thrust and self.slip to the X and y position in world coordinates
         self.fromThrustSlip2XYcoordinates()
 
         # Z-POSITION AND Pitch-ANGLE in meter or angle with sps frequency
@@ -99,9 +100,9 @@ class ProtMov:
  
         for frameI in range(self.traLen-1):
             R = self.mathUtils.getRotMatrix2D(np.deg2rad(self.yawAngle[frameI])*-1)
-            temp = np.dot(R,np.array([self.thrust[frameI],self.slip[frameI]]))
-            self.xProfile[frameI+1] = self.xProfile[frameI] + temp[0]/self.sps
-            self.yProfile[frameI+1] = self.yProfile[frameI] + temp[1]/self.sps
+            temp = np.dot(R,np.array([self.thrust[frameI],self.slip[frameI]])) # rotate seal coordinates to world coordinates
+            self.xProfile[frameI+1] = self.xProfile[frameI] + temp[0]/self.sps # this is done because the values are in m/sec and should be in m/sample
+            self.yProfile[frameI+1] = self.yProfile[frameI] + temp[1]/self.sps # this is done because the values are in m/sec and should be in m/sample
             
     
     def mergeLiftPitch_ThrustYawSlip(self,zProfil,pitchAngle,thrust,slip,yaw):
