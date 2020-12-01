@@ -4,21 +4,22 @@ import copy
 #from sympy import *
 
 class Particle:
-    '''
+    """
     Class 'Particle' holds information about the size and position of a particle inside the turbidity simulation.
     This class defines trajectiries of particles movement by Brownian motion in the ocean that forms tubidity.  
     Generated particles form cloud (class 'Cloud') with a seal as a center of a particles' cloud (class 'Seal').
-    The trajectories of particles' movement are influanced by water currents, water viscosity and obstacles e.g.
-    corals, rocks etc. (class 'Enviroment')
-    '''
+    The trajectories of particles' movement are influenced by water currents, water viscosity and obstacles e.g.
+    corals, rocks etc. (class 'Environment')
+    """
 
     def __init__(self,cloudObj, position,size):
-        '''
-        This function initialises the trajectory of movement for each single particle particle with a x,y,z position
-        inside a cloud in cartesian 3D space. Particles are moving by Brownian motion, where we consider viscosity
-        and temperature gradient of the ocean' water, so particles have different velocity of random walk' movement
+        """
+        This function initialises the trajectory of movement for each single particle with a x,y,z position
+        inside a particle cloud in cartesian 3D space. Particles are moving by Brownian motion, where we consider viscosity
+        and temperature gradient of the ocean water, so particles have different velocity of random walk movement
         (Brownian motion), depending on the depth of their position in the 3D space of ocean (z axis position).
-        Trajectories of particles movement are also influenced by the water currents and obstacles in the ocean.
+        Trajectories of particles movement are also influenced by other environmental factors such as
+        the water currents and obstacles in the ocean, and are negativly influnced by the seal trajectory.
 
         @param cloudObj      string default: none
            string that defines that particles move as a cloud object.
@@ -29,24 +30,22 @@ class Particle:
         @param position     np.array default: none
             tuple consisting of three random coordinates x,y,z in 3D cartesian space.
         @param trajectory    float default: none
-            list of former position of particle x,y,z. List is supplemented with updated
-            former positions when particles move.
+            list of position of particle (x,y,z) before and after the sealStep, and visibility
+            of the particle. The list is supplemented with these 3 datasets for each sealStep.
         @param activeMovement  bool default: True
             defines boundaries of the ocean' space, where partciles move actively. 
-            Active movement of particles is true for ocean depth with the limit - 0 [m] to -70 [m],
+            Active movement of particles is true for ocean depth with the limit - 0 [m] to oceanDepth [m],
             and true when particles are not in the area of obstacle.
         @param visible         bool default: True
             particles are visible in the water for seal, and form opic flow. They are not
-            visible above 0 [m] and below -70,1 [m] and if their position is same as a position of obstacle.
-        @param OFavailable     int default: none
-            the list of particles that are visible and move actively.
+            visible above 0 [m] and 10cm below oceanDepth [m] or if their position is within an obstacle.
         @param temperature  float default: none
             the temperature [K] of water that changes with the depth of ocean. 
         @param viscosity    float default: none 
-            viscosity of saltwater [Ns/m²,Pa*s] that depends on temerature and vary with the depth.
-        @param samplesPerSec float default: 10.0 
+            viscosity of saltwater [Ns/m²,Pa*s] that depends on temperature and vary with the depth.
+        @param samplesPerSec float default: 20.0 
             the model's basic frequency. It defines, how often samples are updated per one second.
-        '''
+        """
         self.cloudObj       = cloudObj # particles form cloud object
         self.size           = size # radius of the particles [µm]
         self.position       = position # tuple consisting of three coordinates x,y,z
@@ -73,7 +72,7 @@ class Particle:
 
     
     def depth2Temperature(self):
-        '''
+        """
         The function 'depth2Temperature' creates a gradient of water's temerature in the ocean
         environment. The data is taken from the doi.org/10.3389/fmars.2018.00287. 
         The data represented by a Gaussian function is temperature data from the Gulf of Finland (Figure 2).
@@ -90,11 +89,11 @@ class Particle:
         The tempetature gradient (z): 
         \f$\ A+H*exp{(-(z-x_o)^2/(2*w^2))}\f$.
 
-        '''
+        """
         self.temperature = 3.1643818163582185+5.289978692454068*np.exp(-1*(self.absPosition[2]+2.854807838826537)**2/(2*13.943640614002176**2))
     
     def temperature2viscosity(self):
-        '''
+        """
         The function 'temperature2viscosity' calculates the viscosity of salt water gradient based on data 
         from https://www.engineeringtoolbox.com/sea-water-properties-d_840.html
         
@@ -110,11 +109,11 @@ class Particle:
         The viscosity gradient (z): 
         \f$\ A*temperature(z)^2+B*x+C\f$.
        
-        '''
+        """
         self.viscosity = 6.432652442106597*10**-7*self.temperature**2+-0.00005261247345535204*self.temperature+0.0018733137829911907
 
     def getBrownianMotionStepSize(self):
-        '''
+        """
         The function 'getBrownianMotionStepSize' runs a temperature dependent brownian motion for each particle.
 
         In a three dimensional space we can describe the velocity in each direction by 
@@ -130,7 +129,9 @@ class Particle:
         R = 8.314462 (general gas constant)
         T = temperature [K]
         N = 6.022*10²³ (Avogadro's number)
-        '''
+
+        @return brownian motion based stepSize
+        """
         self.depth2Temperature()
         self.temperature2viscosity()
 
@@ -148,11 +149,10 @@ class Particle:
         Next the active movement is checked, and those particle beeing visbile and freefloating are moved
         by the brownian motion(randomwalk), the waterCurrent and relative to the sealStep.
         Those particle on the ocean ground, that are not actively moving are just moved by the SealStep
-        Those particles above water and 10cm under the seefloor are not moving.
+        Those particles above water and 10cm under the seefloor or within an obstacle are not moving.
 
         The results of former and new position of particle are saved in self.trajectory. Status indicates
         in bool if the particle is visible or not.
-
         """
         # absolute position is soley needed for environment checks (soil, sky, etc)
         self.absPosition = self.position + sealPosition
@@ -246,25 +246,27 @@ class Cloud:
         """ 
         This function initialises a list of random sized particles[µm] with a random x,y,z position, limited by
         radius of the visual field of a seal (@ param maxVectorMagnitude). Particles are in cartesian 3D space 
-        form a cloud with the seal as a center (0,0,0). 
+        forming a cloud with the seal as a center (0,0,0). 
 
-        @param simObj      string default: none
+        @param simObj                   string default: none
            string that gives a name: simulation object.           
-        @param max_particles     int default: 400
+        @param max_particles            int default: 400
             this manual choosen number sets the number of particles being placed inside the 
             turbidity cloud, this parameter represent the density of the particle.
-        @param sizeRange      tuple default: none
+        @param sizeRange                tuple default: none
             tuple with the range of minimum and maximum size of the particles [µm].
         @param maxVectorMagnitute       float default: .3
-            this value sets the Radius of the turbidty spherical cloud. It defined by the maximum 
+            this value sets the radius of the turbidty spherical cloud. It's defined by the maximum 
             sight area resolution of the habor seal underwater.
-        @param partclObjList     list default: none  
-            list of particle objects within the turbidity cloud. Length of the list defined by max_particles. 
-         @param sealStep    default: (0,0,0,0,0,0)
-            the combined list of values of coordinates pasitions (x,y,z) and orientations (yaw, pitch, roll) 
+        @param sealStep                 default: (0,0,0,0,0,0)
+            the combined list of values of coordinates trajectory (x,y,z) and orientations (yaw, pitch, roll) 
             of a seal that defines the change of step position when seal moves in the ocean. 
-        @param waterCurrent   default: np.zeros(shape=3)
-            the list of water current vectors in the ocean space.
+        @param sealPosition             default: (0,0,0,0,0,0)
+            the combined list of values of coordinates position (x,y,z)  
+        @param partclObjList            list default: none  
+            list of particle objects within the turbidity cloud. Length of the list defined by max_particles. 
+        @param waterCurrent             default: np.zeros(shape=3)
+            an array describing a 3D current (x,y,z) [m/s].
         """
         self.simObj            = simObj # string name
         #from simulation parameters dictionary
@@ -293,9 +295,11 @@ class Cloud:
         """
         The 'randomInit' function returns a list of random sized particles[µm] within a size range 
         of 20µm and 160µm.
-        And in returns 'initialCoord' as a random vector (x,y,z) with a range from -1 to 1.
+        And it returns 'initialCoord' as a random vector (x,y,z) with a range from -1 to 1.
         This is limited by a set maxVectorMagnitute within the getRandomVectorMagnitute
         function.
+
+        @return particle coordinates (x,y,z) and its size [µm]
         """  
         size = np.random.uniform(self.sizeRange[0], self.sizeRange[1], size=(1))
         initialCoord = np.random.uniform(-1,1,size = (3)) # random vector (x,y,z) from -1 to 1
@@ -304,8 +308,10 @@ class Cloud:
 
     def getRandomVectorMagnitude(self,coordinate):
         """
-        The function 'getRandomVectorMagnitude' returns the madnitude of the random vector,
-        limited by the size of 'maxVectorMagnitude', which is radius of particles' cloud.
+        The function 'getRandomVectorMagnitude' calculates the magnitude of the random vector,
+        limited by the size of 'maxVectorMagnitude', which is the radius of particles' cloud.
+
+        @return a positional vector of the particle within the particle Cloud
         """
         normCoord = np.empty(3)
         normCoord = coordinate*(np.random.rand(1)*self.maxVectorMagnitude/np.linalg.norm(coordinate))
@@ -316,9 +322,9 @@ class Cloud:
     def resetParticles(self,lastInitialPosition):
         """
         The 'resetParticles' function resets those particles that moved out of the sphere
-        (MaxVectorMagnitute) by having them reappear on the opposite site of the sphere,
-         with a offset of 5 percent.
-         @return new vector discribing the opposite position of the particle to the seal.
+        (MaxVectorMagnitute) by having them reappear on the opposite site of the sphere.
+
+        @return new vector discribing the opposite position of the particle to the seal.
         """
         randomCoord = np.random.uniform(-1,1,size = (3)) # random vector (x,y,z) from -1 to 1
         initialCoord = self.getRandomVectorMagnitude(randomCoord)
