@@ -283,7 +283,7 @@ class Cloud:
     def add_particles(self):
         """
         The 'add_particle' function initializes and adds random sized particles in random position from
-        'randomInit' function within the Cloud. This forms the partclObjList.
+        'randomInit' function within the Cloud. this forms the partclObjList.
         These positions are described with x,y,z coordinates with the seal being the center of the system.
         """
         while len(self.partclObjList)<self.max_particles:
@@ -363,6 +363,6 @@ class Cloud:
                 pObject.position = self.resetParticles(pObject.trajectory[-1][0])
 
    # We need to safe the start and end postion of all particles before and after
-   #the movement. This is safed as oldPosition and newPosition (see particle Movement)
+   #the movement. this is safed as oldPosition and newPosition (see particle Movement)
                
        

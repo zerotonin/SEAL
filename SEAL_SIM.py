@@ -11,7 +11,7 @@ class SEAL_SIM:
     """
     def __init__(self):
         """
-        this function initialises the sample per seconds,and connects the environment class, 
+        This function initialises the sample per seconds,and connects the environment class, 
         the particle class, the particle cloud class , the seal agent class and the protoMov class,
         in order to transfor all important information between the classes to simulate a seal dive 
         and gain information about the optic flow perception at any point during the dive.
@@ -64,7 +64,7 @@ class SEAL_SIM:
         
     def meterPerSecond2meterPerSample(self,velocity):
         """
-        this function calculates the velocity per sample with the velocity per second,
+        This function calculates the velocity per sample with the velocity per second,
         to be used for the simulation
 
         @return velocity per sample
@@ -88,7 +88,7 @@ class SEAL_SIM:
 
     def runSimulation(self):
         """
-        this function initiates the simulation to run. 
+        This function initiates the simulation to run. 
         
         It calls the setParameters function to set the environment and the particle cloud. 
         Next it creates the obstacles in the environment class according to the user setting.
@@ -119,7 +119,7 @@ class SEAL_SIM:
 
     def userDefParametersCLI(self):
         """
-        this function opens a command line interface, asking the user to set 9 parameters,
+        This function opens a command line interface, asking the user to set 9 parameters,
         which are a needed to simulate specified seal dives.
 
         1. diveType, choosing between vShape and uShape dives
@@ -156,7 +156,7 @@ class SEAL_SIM:
 
     def setParameters(self):
         """
-        this function sets the user defined parameter to the according parameters in the different classes
+        This function sets the user defined parameter to the according parameters in the different classes
         needed to run the simulation
         """
         self.protoMove.mode               = self.simParameterDict['diveType']
@@ -172,7 +172,7 @@ class SEAL_SIM:
         
     def CLI_dialg_choiceText(self,question,default = False,answers=["yes","no"]):
         """
-        this function creates a command line interface for the user to choose between text choice.
+        This function creates a command line interface for the user to choose between text choice.
 
         @return text choice answer of the user 
         """
@@ -185,7 +185,7 @@ class SEAL_SIM:
     
     def CLI_dialg_num(self,question,default = False):
         """
-        this function creates a command line interface for the user to choose any number.
+        This function creates a command line interface for the user to choose any number.
 
         @return number choosen by the user
         """
@@ -197,7 +197,7 @@ class SEAL_SIM:
 
     def CLI_quest(self,question, answers,default):
         """
-        this function defines the command line interface to set the parameters.
+        This function defines the command line interface to set the parameters.
 
         @return the answer typed in the command line by the user
         """
