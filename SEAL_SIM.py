@@ -3,15 +3,15 @@ from tqdm import tqdm
 import numpy as np
 
 class SEAL_SIM:
-    '''
-    Class 'SEAL_SIM' connects all other classes to run the simulation. As masterregulator 
+    """
+    Class 'SEAL_SIM' connects all other classes to run the simulation. As masterregulator it
     sets the user parameters for the simulation and runs the simulation accordingly. As
     an output it saves a sealVelTra list with the trajectroies of the seal-agent throughout the 
     dive simulation and the simulation parameter dictionary saving all usere settings for the simulation
-    '''
+    """
     def __init__(self):
-        '''
-        This function initialises the sample per seconds,and connects the environment class, 
+        """
+        this function initialises the sample per seconds,and connects the environment class, 
         the particle class, the particle cloud class , the seal agent class and the protoMov class,
         in order to transfor all important information between the classes to simulate a seal dive 
         and gain information about the optic flow perception at any point during the dive.
@@ -38,9 +38,9 @@ class SEAL_SIM:
             the dive duration, the current type (static or interpolated), the depth of the ocean,
             the amount of obstacles, maximal number of particles beeing simulated, size range of 
             theses particles and the radius of the particle cloud.
-        @param sealVelTra              ? default:none
+        @param sealVelTra           ? default:none
             the created seal trajectories in the protomov class are stored in a list
-        '''
+        """
         self.simParameterDict = {'diveType'          : 'vShape', # description and unit if av
                                  'durSec'            : 240, # duration of the simulation in seconds
                                  'currentType'       : 'static',
@@ -66,6 +66,8 @@ class SEAL_SIM:
         """
         this function calculates the velocity per sample with the velocity per second,
         to be used for the simulation
+
+        @return velocity per sample
         """
         # THis function should be inherited
         return copy.deepcopy(np.array(velocity)/self.sps)
@@ -86,12 +88,14 @@ class SEAL_SIM:
 
     def runSimulation(self):
         """
-        this function initiates the simulation to run. It calls the setParameters 
-        function to set the environment and the particle cloud. Next it creates the
-        obstacles in the environment class acording to the user setting.
-        Next it generates seal trajectories to simulate a typical seal dive and saves 
-        them in the sealVelTra list. for each step of the seal_agent the particles
-        in the particle Cloud are moving in the opposite direction.
+        this function initiates the simulation to run. 
+        
+        It calls the setParameters function to set the environment and the particle cloud. 
+        Next it creates the obstacles in the environment class according to the user setting.
+        It generates seal trajectories to simulate a typical seal dive and saves 
+        them in the sealVelTra list. for each step of the seal agent the particles
+        in the particle Cloud are moving in the opposite direction and the particle positons 
+        are saved.
         """
         #set environment and particle cloud
         self.setParameters()
@@ -112,15 +116,12 @@ class SEAL_SIM:
             if self.seal.activeSealMovement == False:
                 print("Seal left simulation environment! o.O")
                 break
-            
-        # save results, per step it need to save a data list of all particles with the old and new position information 
-        # use hdf5 ?
-
 
     def userDefParametersCLI(self):
         """
         this function opens a command line interface, asking the user to set 9 parameters,
         which are a needed to simulate specified seal dives.
+
         1. diveType, choosing between vShape and uShape dives
         2. dive duration, defining the duration of the dive in seconds
         3. currentType, choosing between static or interpolated currents
@@ -172,6 +173,8 @@ class SEAL_SIM:
     def CLI_dialg_choiceText(self,question,default = False,answers=["yes","no"]):
         """
         this function creates a command line interface for the user to choose between text choice.
+
+        @return text choice answer of the user 
         """
 
         userAnswer = self.CLI_quest(question,answers,default)
@@ -183,6 +186,8 @@ class SEAL_SIM:
     def CLI_dialg_num(self,question,default = False):
         """
         this function creates a command line interface for the user to choose any number.
+
+        @return number choosen by the user
         """
         userAnswer = self.CLI_quest(question,[],default)
         while userAnswer.strip('-').replace('.','',1).isdigit() ==False:
@@ -193,6 +198,8 @@ class SEAL_SIM:
     def CLI_quest(self,question, answers,default):
         """
         this function defines the command line interface to set the parameters.
+
+        @return the answer typed in the command line by the user
         """
 
         if default != False:
