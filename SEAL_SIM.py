@@ -16,6 +16,11 @@ class SEAL_SIM:
         in order to transfor all important information between the classes to simulate a seal dive 
         and gain information about the optic flow perception at any point during the dive.
 
+        @param simParameterDict     dict  
+            creates a Dictionary with default values for the type of dive (u or v shape), 
+            the dive duration, the current type (static or interpolated), the depth of the ocean,
+            the amount of obstacles, maximal number of particles beeing simulated, size range of 
+            theses particles and the radius of the particle cloud.
         @param sps                  float default: none
             defines the number of samples simulated per second
         @param environment          ? default: none
@@ -33,11 +38,9 @@ class SEAL_SIM:
         @param math                 ? default: True
             creates a shortcut to the mathUtils class stored in 
             utilities.py
-        @param simParameterDict     ? default: none 
-            creates a Dictionary with default values for the type of dive (u or v shape), 
-            the dive duration, the current type (static or interpolated), the depth of the ocean,
-            the amount of obstacles, maximal number of particles beeing simulated, size range of 
-            theses particles and the radius of the particle cloud.
+        @param protoMove             ? default: ?
+            creates a shortcut to the protoMov class stored in 
+            protomov.py
         @param sealVelTra           ? default:none
             the created seal trajectories in the protomov class are stored in a list
         """
@@ -59,7 +62,6 @@ class SEAL_SIM:
         self.plot        = utilities.plotUtils()
         self.math        = utilities.mathUtils()
         self.protoMove   = protoMov.ProtMov(self)
-        
         self.sealVelTra = list()
         
     def meterPerSecond2meterPerSample(self,velocity):
