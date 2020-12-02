@@ -280,9 +280,6 @@ class ProtMov:
             randomTransitionNumber = randomNumbers[i+1]
             newPM = np.where(transProbCS[currentPM,:]>= randomTransitionNumber)
             newPM = newPM[0][0]
-            # a bad hack for the old clustering ...cluster a new with 150 classes
-            if newPM > 197:
-                newPM = 197
             currentPM = newPM 
             self.traIDX.append(protoMov[newPM]) #traIDX = [thrust(m),Slip(m),Yaw(m)]
             self.pmIDX.append(currentPM)
