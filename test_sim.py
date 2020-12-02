@@ -27,14 +27,38 @@ simObj.environment.setCurrents(currentSys)
 from importlib import reload 
 import SEAL_SIM, opticFlowAna
 import numpy as np 
+import matplotlib.pyplot as plt 
+from mpl_toolkits.mplot3d import Axes3D 
 reload(SEAL_SIM)
 reload(opticFlowAna)
 simObj = SEAL_SIM.SEAL_SIM()
 #simObj.userDefParametersCLI()
 simObj.runSimulation()
 
-# analyse OpticFlow ability
+fig = plt.figure() 
+ax = fig.add_subplot(111, projection='3d') 
+for data in [simObj.protoMove.posTrajectory, np.array(simObj.seal.sealTrajectory)]:
+    ax.plot(list(data[:,0]),list(data[:,1]),list(data[:,2]))
+    ax.scatter3D(data[0,0],data[0,1],data[0,2], color = 'green')
+    ax.scatter3D(data[-1,0],data[-1,1],data[-1,2], color = 'red')
+plt.show()     
 
+    frames4Quiver = range(P.traLen)
+    for i in  frames4Quiver[0::5]:
+
+        X = P.xProfile[i]
+        Y = P.yProfile[i]
+        Z = P.zProfile[i]
+        U = P.sealHeading[i,0] 
+        V = P.sealHeading[i,1] 
+        W = P.sealHeading[i,2] 
+        ax.quiver(X,Y,Z,U*.1,V*.1,W*.1)
+plt.show()     
+
+
+
+
+# analyse OpticFlow ability
 reload(opticFlowAna)
 O = opticFlowAna.opticFlowAnalysis(simObj) 
 O.opticFlowAbility()

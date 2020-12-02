@@ -106,6 +106,6 @@ class Seal:
             #print(self.sealStep,SealPosition,SealOrientation)
             #print("=======================================================")
 
-            self.sealTrajectory.append((SealPosition,SealOrientation))
+            self.sealTrajectory.append(np.hstack((SealPosition,SealOrientation)))
         else :
             self.activeSealMovement = False
