@@ -108,7 +108,7 @@ class SEAL_SIM:
         #run trajectory through particle cloud
         for step in tqdm(self.sealVelTra,'running simulation'):
             # get a step from the step trajectory
-            self.seal.sealStep = np.hstack((step,0.0))
+            self.seal.sealStep = step
             # at this time point the seal has its old position but a new step
             # so let's move the particles accordingly
             self.pCloud.moveParticles()
