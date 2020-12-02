@@ -1,7 +1,6 @@
 import numpy as np
-import copy
-import csv
-import random
+import copy, csv, random
+from utilities import mathUtils
 class Seal: 
     """
     The seal class holds informations about the seal agent in the 3D cartisian world, simulating 
@@ -35,7 +34,7 @@ class Seal:
         self.sealStep           = np.zeros(shape =6) # change of position and orientation
         self.sealTrajectory     = list()
         self.activeSealMovement = True
-        self.traIDX             = []#??
+        self.mathUtils    = mathUtils()
 
     def SealStateCheck(self):
         """
@@ -99,10 +98,10 @@ class Seal:
             presentStep = self.simObj.meterPerSecond2meterPerSample(self.sealStep)
             
             #self.sealPosition = self.sealPosition+self.sealStep[0:3]
-            self.sealPosition += presentStep[0:3] # new Seal Position after one sealStep/Movement
-            SealPosition = copy.deepcopy(self.sealPosition)
+            self.sealPosition += self. presentStep[0:3] # new Seal Position after one sealStep/Movement
             self.sealOrientation += presentStep[3:6] # new sealOrientation after each sealStep (should be the same as during the   step?)
             SealOrientation = copy.deepcopy(self.sealOrientation)
+            SealPosition = copy.deepcopy(self.sealPosition)
 
             #print(self.sealStep,SealPosition,SealOrientation)
             #print("=======================================================")
