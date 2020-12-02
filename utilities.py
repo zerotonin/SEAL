@@ -7,16 +7,11 @@ import numpy as np
 class plotUtils:
     '''
     Class 'plotUtilities' contains functions for creating plots for 3D particles' cloud 
-    visialization and for plotting vectors distribution
+    visialization, for plotting vectors distribution, and for optic flow field visualization 
     '''
     def __init__(self):
         # maybe later on we want to keep our particle object list here
         self.name = 'plotting utilities for turbidity model'
-
-        ''' 
-        This class creates a list of position values (x,y,z) and size values (s) of each particle of the 
-        Cloud to plot each particle in respective size into a squared coordinate system.
-         '''
 
     def particleObjList2CoordList(self,frame,prePost,partclObjList):
         '''
@@ -29,7 +24,6 @@ class plotUtils:
         zdata = list()#create list of z coordinated
         sdata = list()#create list of particles' sizes
 
-
         for particle in partclObjList :
             xdata.append(particle.trajectory[frame][prePost][0])
             ydata.append(particle.trajectory[frame][prePost][1])
@@ -41,7 +35,8 @@ class plotUtils:
     def makeSquare3DAxis(self):
         '''
         This function equals axes in 3D plot by giving same limits.
-        @ return a 3D coordinate system with equal axes, ready to plot input data.
+
+        @return a 3D coordinate system with equal axes, ready to plot input data.
         '''
         fig = plt.figure()# open fig space
         ax = Axes3D(fig)#make 3D plot
@@ -49,15 +44,14 @@ class plotUtils:
         ax.set_xlim(-10,10)# x axes goes from -10 to 10 since Cloudsphere is 10
         ax.set_ylim(-10,10)# same here
         ax.set_zlim(-10,10)
+
         return fig,ax
         
-
     def plot3D_positionSizeColorCoded(self,frame,prePost,partclObjList):
         '''
         This function finally returns particles plotted in a 3D coordinate system according to 
         their position and size. Where z - is the depth of the ocean where cloud is located.
         '''
-        
         coordinates = self.particleObjList2CoordList(frame, prePost, partclObjList)
         fig,ax = self.makeSquare3DAxis()
         h = ax.scatter3D(coordinates[0], coordinates[1], coordinates[2], c=coordinates[3], cmap='brg')
@@ -72,7 +66,6 @@ class plotUtils:
         Function that builds 3d graph with zoomed * 10^3 particles sizes for better visualization 
         due to the small size of particles.
         '''
-
         fig,ax = self.makeSquare3DAxis()
 
         for particle in partclObjList :
@@ -87,9 +80,10 @@ class plotUtils:
     def VectorMagnitude(self,partclObjList):
         '''
         This function might take coordinates for x,y,z of particle.
-        @return the list of values of vector magnitude VctMgn for each particle in the cloud.
-        '''
 
+        @return the list of values of vector magnitude VctMgn for 
+                each particle in the cloud.
+        '''
         VctMgn = list()
         for particle in partclObjList:
             VctMgn.append(np.linalg.norm(particle.position))
@@ -112,14 +106,17 @@ class plotUtils:
         plt.title('Distribution of vectors magnitude')
         plt.show()
 
-    
-
 class mathUtils:
     '''
     This class contains tools for switching between cartesian and spheric coordinate
-    systems for particles.
+    systems for particles, and math functions to rotation coordinate in 2D and 3D
+    in order to covert the position between seal and world coordinate system
     '''
     def __init__(self):
+        """
+        @param name           str default: none
+            ??
+        """
         self.name = 'math utilities for coordinate stuff'
 
     def cart2sphere(self):
@@ -127,15 +124,19 @@ class mathUtils:
         Converts cartasian coordinates (x = pobject.positison[0],y = pobject.positison[1],
         z = pobject.positison[2]) of pobjects in self.partclObjList to sperical coordinates
         and returns radius, theta, phi coordinates as list of floats.
+
         r = sqrt(x*x + y*y + z*z)
         theta = atan2((x*x +y*y),z)
         phi = atan2(y,x)
+
+        @return list of radius, theta and phi
         """
         XsqPlusYsq    = self.position[0]**2 + self.position[1]**2
         r             = m.sqrt(XsqPlusYsq + self.position[2]**2)               # r
         theta         = m.atan2(m.sqrt(XsqPlusYsq),self.position[2])     # theta 
         phi           = m.atan2(self.position[1],self.position[0])          # phi not correct 
         self.position = [r,theta,phi]
+
         return [r,theta,phi]
 
     def Cloudcart2sphere (self,partclObjList):
@@ -147,8 +148,15 @@ class mathUtils:
             pobject.cart2sphere()
 
     def agentBasedVels2worldBasedCoords(self,transVel,angles,mode='2D'):
-        # angle expected to be in radians
+        """
+        This function takes the translational velocity of the seal trajectory
+        and converts it into positional coordinates within the world 
+        coordinate system.
 
+        @return worldBased coordinate vector for both 2D or 3D rotated 
+                seal coordinated
+        """
+        # angle expected to be in radians
         angles = angles*-1 # negative angle as we want to get the xyz shift 
                            # from the orientation of the world and not the seal
         transVel = np.array(transVel) # make sure it is a numpy array
@@ -161,9 +169,11 @@ class mathUtils:
         else:
             print('Unknown mode for agentBasedVels2worldBasedCoords func:' + str(mode))
             raise ValueError
-
     
     def getRotMatrix2D(self,theta):
+        """
+        This function 
+        """
         # theta is in radians
         c = np.cos(theta)
         s = np.sin(theta)
