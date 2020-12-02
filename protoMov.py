@@ -334,13 +334,12 @@ class ProtMov:
         )
         return self.resampleData2TraLen(resampled_signal) # to assure trajectory length
 
-    def getSealHeading(self):
+    def getSealHeading(self,headingVector=np.array([10,0,0])):
         
         sealHeading =list()
-        for frameI in range(self.velTra.shape[0]):
+        for frameI in range(self.angles.shape[0]):
 
-            R = self.mathUtils.getRotMatrix3D(self.angles[frameI,0],self.angles[frameI,1],0, mode='passive')
-            sealHeading.append(np.dot(R,np.array([10,0,0]))) 
+            sealHeading.append(self.mathUtils.agentBasedVels2worldBasedCoords(headingVector,self.angles[frameI,:],'3D')) 
             
         self.sealHeading = np.array(sealHeading)
         #print(self.sealHeading[0:10])
