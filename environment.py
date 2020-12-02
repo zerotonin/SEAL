@@ -158,24 +158,12 @@ class environment:
         subtracktd by the radius of the obstacle and the radius of the particleCloud is < 0 the obstacle is in sight 
         of the seal and therefore needs to be checked for visibility and active movement 
         """
-        for obstacle in self.obstacleList: # it should not be maxVectorMagnitue of particle cloud but specific distance a seal could still
+        for obstacle in self.obstacleList: 
+            # it should not be maxVectorMagnitue of particle cloud but specific distance a seal could still
             # detect obstacle, 
             if np.linalg.norm(self.simObj.seal.sealPosition[0:2]-obstacle[0])- (obsatcle[1]/m.tan(0.08666666667)- obstacle[1] < 0:
                 self.observableObstacleList.append(obstacle)
-    
-    def contrast2particleSize(self):
-        """
-        dependent on the contrast particle can be detected by the seal up to 3,8mm in a distance of 60cm, This is too big for real 
-        particles in the balticSea (20µm and 160µm)*R1
-        R1) Bunke, Dennis, et al. "Natural and Anthropogenic Sediment Mixing Processes in the South-Western Baltic Sea." Frontiers in Marine Science (2019).
-        R2) Miroslaw Jonasz (1983) Particle-size distributions in the Baltic, Tellus B:Chemical and Physical Meteorology, 35:5, 346-358, DOI: 10.3402/tellusb.v35i5.14624
-        Those objects that are still visible in 60cm distance can be as small a 3.8mm. Taken the contrast related objct sizes detectable by seals
-        from Frederike Hanke the following function is true.
-        
-        f(x) = 3.6195568931541864+10.040262458171055*Exp(-0.055671078908775984*x) 
-        created via curve fitting in plotly 
-        """
-        
+            
     def checkVisibility(self,parObj):
         """
         The 'checkVisibility' function checks if position of particle is inside of a visual field of 
