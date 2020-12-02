@@ -165,7 +165,7 @@ class ProtMov:
             rawSpeeds = np.diff(self.posTrajectory[frameI-1:frameI+1,:],axis= 0) # get difference of position and orientation per frame        
             rotVel  = rawSpeeds[0][3:]*self.sps  # change to angle velocity from rad/frame to rad/sec
             # calculate rotation matrix for animal orientation. So that we can calculate thrust slip lift from the difference of X,Y,Z coordinates
-            R = self.mathUtils.getRotMatrix3D(self.posTrajectory[frameI-1,3],self.posTrajectory[frameI-1,4],self.posTrajectory[frameI-1,5],mode='passive') 
+            R = self.mathUtils.getRotMatrix3D(self.posTrajectory[frameI-1,3],self.posTrajectory[frameI-1,4],self.posTrajectory[frameI-1,5],mode='active') 
             transVel = np.dot(R,rawSpeeds[0][0:3]) # diff x,y,z -> thrust slip lift
             transVel = transVel*self.sps # change to angle velocity from m/frame to m/sec
             # save everything to vel tra
