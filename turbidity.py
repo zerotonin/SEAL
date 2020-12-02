@@ -56,7 +56,6 @@ class Particle:
         self.viscosity      = float("NAN")
         self.samplesPerSec  = self.cloudObj.simObj.sps #samples per second
         
-
     def randomWalk(self):
         """
         The function 'randomWalk' defines the random step size of a particle that moves via 
@@ -65,12 +64,10 @@ class Particle:
         @ return a random array of particle's coordinates position x,y,z influenced by Brownian motion
         step size.         
         """
-        
         stepSize = self.getBrownianMotionStepSize()
  
         return np.random.choice((-1,1),3)*stepSize
-
-    
+ 
     def depth2Temperature(self):
         """
         The function 'depth2Temperature' creates a gradient of water's temerature in the ocean
@@ -88,7 +85,6 @@ class Particle:
 
         The tempetature gradient (z): 
         \f$\ A+H*exp{(-(z-x_o)^2/(2*w^2))}\f$.
-
         """
         self.temperature = 3.1643818163582185+5.289978692454068*np.exp(-1*(self.absPosition[2]+2.854807838826537)**2/(2*13.943640614002176**2))
     
@@ -108,7 +104,6 @@ class Particle:
 
         The viscosity gradient (z): 
         \f$\ A*temperature(z)^2+B*x+C\f$.
-       
         """
         self.viscosity = 6.432652442106597*10**-7*self.temperature**2+-0.00005261247345535204*self.temperature+0.0018733137829911907
 
@@ -136,9 +131,6 @@ class Particle:
         self.temperature2viscosity()
 
         return np.sqrt((8.314462 * self.temperature+273.15 )/ (3* (6.022*10**23))*np.pi*self.viscosity*self.size* (1/self.samplesPerSec))
-
-
-
 
     def particleMovement(self,sealPosition,waterCurrent,sealStep):
         """
@@ -174,26 +166,6 @@ class Particle:
         status         = copy.deepcopy(self.visible)
     
         self.trajectory.append((oldPosition,newPosition,status))
-        
-
-
-
-    #def cart2cylindric(self,cartPosition):
-    #
-    #    r   = np.sqrt(cartPosition[0]**2+cartPosition[1]**2)
-    #    phi = np.arctan2(cartPosition[1],cartPosition[0]) # https://en.wikipedia.org/wiki/Cylindrical_coordinate_system depending on x value differen function ?
-    #    return r, phi, z
-    
-
-    #def cart2sphere(self,cartPosition):
-    #    
-    #    XsqPlusYsq  = cartPosition[0]**2 + cartPosition[1]**2
-    #    r           = m.sqrt(XsqPlusYsq + cartPosition[2]**2)              
-    #    theta       = m.atan2(m.sqrt(XsqPlusYsq),cartPosition[2])     
-    #    phi         = m.atan2(cartPosition[1],cartPosition[0])          
-    #    return r,theta,phi
-
-
 
 class Cloud:
     """
@@ -237,9 +209,12 @@ class Cloud:
     the seal can sea particles this renders 270 particles.
 
 
-    R1) Michael Weiffen, Bettina Möller, Björn Mauck, Guido Dehnhardt, Effect of water turbidity on the visual acuity of harbor seals (Phoca vitulina) Vision Research (2005)
-    R2) Bunke, Dennis, et al. "Natural and Anthropogenic Sediment Mixing Processes in the South-Western Baltic Sea." Frontiers in Marine Science (2019).
-    R3) Miroslaw Jonasz (1983) Particle-size distributions in the Baltic, Tellus B:Chemical and Physical Meteorology, 35:5, 346-358, DOI: 10.3402/tellusb.v35i5.14624
+    R1) Michael Weiffen, Bettina Möller, Björn Mauck, Guido Dehnhardt, Effect of water turbidity 
+        on the visual acuity of harbor seals (Phoca vitulina) Vision Research (2005)
+    R2) Bunke, Dennis, et al. "Natural and Anthropogenic Sediment Mixing Processes in 
+        the South-Western Baltic Sea." Frontiers in Marine Science (2019).
+    R3) Miroslaw Jonasz (1983) Particle-size distributions in the Baltic, Tellus B:
+        Chemical and Physical Meteorology, 35:5, 346-358, DOI: 10.3402/tellusb.v35i5.14624
     """
 
     def __init__(self, simObj): 
@@ -317,8 +292,6 @@ class Cloud:
         normCoord = coordinate*(np.random.rand(1)*self.maxVectorMagnitude/np.linalg.norm(coordinate))
         return normCoord
         
-
-
     def resetParticles(self,lastInitialPosition):
         """
         The 'resetParticles' function resets those particles that moved out of the sphere
@@ -362,7 +335,4 @@ class Cloud:
                 #respawing particles that drifted away
                 pObject.position = self.resetParticles(pObject.trajectory[-1][0])
 
-   # We need to safe the start and end postion of all particles before and after
-   #the movement. this is safed as oldPosition and newPosition (see particle Movement)
-               
        
