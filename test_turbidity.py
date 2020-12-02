@@ -79,3 +79,40 @@ C.Cloudsphere2cart()
 print(C.partclObjList[0].position)                                                                                                 
 C.Cloudcart2sphere()                                                                                                               
 print(C.partclObjList[0].position) 
+
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+unused functinon from particle class
+        
+
+
+
+    #def cart2cylindric(self,cartPosition):
+    #
+    #    r   = np.sqrt(cartPosition[0]**2+cartPosition[1]**2)
+    #    phi = np.arctan2(cartPosition[1],cartPosition[0]) # https://en.wikipedia.org/wiki/Cylindrical_coordinate_system depending on x value differen function ?
+    #    return r, phi, z
+    
+
+    #def cart2sphere(self,cartPosition):
+    #    
+    #    XsqPlusYsq  = cartPosition[0]**2 + cartPosition[1]**2
+    #    r           = m.sqrt(XsqPlusYsq + cartPosition[2]**2)              
+    #    theta       = m.atan2(m.sqrt(XsqPlusYsq),cartPosition[2])     
+    #    phi         = m.atan2(cartPosition[1],cartPosition[0])          
+    #    return r,theta,phi
+
+unused function from environment class
+    #def contrast2particleSize(self):
+    #    """
+    #    dependent on the contrast particle can be detected by the seal up to 3,8mm in a distance of 60cm, This is too big for real 
+    #    particles in the balticSea (20µm and 160µm)*R1
+    #    R1) Bunke, Dennis, et al. "Natural and Anthropogenic Sediment Mixing Processes in the South-Western Baltic Sea." Frontiers in Marine Science (2019).
+    #    R2) Miroslaw Jonasz (1983) Particle-size distributions in the Baltic, Tellus B:Chemical and Physical Meteorology, 35:5, 346-358, DOI: 10.3402/tellusb.v35i5.14624
+    #    Those objects that are still visible in 60cm distance can be as small a 3.8mm. Taken the contrast related objct sizes detectable by seals
+    #    from Frederike Hanke the following function is true.
+    #    
+    #    f(x) = 3.6195568931541864+10.040262458171055*Exp(-0.055671078908775984*x) 
+    #    created via curve fitting in plotly 
+    #    """
