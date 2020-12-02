@@ -172,15 +172,27 @@ class mathUtils:
     
     def getRotMatrix2D(self,theta):
         """
-        This function 
+        This function creates a rotation matrix in order to rotate
+        a 2D vector arround a angle (theta)
+
+        @return 2x2 rotation matrix 
+                [c,-s]
+                [s, c]
         """
         # theta is in radians
         c = np.cos(theta)
         s = np.sin(theta)
+
         return np.array(((c, -s), (s, c)))
-        
     
     def getRotMatrix3D(self,yaw,pitch,roll,mode='active'):
+        """
+        This function creates a 3D rotation matrix in order
+        to rotate activly or passivly around the three given 
+        angles (yaw, pitch, roll)
+
+        @return 3x3 rotation matrix based on sinus and cosinus from yaw pitch and roll
+        """
         # theta is in radians
         cosYaw = np.cos(yaw)
         sinYaw = np.sin(yaw)
