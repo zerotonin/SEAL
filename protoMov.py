@@ -112,7 +112,7 @@ class ProtMov:
 
         # get X-Y-positions
         # this transforms self.thrust and self.slip to the X and y position in world coordinates
-        self.fromThrustSlip2XYcoordinates()
+        self.fromThrustSlipTRA2XYcoordinatesTRA()
 
         # Z-POSITION AND Pitch-ANGLE in meter or angle with sps frequency
         self.zProfile ,self.pitchAngle = self.createLiftPitch(currentDive)
@@ -125,7 +125,7 @@ class ProtMov:
         # combine both trajectories
         self.mergeLiftPitch_ThrustYawSlip()#(thurst,slip,lift,yaw,pitch)
 
-    def fromThrustSlip2XYcoordinates(self):
+    def fromThrustSlipTRA2XYcoordinatesTRA(self):
         """
         This function creates the x and y profiles by rotating the 2D thrust and slip vector with 
         a rotation matrix of yaw.
@@ -170,7 +170,7 @@ class ProtMov:
             
         self.velTra = np.array(self.velTra)
     
-    def getPositionAndAngelsFromVel(self):
+    def getPositionAndAngelTrajectoryFromVelTrajectory(self):
         """
         This function calculates the angle(deg) and postion(m) data from the angleVelocity(deg/s) and 
         directionVelocity(m/s) data. For the angles the cumulative sum of the angleVelocities
@@ -189,7 +189,7 @@ class ProtMov:
 
         self.positions = positions 
         self.angles    = angles  
-            
+
     def createLiftPitch(self, currentDive):
         """
         Dependent on the before defined phases and their duration the dive simulation 
