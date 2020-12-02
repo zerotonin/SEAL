@@ -65,18 +65,19 @@ class ProtMov:
 
         # dive phases are keywords for a tupel consisting of 0) duration normalised to total duration
         # 1) mean pitch angle [deg]  2)  standard deviation of the mean [deg] 3)  mean z-profil [m/s]
-        # 4) standard deviation of z-profile [m/s]
-        self.diveShapeU = {'surface'  :(10.0/77.0, -79.639515  ,12.78034071 ,0.003492857142857107  ,0.012394484328836674),
-                           'down'     :(14.0/77.0, 63.9146825  ,8.36629103  ,-0.99880133333333     ,0.05321871641526968),
-                           'straight' :(65.0/77.0, 8.36629103  ,5.5529812   ,0.0024724705882352887 ,0.029324291568831443),
-                           'up'       :(77.0/77.0,-68.64291923 ,15.63982373 ,0.24612163636363638   ,0.40711433143914316),
-                           'surface2' :(77.0/77.0, -79.639515  ,12.78034071 ,0.003492857142857107  ,0.012394484328836674)} # surface 2 is a bonus duration if up wards swimming ends before its duration
+        # 4) standard deviation of z-profile [m/s]. We inverted the sign of the pitch values from the 
+        # original data, so that they now fit the international definition of the pitch angle
+        self.diveShapeU = {'surface'  :(10.0/77.0, 79.639515  ,12.78034071 ,0.003492857142857107  ,0.012394484328836674),
+                           'down'     :(14.0/77.0, -63.9146825  ,8.36629103  ,-0.99880133333333     ,0.05321871641526968),
+                           'straight' :(65.0/77.0, -8.36629103  ,5.5529812   ,0.0024724705882352887 ,0.029324291568831443),
+                           'up'       :(77.0/77.0,68.64291923 ,15.63982373 ,0.24612163636363638   ,0.40711433143914316),
+                           'surface2' :(77.0/77.0, 79.639515  ,12.78034071 ,0.003492857142857107  ,0.012394484328836674)} # surface 2 is a bonus duration if up wards swimming ends before its duration
         
-        self.diveShapeV = {'surface'  :(11.0/36.0, -74.53024727,7.65994214  ,-0.005039636363636366 ,0.0280961935023646),        
-                           'down'     :(25.0/36.0, 17.04128714 ,25.74478444 ,-0.23516400000000004  ,0.17638583527291268),
+        self.diveShapeV = {'surface'  :(11.0/36.0, 74.53024727,7.65994214  ,-0.005039636363636366 ,0.0280961935023646),        
+                           'down'     :(25.0/36.0, -17.04128714 ,25.74478444 ,-0.23516400000000004  ,0.17638583527291268),
                            'straight' :(25.0/36.0, 0.0         ,0.0         ,0.0                   ,0.0 ),
-                           'up'       :(36.0/36.0,-49.06783    ,28.94055575 ,0.301                 ,0.28513959297018016),
-                           'surface2' :(36.0/36.0 -74.53024727 ,7.65994214  ,-0.005039636363636366 ,0.0280961935023646)} # surface 2 is a bonus duration if up wards swimming ends before its duration
+                           'up'       :(36.0/36.0, 49.06783    ,28.94055575 ,0.301                 ,0.28513959297018016),
+                           'surface2' :(36.0/36.0, 74.53024727 ,7.65994214  ,-0.005039636363636366 ,0.0280961935023646)} # surface 2 is a bonus duration if up wards swimming ends before its duration
 
     def generator2(self):
         """
@@ -151,10 +152,11 @@ class ProtMov:
         velTra list.
         """
         # filter zProfile as the original data had low temporal resolution
-        self.zProfile = gaussian_filter1d(self.zProfile, 3)
+        self.zProfile   = gaussian_filter1d(self.zProfile, 3)
+        self.pitchAngle = gaussian_filter1d(self.pitchAngle, 30)
 
         # Make positional trajectory in m, rad, witrh all six degrees of freedom. Roll is set to zero as it ix not defined.
-        self.posTrajectory = np.vstack((self.xProfile,self.yProfile,self.zProfile,self.yawAngle,self.pitchAngle, np.zeros(shape=self.traLen)))  
+        self.posTrajectory = np.vstack((self.xProfile,self.yProfile,self.zProfile,np.deg2rad(self.yawAngle),np.deg2rad(self.pitchAngle), np.zeros(shape=self.traLen)))  
         self.posTrajectory = self.posTrajectory.transpose()
 
         # Now we have to calculate the velocity step trajectory, both,  in seal coordinates and per second.
@@ -239,6 +241,7 @@ class ProtMov:
             currentZshift =np.random.normal(loc=currentDive[currentKey][3], scale=currentDive[currentKey][4], size=None)
 
             pitchAngle.append(currentPitch)
+            # here we transform from velocities to positions 
             zProfile.append(zProfile[-1] + currentZshift/self.origDiveFPS )
             # extreme cases
             if zProfile[-1] < self.oceanDepth:

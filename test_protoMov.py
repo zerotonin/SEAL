@@ -6,22 +6,8 @@ import matplotlib.pyplot as plt
 reload(protoMov)
 simObj = SEAL_SIM.SEAL_SIM()
 P = protoMov.ProtMov(simObj)
-P.generator2('uShape',60)
+P.generator2()
 
-ends = [P.diveShapeU['surface'][0]*P.traDurSec*P.origDiveFPS,
-       P.diveShapeU['down'][0]*P.traDurSec*P.origDiveFPS,
-       P.diveShapeU['straight'][0]*P.traDurSec*P.origDiveFPS,
-       P.diveShapeU['up'][0]*P.traDurSec*P.origDiveFPS,
-       P.diveShapeU['surface2'][0]*P.traDurSec*P.origDiveFPS]
-print((np.ceil(np.array(ends))))
-#P.getPositionAndAngels
-
-
-
-
-fig = plt.figure() 
-ax = fig.gca()   
-ax.plot(P.thrust)
 
 fig = plt.figure() 
 ax = fig.gca(projection='3d')   
@@ -38,6 +24,10 @@ plt.show()
 
 fig = plt.figure() 
 ax = fig.gca()   
+ax.plot(P.thrust)
+
+fig = plt.figure() 
+ax = fig.gca()   
 ax.plot(P.yaw)
 
 fig = plt.figure() 
@@ -47,6 +37,16 @@ ax.set_xlabel('X')
 ax.set_ylabel('Y')
 ax.set_zlabel('Depth (m)')
 plt.show()
+
+
+
+#ends = [P.diveShapeU['surface'][0]*P.traDurSec*P.origDiveFPS,
+#       P.diveShapeU['down'][0]*P.traDurSec*P.origDiveFPS,
+#       P.diveShapeU['straight'][0]*P.traDurSec*P.origDiveFPS,
+#       P.diveShapeU['up'][0]*P.traDurSec*P.origDiveFPS,
+#       P.diveShapeU['surface2'][0]*P.traDurSec*P.origDiveFPS]
+#print((np.ceil(np.array(ends))))
+#P.getPositionAndAngels
 
 ######################################################################################
 
@@ -59,9 +59,9 @@ from mpl_toolkits.mplot3d import Axes3D
 reload(protoMov) 
 simObj = SEAL_SIM.SEAL_SIM() 
 P = protoMov.ProtMov(simObj) 
-P.generator2('uShape',600)  
+P.generator2()  
 
-P.getPositionAndAngelsFromVel()
+P. getPositionAndAngelTrajectoryFromVelTrajectory()
 
 P.getSealHeading()
 
@@ -69,8 +69,10 @@ P.getSealHeading()
 fig2 = plt.figure()
 ax =fig2.add_subplot(311)
 ax.plot(np.rad2deg(P.angles[:,0]))
+ax.set_ylabel('yaw, deg')
 ax =fig2.add_subplot(312)
 ax.plot(np.rad2deg(P.angles[:,1]))
+ax.set_ylabel('pitch, deg')
 ax =fig2.add_subplot(313)
 ax.plot(P.zProfile)
 fig3 = plt.figure()
@@ -79,13 +81,11 @@ ax.plot(P.xProfile,P.yProfile)
 
 fig = plt.figure() 
 ax = fig.add_subplot(111, projection='3d') 
-#ax.set_xlim(-70,70)# x axes goes from -10 to 10 since Cloudsphere is 10 
-#ax.set_ylim(-70,70)# same here 
-#ax.set_zlim(-70,10)
 ax.plot(list(P.xProfile),list(P.yProfile),list(P.zProfile),color='red')
 ax.scatter3D(P.xProfile[0],P.yProfile[0],P.zProfile[0], color = 'green')
 ax.scatter3D(P.xProfile[-1],P.yProfile[-1],P.zProfile[-1], color = 'red')
-for i in range(P.traLen):
+frames4Quiver = range(P.traLen)
+for i in  frames4Quiver[0::5]:
 
     X = P.xProfile[i]
     Y = P.yProfile[i]
@@ -93,7 +93,7 @@ for i in range(P.traLen):
     U = P.sealHeading[i,0] 
     V = P.sealHeading[i,1] 
     W = P.sealHeading[i,2] 
-    ax.quiver(X,Y,Z,U,V,W,arrow_length_ratio=0.01)
+    ax.quiver(X,Y,Z,U*.1,V*.1,W*.1)
 plt.show()     
 
 import numpy as np
