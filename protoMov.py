@@ -182,7 +182,6 @@ class ProtMov:
         values in the world coordinates system(x,y,z)
         """
         angles = np.cumsum(self.velTra[:,3:]/self.sps,axis=0)
-        angles = np.deg2rad(angles)
         positions = np.zeros(shape=(self.velTra.shape[0]+1,3))
 
         for frameI in range(self.velTra.shape[0]):
