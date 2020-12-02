@@ -161,7 +161,7 @@ class environment:
         for obstacle in self.obstacleList: 
             # it should not be maxVectorMagnitue of particle cloud but specific distance a seal could still
             # detect obstacle, 
-            if np.linalg.norm(self.simObj.seal.sealPosition[0:2]-obstacle[0])- (obsatcle[1]/m.tan(0.08666666667)- obstacle[1] < 0:
+            if np.linalg.norm(self.simObj.seal.sealPosition[0:2]-obstacle[0]) < obsatcle[1]/np.tan(0.08666666667) + obstacle[1]:
                 self.observableObstacleList.append(obstacle)
             
     def checkVisibility(self,parObj):
