@@ -30,7 +30,7 @@ import numpy as np
 reload(SEAL_SIM)
 reload(opticFlowAna)
 simObj = SEAL_SIM.SEAL_SIM()
-simObj.userDefParametersCLI()
+#simObj.userDefParametersCLI()
 simObj.runSimulation()
 
 # analyse OpticFlow ability
