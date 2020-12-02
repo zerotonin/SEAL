@@ -146,16 +146,16 @@ class mathUtils:
         for pobject in self.partclObjList:
             pobject.cart2sphere()
 
-    def agentBasedVels2worldBasedCoords(transVel,angles,mode='2D'):
+    def agentBasedVels2worldBasedCoords(self,transVel,angles,mode='2D'):
         # angle expected to be in radians
 
         angles = angles*-1 # negative angle as we want to get the xyz shift 
                            # from the orientation of the world and not the seal
         if mode == '2D':  
-            R = self.mathUtils.getRotMatrix2D(angles)
+            R = self.getRotMatrix2D(angles)
             return np.dot(R,np.array(transVel))
         elif mode == '3D':
-            R = self.mathUtils.getRotMatrix3D(angles[0],angles[1],angles[2])
+            R = self.getRotMatrix3D(angles[0],angles[1],angles[2])
             return np.dot(R,np.array(self.transVel)) 
         else:
             print('Unknown mode for agentBasedVels2worldBasedCoords func:' + str(mode))
