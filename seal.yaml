@@ -22,4 +22,4 @@ dependencies:
 - pip   
 - pip:
     - ai.cs
-    
+    - tqdm
