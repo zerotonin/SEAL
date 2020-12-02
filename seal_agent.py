@@ -97,7 +97,7 @@ class Seal:
             # calculate m/s to m/sample
             presentStep = self.simObj.meterPerSecond2meterPerSample(self.sealStep)
             
-            self.sealPosition += self.mathUtils.agentBasedVels2worldBasedCoords(self.presentStep[0:3],self.sealOrientation,'3D') # new Seal Position after one sealStep/Movement
+            self.sealPosition += self.mathUtils.agentBasedVels2worldBasedCoords(presentStep[0:3],self.sealOrientation,'3D') # new Seal Position after one sealStep/Movement
             self.sealOrientation += presentStep[3:6] # new sealOrientation after each sealStep (should be the same as during the   step?)
             
             SealOrientation = copy.deepcopy(self.sealOrientation)
