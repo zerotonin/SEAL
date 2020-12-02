@@ -134,8 +134,9 @@ class ProtMov:
         self.yProfile = np.zeros(shape=(self.traLen,))
  
         for frameI in range(self.traLen-1):
-            R = self.mathUtils.getRotMatrix2D(np.deg2rad(self.yawAngle[frameI])*-1)
-            temp = np.dot(R,np.array([self.thrust[frameI],self.slip[frameI]])) # rotate seal coordinates to world coordinates
+            temp = self.mathUtils.agentBasedVels2worldBasedCoords(
+                np.array([self.thrust[frameI],self.slip[frameI]]),np.deg2rad(self.yawAngle[frameI]),
+                '2D')
             self.xProfile[frameI+1] = self.xProfile[frameI] + temp[0]/self.sps # this is done because the values are in m/sec and should be in m/sample
             self.yProfile[frameI+1] = self.yProfile[frameI] + temp[1]/self.sps # this is done because the values are in m/sec and should be in m/sample
             
@@ -183,10 +184,9 @@ class ProtMov:
         positions = np.zeros(shape=(self.velTra.shape[0]+1,3))
 
         for frameI in range(self.velTra.shape[0]):
-
-            R = self.mathUtils.getRotMatrix3D(angles[frameI,0],angles[frameI,1],0)#why -1 ?
-            positions[frameI+1,:] = np.dot(R,np.array(self.velTra[frameI,0:3]/self.sps)) 
-
+            positions[frameI+1,:] = self.mathUtils.agentBasedVels2worldBasedCoords(
+                                np.array(self.velTra[frameI,0:3]/self.sps),angles[frameI,:],'3D')
+     
         self.positions = positions 
         self.angles    = angles  
 
