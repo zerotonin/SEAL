@@ -19,24 +19,34 @@ class opticFlowAnalysis:
         """
         this class takes the trajectroy data from the particles and seal_agent to analyze the optic flow
 
-        @param simObj                  ? default= none
-        @param particleList            ? default= none
+        @param simObj                  str default: none
+            the name of the environment simulation.
+        @param mathUtils               ? default: 
+            creates a shortcut to the mathUtils class stored in utilities.py
+        @param particleList            ? default: none
             the particleList is a shortcut to the particleObjectList creates in the 
             Cloud class stored in turbidity.py
-        @param sealTrajectories        ? default= none
+        @param sealTrajectories        ? default: none
             the sealTrajectories is a shortcut to the sealTrajectories stores in the 
             seal class in SEAL_SIM stored in SEAL_SIM.py
+        @param anaDataList             list default: none
+            creates a list holding information about
+            distTrueList,distOFestList,partCylList,OFvectorList
+        @param distRankDiff            list default: none
+            a list of the distance rank differenc between the 
+            distance of the particle movement and the percieved shift 
+            on the seals retina (OFvector)
         """
         self.simObj         = simObj
         self.mathUtils      = mathUtils()
         self.particleList   = simObj.pCloud.partclObjList
         self.sealTrajectory = simObj.seal.sealTrajectory
-        self.r_querrList    = []
-        self.rMagnitudeList = []
+        self.anaDataList  = list()
+        self.distRankDiff = list()
     
     def createOpticFlow(self,frame):
         """
-        this function plotts a 2D optic flow field for a single sealStep, by calculating the 
+        This function plotts a 2D optic flow field for a single sealStep, by calculating the 
         magnitute ot the movement vector from the oldPosition of the particle to the newPosition 
         for phi and z (ignoring the radius, since the retina only has 2 dimensions)
         """
@@ -54,12 +64,13 @@ class opticFlowAnalysis:
             ax.quiver(X,Y,U,V, angles ='xy',scale_units='xy', scale =1)
         plt.show() 
 
-
     def create2DParticleDistributionList(self,prePost, frame):
         """
-        this function creaty x and y list fpr the azimuth(x) and z(height) values of the particles from
-        the cylindric particle positions at a given fram for either the oldPosition (prePost = 0)
-        or the nwe Position (prePost = 1)
+        This function creats x and y list for the azimuth(x) and z(height) values of the particles from
+        the cylindric particle positions at a given frame for either the oldPosition (prePost = 0)
+        or the new Position (prePost = 1)
+
+        @return xList and yList holding information about the azimuth and height
         """
         xList = list()
         yList = list()
@@ -75,7 +86,7 @@ class opticFlowAnalysis:
 
     def plot2DparticleDist(self, frame):
         """
-        this function plots the old and new positions of particles for a given frame
+        This function plots the old and new positions of particles for a given frame
         it creates x and y list of the cylindric coordinates of the particles 
         with the create2DparticleDistributionList and plots the old positions
         in red and the new positions in green
@@ -112,9 +123,6 @@ class opticFlowAnalysis:
         for this seal step the median error of all particles will be our quality value
         R = norm(phi1_-phi_0, z_1-z_0)
         """
-        self.anaDataList  = list()
-        self.distRankDiff = list()
-        self.opticFlowField = list
         for frameI in tqdm(range(self.simObj.protoMove.traLen),desc='calculating OF'):
             distTrueList  = list()
             distOFestList = list()
@@ -131,9 +139,15 @@ class opticFlowAnalysis:
                 
             self.anaDataList.append([distTrueList,distOFestList,partCylList,OFvectorList])                
             self.distRankDiff.append(self.calcDistanceRankDiff(distTrueList,distOFestList))
-            
 
     def calcDistanceRankDiff(self,distTrue,distEstOF):
+        """
+        This function calculates the distance rank difference between the 
+        trueDistance moved by the particles and the estimates distance moved
+        by the 2D shift on the retina
+
+        @return rankDiff between estimated and true distance
+        """
         # clear list of None and build np.arry
         distEstOF_clean = np.array([dist for dist in distEstOF if dist])
         distTrue_clean = np.array([dist for dist in distTrue if dist])
@@ -145,19 +159,35 @@ class opticFlowAnalysis:
         trueIDX = np.argsort(distTrue_clean)
         estIDX = np.argsort(distEstOF_clean**-1) 
         rankDiff = abs(estIDX -trueIDX)
+
         return rankDiff
+
     def cart2cylindric(self,cartPosition):
         """
+        This function converts cartisian coordinates into cylindical coordinates,
+        where the seal center stay position (0,0,0).
         https://pypi.org/project/ai.cs/
         r   = axial distance or radial distance
-        phi = angle between the reference dircetion on the choosen plane and the line from the origin to the porjection of point P on the plane
+        phi = angle between the reference dircetion on the choosen plane and
+              the line from the origin to the porjection of point P on the plane
         z   = height
+
+        @return array of cartisian coordinates
         """
         r, phi, z = cs.cart2cyl(x=cartPosition[0], y=cartPosition[1], z=cartPosition[2])
+
         return np.array([r, phi, z]) 
 
     def analyseSingleParticleOF(self,frameNo,partclNo):
+        """
+        This function creates the OF vector for each particle
+        at a given frame(sample). 
 
+        @returns cylindric coordinates from particle, 
+                 optic flow vector of particle
+                 distance particle moved
+                 and opticFlow estimates distance particle moved
+        """
         #get particle step position
         particleTrajEntry = self.particleList[partclNo].trajectory[frameNo]
 
@@ -179,10 +209,17 @@ class opticFlowAnalysis:
             return cylParticle, OFvector, distance, OFdistanceEst 
         else:
             return None, None, None, None
-        # rotat
-
-    def rotateParticleStep2SealHeading(self,particleTrajStep,sealOrientationStep):
         
+    def rotateParticleStep2SealHeading(self,particleTrajStep,sealOrientationStep):
+        """
+        This function rotates the paricleStep to the Seals heading so the 
+        particles are moving into the opposite direction from the seals heading
+        This is done by a 3D rotation matrix around the old orientation of the 
+        seal.
+
+        @return old and new particle position from seals point of view in 
+                cartisian coordinates
+        """
         sealOrientationOld = sealOrientationStep[0]
         sealOrientationNew = sealOrientationStep[1]
         
@@ -201,25 +238,35 @@ class opticFlowAnalysis:
         return (partclPosOld,partclPosNew)
     
     def absParticlePos2cylsealCoord(self,particleTrajEntry,sealTrajEntry):
+        """
+        This function activates the rotation of particle to the seal heading 
+        and afterwards converts the cartisian coordinates to cylindrical 
+        coordinates
+
+        @return old and new particle position from seals point of view in 
+                cylindrical coordinates
+        """
         # rotate 3D cartesian coordinates to seal orientation
         relPartPosCart = self.rotateParticleStep2SealHeading(particleTrajEntry,sealTrajEntry)
+
         # transfrom from cartesian into cylindrical
         return (self.cart2cylindric(relPartPosCart[0]),self.cart2cylindric(relPartPosCart[1]))
 
-
     def getDistancesFromCylParticles(self,cylParticles): 
-            
-            distance_groundTruth = (cylParticles[0][0]+cylParticles[1][0])/2
-            
-            """
-            magnitude between the particle before and after sealMovement,
-            describing the shift on the retina for optic flow
-            """
-
-            OFvector = np.subtract(cylParticles[1][1:3],cylParticles[0][1:3]) # magnitude of 2D vector p1(phi,z) to p2(phi,z)
-            distance_OFestimate = np.linalg.norm(OFvector)
-            
-            return OFvector,distance_groundTruth,distance_OFestimate
+        """
+        This function 
+        """
+        
+        distance_groundTruth = (cylParticles[0][0]+cylParticles[1][0])/2
+        
+        """
+        magnitude between the particle before and after sealMovement,
+        describing the shift on the retina for optic flow
+        """
+        OFvector = np.subtract(cylParticles[1][1:3],cylParticles[0][1:3]) # magnitude of 2D vector p1(phi,z) to p2(phi,z)
+        distance_OFestimate = np.linalg.norm(OFvector)
+        
+        return OFvector,distance_groundTruth,distance_OFestimate
          
     def cartTra2cylTra(self,cartTra):
         '''
