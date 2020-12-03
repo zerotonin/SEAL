@@ -49,10 +49,11 @@ class Seal:
             self.activeSealMovement = True
     
 
-    def createSealStep(self,mode):
+    def testCreateSealStep(self,mode):
         """
+        This function creats basic seal steps to test the simulation.
         In order to ensure a divepattern, starting at the ocean surface, going down, and 
-        goingt up again ending at the surface again three differen sealSteps are define.
+        goingt up again ending at the surface again three differen sealSteps are defined.
         To test we definde a straight down dive and a 45down dive. otherwise the sealSteps
         will be randomly defined with the x y z values beeing limited between-5 and 5 m.
         This will be change later to connect it to haborSealDiveData to simulate real 
@@ -68,27 +69,27 @@ class Seal:
             print('Unkown step type: ' + mode)
 
  
-    def createRandomStep(self):
+    def testCreateRandomStep(self):
         """
-        creating random sealStep consisting of randomly choosen StepCoordinates x,y,z 
+        Creating random sealStep consisting of randomly choosen StepCoordinates x,y,z 
         beeing limited betweem -5 and 5m, defining the direction and lenght of the step,
         AND randomly choosen orientation of the seal during this step defines by yaw pitch
         and roll values beeing limited to 0 to 2pi.
+        this function was used to test the other parametwer of the simulation throughout the 
+        creation.
         """
-        #sealStepCoordinates = np.random.uniform(-5,5,size = (3)) #randomly choosen stepSize 
-        #sealStepOrientation = np.random.uniform(0,np.pi*2,size = (3)) #ramdomly chooses orientation of step 
-        self.createThrustSlipYaw()
-        self.createLiftPitch()
-        self.sealStep = np.column_stack((self.traIDX,self.lift ,self.pitch))# thust(m), slip(m),yaw(winkel),lift(m),picth(winkel)?? wie ändert man das ?
+        sealStepCoordinates = np.random.uniform(-5,5,size = (3)) #randomly choosen stepSize 
+        sealStepOrientation = np.random.uniform(0,np.pi*2,size = (3)) #ramdomly chooses orientation of step 
+        self.sealStep = np.column_stack((sealStepCoordinates, sealStepOrientation))#random combination of translational and rotational trajectories
         
         print(len(self.sealStep))   
         print(self.sealStep)     
 
     def MoveSeal(self): # function to simulate dive (series of seal trajectories)
         """
-        this function should safe a sealTrajectory list listing all endPosition after each sealStep for a single dive
-        in correct order. sealStep holding information for x,y,z direction of MovingVector as well as
-        yaw,pitch,roll (orientation of the seal)
+        This function moves the seal in the world coordinate system dependen on its 
+        active state. For each step the sealPosition and orientation is saved in 
+        the sealTrajectory list.
         """    
         self.SealStateCheck()
         
