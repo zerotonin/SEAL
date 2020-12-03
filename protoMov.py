@@ -334,6 +334,10 @@ class ProtMov:
         return self.resampleData2TraLen(resampled_signal) # to assure trajectory length
 
     def getSealHeading(self,headingVector=np.array([10,0,0])):
+        """
+        This function creats a 3D heading vector by rotating the 
+        heading vector by the thrust pitch and roll angles.
+        """
         
         sealHeading =list()
         for frameI in range(self.angles.shape[0]):

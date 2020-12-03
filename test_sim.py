@@ -80,16 +80,16 @@ plt.show()
 #######
 fig3 = plt.figure()
 fig, ((ax1, ax2, ax3),(ax4, ax5, ax6)) = plt.subplots(2,3)
-ax1.plot(np.rad2deg(simObj.protoMove.angles[:,0]))
-ax1.set_ylabel('yaw, deg')
-ax2.plot(np.rad2deg(simObj.protoMove.posTrajectory[:,3]))
-ax2.set_ylabel('yaw from posTrajectory')
+ax1.plot(np.rad2deg(simObj.protoMove.posTrajectory[:,3]))
+ax1.set_ylabel('yaw from posTrajectory')
+ax2.plot(np.rad2deg(simObj.protoMove.angles[:,0]))
+ax2.set_ylabel('yaw, cumSum fromVeltra')
 ax3.plot(np.rad2deg(sealPos[:,3]))
 ax3.set_ylabel('yaw from sealTrajectory')
-ax4.plot(np.rad2deg(simObj.protoMove.angles[:,1]))
-ax4.set_ylabel('pitch, deg')
-ax5.plot(np.rad2deg(simObj.protoMove.posTrajectory[:,4]))
-ax5.set_ylabel('pitch rom posTrajectory')
+ax4.plot(np.rad2deg(simObj.protoMove.posTrajectory[:,4]))
+ax4.set_ylabel('pitch rom posTrajectory')
+ax5.plot(np.rad2deg(simObj.protoMove.angles[:,1]))
+ax5.set_ylabel('pitch, cumSum fromVeltra')
 ax6.plot(np.rad2deg(sealPos[:,4]))
 ax6.set_ylabel('pitch from sealTrajectory')
 
@@ -120,6 +120,22 @@ ax9.plot(np.rad2deg(sealPos[:,2]))
 ax9.set_ylabel('z from sealTrajectory')
 
 plt.show()
+
+###########################################
+#test data translation between posTrajectory and velTra YAW & PITCHs   
+###########################################
+
+# YAW
+
+print('yawAngle in rad',simObj.protoMove.posTrajectory[:,3][0:10]) 
+print('yawAngle from angles', simObj.protoMove.angles[:,0][0:10])
+print('yawAngle from veltra', np.cumsum(simObj.protoMove.velTra[:,3][0:10]/simObj.sps))
+
+#PITCH 
+
+print('picthAngle in rad',simObj.protoMove.posTrajectory[:,4][0:10]) 
+print('picthAngle from angles', simObj.protoMove.angles[:,1][0:10])
+print('picthAngle from veltra', np.cumsum(simObj.protoMove.velTra[:,4][0:10]/simObj.sps))
 
 
 # analyse OpticFlow ability
