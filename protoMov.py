@@ -117,6 +117,7 @@ class ProtMov:
 
         # Z-POSITION AND Pitch-ANGLE in meter or angle with sps frequency
         self.zProfile ,self.pitchAngle = self.createLiftPitch(currentDive)
+        print('interpolated PitchAngle', self.pitchAngle)
         #print(self.zProfile)
         
         # check for flying seals!
@@ -163,7 +164,11 @@ class ProtMov:
         self.velTra = list()
         for frameI in np.arange(1,self.traLen):
             rawSpeeds = np.diff(self.posTrajectory[frameI-1:frameI+1,:],axis= 0) # get difference of position and orientation per frame        
-            rotVel  = rawSpeeds[0][3:]*self.sps  # change to angle velocity from rad/frame to rad/sec
+            rotVel  = rawSpeeds[0][3:]*self.sps 
+            #eprint(rotVel)
+            #erotStart = np.array([np.deg2rad(self.yawAngle[0]),np.deg2rad(self.pitchAngle[0]),0])*self.sps
+            #eprint(rotStart)
+            #erotVel  = np.vstack((rotStart,rotVel)) # change to angle velocity from rad/frame to rad/sec
             # calculate rotation matrix for animal orientation. So that we can calculate thrust slip lift from the difference of X,Y,Z coordinates
             R = self.mathUtils.getRotMatrix3D(self.posTrajectory[frameI-1,3],self.posTrajectory[frameI-1,4],self.posTrajectory[frameI-1,5],mode='passive') 
             transVel = np.dot(R,rawSpeeds[0][0:3]) # diff x,y,z -> thrust slip lift
@@ -180,8 +185,12 @@ class ProtMov:
         over the time of the dive is calculates. As for the positions the directionVectors from 
         seal point of view needed to be rotated around yaw and pitch in order to get the position 
         values in the world coordinates system(x,y,z)
+    
         """
-        angles = np.cumsum(self.velTra[:,3:]/self.sps,axis=0)
+        testAngle = np.array([np.deg2rad(self.yawAngle[0]),np.deg2rad(self.pitchAngle[0]),0])
+        testVelAngle = self.velTra[:,3:]/self.sps
+        angles = np.vstack((testAngle,testVelAngle))
+        angles = np.cumsum(angles,axis=0)
         positions = np.zeros(shape=(self.velTra.shape[0]+1,3))
 
         for frameI in range(self.velTra.shape[0]):
@@ -189,7 +198,7 @@ class ProtMov:
                                 np.array(self.velTra[frameI,0:3]/self.sps),angles[frameI,:],'3D')
      
         self.positions = positions 
-        self.angles    = angles  
+        self.angles    = angles 
 
     def createLiftPitch(self, currentDive):
         """
@@ -247,6 +256,7 @@ class ProtMov:
                 zProfile[-1] = self.oceanDepth+0.1
             elif zProfile[-1] > 0:
                 zProfile[-1] = 0
+        print('pitchAngleList : ', pitchAngle)
 
         return self.resample_by_interpolation(zProfile,self.origDiveFPS,self.sps),self.resample_by_interpolation(pitchAngle,self.origDiveFPS,self.sps)
 
