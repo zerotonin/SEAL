@@ -34,7 +34,7 @@ class Seal:
         self.sealStep           = np.zeros(shape =6) # change of position and orientation
         self.sealTrajectory     = list()
         self.activeSealMovement = True
-        self.trajectorRecording = False # usually set to false as the protMov class already creates an entire trajectory
+        self.trajectoryRecording = False # usually set to false as the protMov class already creates an entire trajectory
         self.mathUtils    = mathUtils()
 
     def SealStateCheck(self):
@@ -105,7 +105,7 @@ class Seal:
             SealOrientation = copy.deepcopy(self.sealOrientation)
             SealPosition = copy.deepcopy(self.sealPosition)
             
-            if trajectorRecording == True:            
+            if self.trajectoryRecording == True:            
                 self.sealTrajectory.append(np.hstack((SealPosition,SealOrientation)))
         else :
             self.activeSealMovement = False
