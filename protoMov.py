@@ -117,7 +117,7 @@ class ProtMov:
 
         # Z-POSITION AND Pitch-ANGLE in meter or angle with sps frequency
         self.zProfile ,self.pitchAngle = self.createLiftPitch(currentDive)
-        print('interpolated PitchAngle', self.pitchAngle)
+        #print('interpolated PitchAngle', self.pitchAngle)
         #print(self.zProfile)
         
         # check for flying seals!
@@ -231,20 +231,20 @@ class ProtMov:
             if frameI > currentPhaseTimeOut and currentPhase < 5:
                 currentPhase += 1
                 bonusDur      = 0
-                print(currentPhase,frameI,currentPhaseTimeOut,'frame out')
+                #print(currentPhase,frameI,currentPhaseTimeOut,'frame out')
             
             elif currentPhase == 1 and zProfile[-1] <= self.oceanDepth+0.5:
                 currentPhase += 1
                 bonusDur = currentDive[currentKey][0]*self.origDiveFPS -frameI
-                print(currentPhase,frameI,currentPhaseTimeOut,'depth out')
+                #print(currentPhase,frameI,currentPhaseTimeOut,'depth out')
 
             elif currentPhase == 3 and zProfile[-1] >= 0:
                 currentPhase += 1
                 bonusDur = currentDive[currentKey][0]*self.origDiveFPS -frameI
-                print(currentPhase,frameI,currentPhaseTimeOut,'surface out')
+                #print(currentPhase,frameI,currentPhaseTimeOut,'surface out')
             else: 
-                print(currentPhase,frameI,currentPhaseTimeOut,'go on')
-
+                #print(currentPhase,frameI,currentPhaseTimeOut,'go on')
+                pass
             currentPitch  =np.random.normal(loc=currentDive[currentKey][1], scale=currentDive[currentKey][2], size=None)
             currentZshift =np.random.normal(loc=currentDive[currentKey][3], scale=currentDive[currentKey][4], size=None)
 
@@ -256,7 +256,7 @@ class ProtMov:
                 zProfile[-1] = self.oceanDepth+0.1
             elif zProfile[-1] > 0:
                 zProfile[-1] = 0
-        print('pitchAngleList : ', pitchAngle)
+        #print('pitchAngleList : ', pitchAngle)
 
         return self.resample_by_interpolation(zProfile,self.origDiveFPS,self.sps),self.resample_by_interpolation(pitchAngle,self.origDiveFPS,self.sps)
 
