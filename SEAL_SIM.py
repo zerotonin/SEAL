@@ -104,10 +104,11 @@ class SEAL_SIM:
         self.environment.creatObstacles() #create obstacle if maxObsticales >0
         #get trajectory
         self.protoMove.generator2()
-        print(self.protoMove.posTrajectory[0,:])
-        self.sealVelTra = self.protoMove.velTra
-        self.seal.sealPosition    = copy.deepcopy(self.protoMove.posTrajectory[0,0:3])
-        self.seal.sealOrientation = copy.deepcopy(self.protoMove.posTrajectory[0,3:])
+        # set the seal class to the trajectories of the protoMove class
+        self.sealVelTra = self.protoMove.velTra # steps needed for movement
+        self.seal.sealTrajectory  = self.protoMove.posTrajectory # save trajectory to avoid trajectory recording by seal class
+        self.seal.sealPosition    = copy.deepcopy(self.protoMove.posTrajectory[0,0:3]) # get initial value
+        self.seal.sealOrientation = copy.deepcopy(self.protoMove.posTrajectory[0,3:])  # get initial value
         #run trajectory through particle cloud
         for step in tqdm(self.sealVelTra,'running simulation'):
             # get a step from the step trajectory
