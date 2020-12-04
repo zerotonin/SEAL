@@ -104,7 +104,10 @@ class SEAL_SIM:
         self.environment.creatObstacles() #create obstacle if maxObsticales >0
         #get trajectory
         self.protoMove.generator2()
+        print(self.protoMove.posTrajectory[0,:])
         self.sealVelTra = self.protoMove.velTra
+        self.seal.sealPosition    = copy.deepcopy(self.protoMove.posTrajectory[0,0:3])
+        self.seal.sealOrientation = copy.deepcopy(self.protoMove.posTrajectory[0,3:])
         #run trajectory through particle cloud
         for step in tqdm(self.sealVelTra,'running simulation'):
             # get a step from the step trajectory
@@ -118,6 +121,7 @@ class SEAL_SIM:
             if self.seal.activeSealMovement == False:
                 print("Seal left simulation environment! o.O")
                 break
+        print(self.protoMove.posTrajectory[0,:])
 
     def userDefParametersCLI(self):
         """
