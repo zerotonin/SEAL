@@ -52,6 +52,7 @@ class opticFlowAnalysis:
         """
         fig = plt.figure() 
         ax = fig.add_subplot(111) 
+        #for specific frame it calcultates the magnitute between the old and new position of each visibile? particle
         for i in range(len(self.particleList)): # po should be (oldPosition, newPosition, status) of particle per movement
             direct = self.anaDataList[frame][3][i]
             if  self.anaDataList[frame][2][i] != None: # richtungsvector between frames
@@ -59,9 +60,10 @@ class opticFlowAnalysis:
                 Y = self.anaDataList[frame][2][i][0][2] # z
                 U = direct[0] # phi direction
                 V = direct[1] # z direction
+                ax.quiver(X,Y,U,V, angles ='xy',scale_units='xy', scale =1)
             else:
                 pass
-            ax.quiver(X,Y,U,V, angles ='xy',scale_units='xy', scale =1)
+            
         plt.show() 
 
     def create2DParticleDistributionList(self,prePost, frame):
@@ -77,8 +79,8 @@ class opticFlowAnalysis:
 
         for i in range(len(self.particleList)):
             if self.anaDataList[frame][2][i] != None:
-                    xList.append(self.anaDataList[frame][2][i][prePost][1])
-                    yList.append(self.anaDataList[frame][2][i][prePost][2])
+                xList.append(self.anaDataList[frame][2][i][prePost][1])
+                yList.append(self.anaDataList[frame][2][i][prePost][2])
             else: 
                 xList.append(None)
                 yList.append(None)
@@ -194,13 +196,13 @@ class opticFlowAnalysis:
         if particleTrajEntry[2] == True:
             #get seal step orientations
             if frameNo == 0:
-                sealOrientationStep=(self.sealTrajectory[frameNo][1],self.sealTrajectory[frameNo][1])
+                sealOrientationStep=(self.sealTrajectory[frameNo][3:],self.sealTrajectory[frameNo][3:])
             else:
-                sealOrientationStep=(self.sealTrajectory[frameNo-1][1],self.sealTrajectory[frameNo][1])
+                sealOrientationStep=(self.sealTrajectory[frameNo-1][3:],self.sealTrajectory[frameNo][3:])
 
             # in this function the particle position are rotated so that they align with the animals 
             # orientation. Furthermore they transfer from a 3-D cartesian coordinate sytem into a 3-D
-            # cylindirical coordinate system
+            # cylindirical coordinate systemeal
             cylParticle = self.absParticlePos2cylsealCoord(particleTrajEntry,sealOrientationStep)
 
             #now calculate the OF vector and the resulting distance and distance estimate
