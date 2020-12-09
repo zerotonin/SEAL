@@ -102,7 +102,7 @@ class opticFlowAnalysis:
         ax.set_xlim(min(min(xList),min(postxList)),max(max(xList),max(postxList)))
         ax.set_ylim(min(min(yList),min(postyList)),max(max(yList),max(postyList)))
         plt.show()
-    
+
     def opticFlowAbility(self):
         """
         The particle position is denoted in a cylindrical coordinate system.
@@ -125,7 +125,7 @@ class opticFlowAnalysis:
         for this seal step the median error of all particles will be our quality value
         R = norm(phi1_-phi_0, z_1-z_0)
         """
-        for frameI in tqdm(range(self.simObj.protoMove.traLen),desc='calculating OF'):
+        for frameI in tqdm(range(self.simObj.protoMove.traLen-1),desc='calculating OF'):
             distTrueList  = list()
             distOFestList = list()
             partCylList   = list()
