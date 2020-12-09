@@ -323,6 +323,8 @@ class Cloud:
         """    
         #update water current
         self.waterCurrent = self.simObj.environment.getWaterCurrent()
+        self.sealPosition = self.simObj.seal.sealPosition
+        self.sealStep     = self.simObj.seal.sealStep
         for pObject in self.partclObjList:
             # transform from meter per second to meter per sample
             presentSealStep    = self.simObj.meterPerSecond2meterPerSample(self.sealStep)
