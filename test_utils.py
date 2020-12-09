@@ -24,7 +24,7 @@ simObj = SEAL_SIM.SEAL_SIM()
 simObj.userDefParametersCLI() 
 simObj.runSimulation()   
 
-pU.plot3D_positionSizeColorCoded(100,1,simObj.pCloud.partclObjList )
+pU.plot3D_positionSizeColorCoded(100,0,simObj.pCloud.partclObjList )
 pU.plot3D_positionSizeColorCoded(100,1,simObj.pCloud.partclObjList )
 
 O = opticFlowAna.opticFlowAnalysis(simObj)
