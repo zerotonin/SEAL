@@ -53,11 +53,11 @@ class ProtMov:
             samples since it is not present in vShaped dives. 
         """
         self.simObj       = simObj
-        self.sps          = simObj.sps #shorthand
-        self.oceanDepth   = simObj.environment.oceanDepth #shorthand
+        self.sps          = simObj.sps #shorthand LINKED
+        self.oceanDepth   = simObj.environment.oceanDepth #shorthand LINKED
         self.mathUtils    = mathUtils()
         self.origDiveFPS  = 0.2 # the orginal data was recorded every 5th second 
-        self.origVideoFPS = 25
+        self.origVideoFPS = 25 # video fps of the original footage
         self.traIDX       = []
         self.mode         = 'random'
         self.traLenSec    = 240
