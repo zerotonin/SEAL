@@ -83,7 +83,6 @@ class ProtMov:
         self.yheading      = list()
         self.zheading      = list()
 
-
         # dive phases are keywords for a tupel consisting of 0) duration normalised to total duration
         # 1) mean pitch angle [deg]  2)  standard deviation of the mean [deg] 3)  mean z-profil [m/s]
         # 4) standard deviation of z-profile [m/s]. We inverted the sign of the pitch values from the 
