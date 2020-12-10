@@ -46,15 +46,17 @@ class Particle:
         @param samplesPerSec float default: 20.0 
             the model's basic frequency. It defines, how often samples are updated per one second.
         """
+        # objects from other classes
         self.cloudObj       = cloudObj # particles form cloud object
+        self.samplesPerSec  = self.cloudObj.simObj.sps #samples per second
         self.size           = size # radius of the particles [µm]
         self.position       = position # tuple consisting of three coordinates x,y,z
-        self.trajectory     = [] # list of former positions x,y,z
+        # private objects
+        self.trajectory     = [] # list of positions pre and post sealStep
         self.activeMovement = True #particles actively move by Brownian motian
         self.visible        = True #particles are in the visual field of a seal
         self.temperature    = float("NAN")
         self.viscosity      = float("NAN")
-        self.samplesPerSec  = self.cloudObj.simObj.sps #samples per second
         self.absPosition    = None
         
     def randomWalk(self):
@@ -252,7 +254,7 @@ class Cloud:
         #from seal object of the simulation object
         self.sealStep          = self.simObj.seal.sealStep # change of position and orientation
         self.sealPosition      = self.simObj.seal.sealPosition # change of position and orientation
-
+        
         self.partclObjList     = [] # list of particle objects
         self.waterCurrent      = np.zeros(shape=3) # water current 
     
