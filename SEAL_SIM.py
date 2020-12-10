@@ -44,6 +44,7 @@ class SEAL_SIM:
         @param sealVelTra           ? default:none
             the created seal trajectories in the protomov class are stored in a list
         """
+        # public objects
         self.simParameterDict = {'diveType'          : 'vShape', # description and unit if av
                                  'durSec'            : 240, # duration of the simulation in seconds
                                  'currentType'       : 'static',
@@ -55,6 +56,7 @@ class SEAL_SIM:
                                  'cloudRadius'       : 0.0018, 
                                  }
         self.sps         = 200 # samples per second
+        # objects from other classes
         self.environment = environment.environment(self) # velocity in meter per second will be transformed into an evironment object
         self.seal        = seal_agent.Seal(self)
         self.pCloud      = turbidity.Cloud(self)
@@ -62,12 +64,13 @@ class SEAL_SIM:
         self.plot        = utilities.plotUtils()
         self.math        = utilities.mathUtils()
         self.protoMove   = protoMov.ProtMov(self)
+        # private?
         self.sealVelTra = list()
         
     def meterPerSecond2meterPerSample(self,velocity):
         """
         This function calculates the velocity per sample with the velocity per second,
-        to be used for the simulation
+        to be used for the  
 
         @return velocity per sample
         """
