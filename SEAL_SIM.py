@@ -55,6 +55,7 @@ class SEAL_SIM:
         self.math        = utilities.mathUtils()
         self.protoMove   = protoMov.ProtMov(self)
         self.runTimeData = runTimeData.runTimeData(self)
+        self.sps         = self.runTimeData.getParameter('sps')
         # private?
         self.sealVelTra = list()
         
