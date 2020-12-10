@@ -3,23 +3,24 @@ import numpy as np
 class runTimeData:
     '''
     '''
-    def __init__(self):
+    def __init__(self,simObj):
+        self.simObj                 = simObj
         self.sps                    = 20 # number of samples per second
         self.oceanSurface           = 0 # [m] linkable
         self.oceanDepth             = -70 # [m] linkable
         self.oceanLimit             = (-70,70) # [m] linkable
         self.waterCurrent           = np.array([0.0,0.1,0.0]) # just a simple example will be changed later 
-        self.waterCurrentMode       = 'static' # static or interpolated
+        #self.waterCurrentMode       = 'static' # static or interpolated
         self.maxObstacles           = 200
-        self.mode                   = 'uShape' # needed when using self.divetype?
-        self.traLenSec              = 240 # needed when using self.durSec?
+        #self.mode                   = 'vShape' # needed when using self.divetype?
+        #self.traLenSec              = 240 # needed when using self.durSec?
         self.traLen                 = self.traLenSec*self.sps # number of samples
         self.velTra                 = list() # list of sealTrajectory per sample with (thrust,slip,lift,yaw,pitch,roll)        
         self.sealPosition           = np.zeros(shape = 3) #centre of the coordinate system of the Seal in disctance to (0,0,0) of world
         self.sealOrientation        = np.zeros(shape = 3)  # orientation as yaw pitch roll
         self.sealStep               = np.zeros(shape =6) # change of position and orientation
         self.sealTrajectory         = list() # public??
-        self.diveType               = 'uShape', # descri
+        self.diveType               = 'vShape', # descri
         self.durSec                 = 240, # duration of,
         self.currentType            = 'static'
         self.currentStaticVel       = (0.0,2.0,0.0),
@@ -35,49 +36,49 @@ class runTimeData:
         self.diveType and durSec ?
         '''
         if parameterName == 'sps':
-            self.sps 
+            self.sps = parameterValue
         elif parameterName == 'oceanSurface':
-            self.oceanSurface 
+            self.oceanSurface = parameterValue
         elif parameterName == 'oceanDepth':
-            self.oceanDepth 
+            self.oceanDepth = parameterValue
         elif parameterName == 'oceanLimit':
-            self.oceanLimit 
+            self.oceanLimit = parameterValue
         elif parameterName == 'waterCurrent':
-            self.waterCurrent 
+            self.waterCurrent = parameterValue
         elif parameterName == 'waterCurrentMode':
-            self.waterCurrentMode 
+            self.waterCurrentMode = parameterValue
         elif parameterName == 'maxObstacles':
-            self.maxObstacles 
+            self.maxObstacles = parameterValue
         elif parameterName == 'traLen':
-            self.traLen 
+            self.traLen = parameterValue
         elif parameterName == 'velTra ':
-            self.velTra  
+            self.velTra  = parameterValue
         elif parameterName == 'sealPosition':
-            self.sealPosition 
+            self.sealPosition = parameterValue
         elif parameterName == 'sealOrientation':
-            self.sealOrientation  
+            self.sealOrientation  = parameterValue
         elif parameterName == 'sealStep':
-            self.sealStep  
+            self.sealStep  = parameterValue
         elif parameterName == 'sealTrajectory':
-            self.sealTrajectory  
+            self.sealTrajectory  = parameterValue
         elif parameterName == 'diveType':
-            self.diveType  
+            self.diveType  = parameterValue
         elif parameterName == 'durSec':
-            self.durSec  
+            self.durSec  = parameterValue
         elif parameterName == 'currentType':
-            self.currentType  
+            self.currentType  = parameterValue
         elif parameterName == 'currentStaticVel':
-            self.currentStaticVel  
+            self.currentStaticVel  = parameterValue
         elif parameterName == 'oceanDepth':
-            self.oceanDepth  
+            self.oceanDepth  = parameterValue
         elif parameterName == 'amountOfObstacles':
-            self.amountOfObstacles  
+            self.amountOfObstacles  = parameterValue
         elif parameterName == 'max_particles':
-            self.max_particles  
+            self.max_particles  = parameterValue
         elif parameterName == 'particleSizeRange':
-            self.particleSizeRange  
+            self.particleSizeRange  = parameterValue
         elif parameterName == 'cloudRadius':
-            self.cloudRadius  
+            self.cloudRadius  = parameterValue
         else:
             print('unknown parameter')
 
