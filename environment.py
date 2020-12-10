@@ -46,7 +46,7 @@ class environment:
         '''
         # objects from other classes
         self.simObj                 = simObj #name
-        self.sealPosition           = self.simObj.seal.sealPosition
+        self.sealPosition           = None
         # public objects
         self.oceanSurface           = 0 # [m] linkable
         self.oceanDepth             = -70 # [m] linkable
@@ -127,6 +127,7 @@ class environment:
         This function calcuates the waterCurrent at the sealPosition based
         on the interpolated current matrix created in setCurrents.
         """
+        self.sealPosition = self.simObj.seal.sealPosition
 
         self.waterCurrent = np.array([self.waterCurrentFunc[0]((self.sealPosition[0],self.sealPosition[1],self.sealPosition[2])),
                                       self.waterCurrentFunc[1]((self.sealPosition[0],self.sealPosition[1],self.sealPosition[2])),
