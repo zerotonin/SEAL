@@ -52,17 +52,21 @@ class ProtMov:
             in this case the straight phase is defined by a length of zero
             samples since it is not present in vShaped dives. 
         """
+        # objects from other classes
         self.simObj        = simObj
         self.sps           = simObj.sps #shorthand LINKED
         self.oceanDepth    = simObj.environment.oceanDepth #shorthand LINKED
         self.mathUtils     = mathUtils()
+        # public objects
+        self.mode          = 'random'
+        self.traLenSec     = 240
+        self.traLen        = self.traLenSec*self.sps 
+        self.velTra = list()
+        # private objects
         self.origDiveFPS   = 0.2 # the orginal data was recorded every 5th second 
         self.origVideoFPS  = 25 # video fps of the original footage
         self.traIDX        = []
         self.pmIDX         = []
-        self.mode          = 'random'
-        self.traLenSec     = 240
-        self.traLen        = self.traLenSec*self.sps 
         self.thrust        = []
         self.slip          = []
         self.yaw           = []
@@ -72,8 +76,8 @@ class ProtMov:
         self.xProfile      = np.zeros(shape=(self.traLen,))
         self.yProfile      = np.zeros(shape=(self.traLen,))  
         self.posTrajectory = None
-        self.positions     = positions
-        self.angles        = angles 
+        self.positions     = None
+        self.angles        = None
         self.sealHeading   = list()
         self.xheading      = list()
         self.yheading      = list()
@@ -178,7 +182,7 @@ class ProtMov:
         self.posTrajectory = self.posTrajectory.transpose()
 
         # Now we have to calculate the velocity step trajectory, both,  in seal coordinates and per second.
-        self.velTra = list()
+
         for frameI in np.arange(1,self.traLen):
             rawSpeeds = np.diff(self.posTrajectory[frameI-1:frameI+1,:],axis= 0) # get difference of position and orientation per frame        
             rotVel  = rawSpeeds[0][3:]*self.sps 
