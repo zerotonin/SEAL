@@ -248,7 +248,7 @@ class Cloud:
         """
         self.simObj            = simObj # string name
         #from simulation parameters dictionary
-        self.max_particles      = (self.simObj.runTimeData.getParameter('max_particles') # integer number of particles )
+        self.max_particles      = self.simObj.runTimeData.getParameter('max_particles') # integer number of particles )
         self.sizeRange          = self.simObj.runTimeData.getParameter('particleSizeRange') # tuple with the min and max radius[µm]
         self.maxVectorMagnitude = self.simObj.runTimeData.getParameter('cloudRadius') # max radius of a cloud
         #from seal object of the simulation object
