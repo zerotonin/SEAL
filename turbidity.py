@@ -55,7 +55,7 @@ class Particle:
         self.temperature    = float("NAN")
         self.viscosity      = float("NAN")
         self.samplesPerSec  = self.cloudObj.simObj.sps #samples per second
-        self.absPosition    = ??
+        self.absPosition    = None
         
     def randomWalk(self):
         """

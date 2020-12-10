@@ -71,7 +71,7 @@ class ProtMov:
         self.pitchAngle    = []
         self.xProfile      = np.zeros(shape=(self.traLen,))
         self.yProfile      = np.zeros(shape=(self.traLen,))  
-        self.posTrajectory = ??
+        self.posTrajectory = None
         self.positions     = positions
         self.angles        = angles 
         self.sealHeading   = list()
