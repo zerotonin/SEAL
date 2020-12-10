@@ -61,7 +61,7 @@ class Seal:
         seal like steps.
         """
         if mode == 'random':
-            self.createRandomStep()
+            self.testCreateRandomStep()
         elif mode == 'straightDown':
             self.sealStep = np.array([0.,0.,-10.0,0.,0.,0.])
         elif mode == '45down':
