@@ -54,8 +54,8 @@ class ProtMov:
         """
         # objects from other classes
         self.simObj        = simObj
-        self.sps           = simObj.sps #shorthand LINKED
-        self.oceanDepth    = simObj.environment.oceanDepth #shorthand LINKED
+        self.sps           = simObj.runTimeData.getParameter('sps') #shorthand LINKED
+        self.oceanDepth    = simObj.runTimeData.getParameter('oceanDepth') #shorthand LINKED
         self.mathUtils     = mathUtils()
         # public objects
         self.mode          = simObj.runTimeData.getParameter('diveType')
