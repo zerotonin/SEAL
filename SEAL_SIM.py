@@ -1,4 +1,4 @@
-import turbidity, seal_agent,copy,environment,utilities,protoMov, runTimeData
+import turbidity, seal_agent,copy,environment,utilities,protoMov,runTimeData
 from tqdm import tqdm
 import numpy as np
 
@@ -45,7 +45,7 @@ class SEAL_SIM:
             the created seal trajectories in the protomov class are stored in a list
         """
         # public objects
-        self.simParameterDict = {'sps'               : 20
+        self.simParameterDict = {'sps'               : 20,
                                  'diveType'          : 'vShape', # description and unit if av
                                  'durSec'            : 240, # duration of the simulation in seconds
                                  'currentType'       : 'static',
@@ -172,6 +172,7 @@ class SEAL_SIM:
         This function sets the user defined parameter to the according parameters in the different classes
         needed to run the simulation
         """
+        self.sps                          = self.simParameterDict['sps']
         self.protoMove.mode               = self.simParameterDict['diveType']
         self.protoMove.traLenSec          = self.simParameterDict['durSec']
         self.environment.waterCurrentMode = self.simParameterDict['currentType']
@@ -183,8 +184,25 @@ class SEAL_SIM:
         self.pCloud.sizeRange             = self.simParameterDict['particleSizeRange']
         self.pCloud.maxVectorMagnitude    = self.simParameterDict['cloudRadius']
 
-    def setParametersinRunTimeData(self):
+    def setParametersInRunTimeData(self):
 
+        self.runTimeData.setParameter('sps', float(self.CLI_dialg_num('Set SPS', '20')))
+        self.runTimeData.setParameter('diveType',self.CLI_dialg_choiceText('What dive Type schould be simulated ?', 'vShape', ['uShape','vShape']))
+        self.runTimeData.setParameter('durSec',float(self.CLI_dialg_num('How long should the dive simulation last?', '240')))    
+        self.runTimeData.setParameter('currentType',self.CLI_dialg_choiceText('What kind of current should be sim)ulates? ', 'static', ['static','interp']))
+        if self.runTimeData.currentType == 'static':
+            current_X = float(self.CLI_dialg_num('Set x-velocity in m/s:','0.0'))
+            current_Y = float(self.CLI_dialg_num('Set y-velocity in m/s:','2.0'))
+            current_Z = float(self.CLI_dialg_num('Set z-velocity in m/s:','0.0'))
+            self.runTimeData.setParameter('currentStaticVel', (current_X,current_Y,current_Z))
+        else:
+            # add standard cases after intial tests
+            print("For the interpolated type, you need to define the different currents in a tetraheder or choose one of the standard cases")
+        self.runTimeData.setParameter('oceanDepth',float(self.CLI_dialg_num('Set a depth of the oceans', '-70')))
+        self.runTimeData.setParameter('amountOfObstacles',int(self.CLI_dialg_num('How many obstacle should be simulates in the environment? ', '100')))
+        self.runTimeData.setParameter('max_particles',int(self.CLI_dialg_num('How many particles should be simulates in the particleCloud? ', '270')))
+        self.runTimeData.setParameter('particleSizeRange',(float(self.CLI_dialg_num('Set smallest Particle Size', '.00002')), float(self.CLI_dialg_num('Set biggest Particel Size', '0.00016'))))
+        self.runTimeData.setParameter('cloudRadius',float(self.CLI_dialg_num('Set radius of the Cloud', '0.0018')))
         
     def CLI_dialg_choiceText(self,question,default = False,answers=["yes","no"]):
         """
