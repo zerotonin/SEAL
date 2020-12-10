@@ -28,14 +28,14 @@ class Seal:
             and the oceanFloor(-70)
         """
 
-        self.simObj             = simObj
-        self.sealPosition       = np.zeros(shape = 3) #centre of the coordinate system of the Seal in disctance to (0,0,0) of world
-        self.sealOrientation    = np.zeros(shape = 3)  # orientation as yaw pitch roll
-        self.sealStep           = np.zeros(shape =6) # change of position and orientation
-        self.sealTrajectory     = list()
-        self.activeSealMovement = True
-        self.trajectoryRecording = False # usually set to false as the protMov class already creates an entire trajectory
-        self.mathUtils    = mathUtils()
+        self.simObj                 = simObj
+        self.sealPosition           = np.zeros(shape = 3) #centre of the coordinate system of the Seal in disctance to (0,0,0) of world
+        self.sealOrientation        = np.zeros(shape = 3)  # orientation as yaw pitch roll
+        self.sealStep               = np.zeros(shape =6) # change of position and orientation
+        self.sealTrajectory         = list()
+        self.activeSealMovement     = True
+        self.trajectoryRecording    = False # usually set to false as the protMov class already creates an entire trajectory
+        self.mathUtils              = mathUtils()
 
     def SealStateCheck(self):
         """
