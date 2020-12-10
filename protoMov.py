@@ -60,7 +60,7 @@ class ProtMov:
         # public objects
         self.mode          = simObj.runTimeData.getParameter('diveType')
         self.traLenSec     = simObj.runTimeData.getParameter('durSec')
-        self.traLen        = self.traLenSec*self.sps 
+        self.traLen        = int(simObj.runTimeData.getParameter('traLen'))
         self.velTra        = simObj.runTimeData.getParameter('velTra')
         # private objects
         self.origDiveFPS   = 0.2 # the orginal data was recorded every 5th second 
@@ -302,6 +302,7 @@ class ProtMov:
         randomNumbers = np.random.rand(pmTraLen+1)   # defines number betwen 0 and 1. the corresponding distributionCS is taken as start PM
         currentPM = np.where(distributionCS>= randomNumbers[0])
         currentPM = currentPM[0][0]
+        self.traIDX = list()
         self.traIDX.append(protoMov[currentPM])
         self.pmIDX = list()
         self.pmIDX.append(currentPM)
