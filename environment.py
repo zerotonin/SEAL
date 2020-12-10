@@ -48,13 +48,14 @@ class environment:
         self.oceanSurface           = 0 # [m]
         self.oceanDepth             = -70 # [m]
         self.oceanLimit             = (-70,70) # [m]
-        self.activeMovement         = True 
+        self.activeMovement         = True #
         self.visible                = True 
         self.waterCurrent           = np.array([0.0,2.0,0.0]) # just a simple example will be changed later 
         self.waterCurrentMode       = 'static'
         self.obstacleList           = []
         self.observableObstacleList = []
         self.maxObstacles           = 200
+        self.sealPosition           = self.simObj.seal.sealPosition
 
     def getWaterCurrent(self):
         """
@@ -125,10 +126,10 @@ class environment:
         This function calcuates the waterCurrent at the sealPosition based
         on the interpolated current matrix created in setCurrents.
         """
-        pos = self.simObj.seal.sealPosition
-        self.waterCurrent = np.array([self.waterCurrentFunc[0]((pos[0],pos[1],pos[2])),
-                                      self.waterCurrentFunc[1]((pos[0],pos[1],pos[2])),
-                                      self.waterCurrentFunc[2]((pos[0],pos[1],pos[2]))])
+
+        self.waterCurrent = np.array([self.waterCurrentFunc[0]((self.sealPosition[0],self.sealPosition[1],self.sealPosition[2])),
+                                      self.waterCurrentFunc[1]((self.sealPosition[0],self.sealPosition[1],self.sealPosition[2])),
+                                      self.waterCurrentFunc[2]((self.sealPosition[0],self.sealPosition[1],self.sealPosition[2]))])
 
     def creatObstacles(self):
         """
@@ -161,7 +162,7 @@ class environment:
         for obstacle in self.obstacleList: 
             # it should not be maxVectorMagnitue of particle cloud but specific distance a seal could still
             # detect obstacle, 
-            if np.linalg.norm(self.simObj.seal.sealPosition[0:2]-obstacle[0]) < obsatcle[1]/np.tan(0.08666666667) + obstacle[1]:
+            if np.linalg.norm(self.sealPosition[0:2]-obstacle[0]) < obstacle[1]/np.tan(0.08666666667) + obstacle[1]:
                 self.observableObstacleList.append(obstacle)
             
     def checkVisibility(self,parObj):
@@ -213,6 +214,7 @@ class environment:
         The Seals active movement is false if the agends is above water or below the seafloor or within an 
         obstacle.
         """
+        # can change sealObj.sealPosition to self.sealPosition ? 
         if sealObj.sealPosition[2] >= self.oceanSurface or sealObj.sealPosition[2] <= self.oceanDepth:
             sealObj.activeSealMovement = False
             #seal steps needs to go down (self.sealStep[2])
@@ -221,5 +223,5 @@ class environment:
             sealObstacleDist = np.linalg.norm(sealObj.position[0:2]-obstacle[0])
             if sealObstacleDist <= obstacle[1]:
                 sealObj.activeSealMovement = False 
-                print([seal in object])
+                print(['seal in object'])
     
