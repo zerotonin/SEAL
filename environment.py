@@ -44,16 +44,19 @@ class environment:
         @param maxObstacles             float default: 200
             the number of obstacles to create in the ocean environment
         '''
+        # objects from other classes
         self.simObj                 = simObj #name
+        self.sealPosition           = self.simObj.seal.sealPosition
+        # public objects
         self.oceanSurface           = 0 # [m] linkable
         self.oceanDepth             = -70 # [m] linkable
         self.oceanLimit             = (-70,70) # [m] linkable
         self.waterCurrent           = np.array([0.0,2.0,0.0]) # just a simple example will be changed later 
         self.waterCurrentMode       = 'static'
+        self.maxObstacles           = 200
+        # privates objects
         self.obstacleList           = []
         self.observableObstacleList = []
-        self.maxObstacles           = 200
-        self.sealPosition           = self.simObj.seal.sealPosition
 
     def getWaterCurrent(self):
         """
