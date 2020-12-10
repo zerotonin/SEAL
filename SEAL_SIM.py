@@ -54,7 +54,7 @@ class SEAL_SIM:
                                  'particleSizeRange' : (.00002,0.00016),
                                  'cloudRadius'       : 0.0018, 
                                  }
-        self.sps         = 20 # samples per second
+        self.sps         = 200 # samples per second
         self.environment = environment.environment(self) # velocity in meter per second will be transformed into an evironment object
         self.seal        = seal_agent.Seal(self)
         self.pCloud      = turbidity.Cloud(self)

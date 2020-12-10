@@ -45,17 +45,28 @@ class environment:
             the number of obstacles to create in the ocean environment
         '''
         self.simObj                 = simObj #name
+<<<<<<< HEAD
         self.oceanSurface           = 0 # [m]
         self.oceanDepth             = -70 # [m]
         self.oceanLimit             = (-70,70) # [m]
         self.activeMovement         = True #
+=======
+        self.oceanSurface           = 0 # [m] linkable
+        self.oceanDepth             = -70 # [m] linkable
+        self.oceanLimit             = (-70,70) # [m] linkable
+        self.activeMovement         = True 
+>>>>>>> 4cee7439d8baab40251b6a8ec91a89c572e47ce3
         self.visible                = True 
         self.waterCurrent           = np.array([0.0,2.0,0.0]) # just a simple example will be changed later 
         self.waterCurrentMode       = 'static'
         self.obstacleList           = []
         self.observableObstacleList = []
+<<<<<<< HEAD
         self.maxObstacles           = 200
         self.sealPosition           = self.simObj.seal.sealPosition
+=======
+        self.maxObstacles           = 200 # linkable
+>>>>>>> 4cee7439d8baab40251b6a8ec91a89c572e47ce3
 
     def getWaterCurrent(self):
         """

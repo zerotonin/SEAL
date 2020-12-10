@@ -39,8 +39,8 @@ class opticFlowAnalysis:
         """
         self.simObj         = simObj
         self.mathUtils      = mathUtils()
-        self.particleList   = simObj.pCloud.partclObjList
-        self.sealTrajectory = simObj.seal.sealTrajectory
+        self.particleList   = simObj.pCloud.partclObjList #mutable
+        self.sealTrajectory = simObj.seal.sealTrajectory #mutable
         self.anaDataList  = list()
         self.distRankDiff = list()
     
