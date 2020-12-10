@@ -96,7 +96,6 @@ class SEAL_SIM:
         """
         #set environment and particle cloud
         #self.setParameters()
-        self.setParametersInRunTimeData()
         self.environment.creatObstacles() #create obstacle if maxObsticales >0
         #get trajectory
         self.protoMove.generator2()
@@ -126,61 +125,61 @@ class SEAL_SIM:
                 break
         print(self.protoMove.posTrajectory[0,:])
 
-    def userDefParametersCLI(self):
-        """
-        This function opens a command line interface, asking the user to set 9 parameters,
-        which are a needed to simulate specified seal dives.
-
-        1. diveType, choosing between vShape and uShape dives
-        2. dive duration, defining the duration of the dive in seconds
-        3. currentType, choosing between static or interpolated currents
-        4. currentStaticVal, defining x,y,and z velocities for static currents
-        5. oceanDepth, setting the depth of the ocean
-        6. amount of Obstacles, setting the number of obstacles simulated in the enviornment
-        7. max_Particles, setting the number of particles simulated in the particleCloud
-        8. particleSizeRange, setting the lower and upper limits for the size of particles in mm ?
-        9. cloudRadius, setting the Radius of the particleCloud surrounding the seal_agent
-        Next, it sets the user defined parameters in the specidifc classes, needed for the 
-        simulation.
-        """
-        self.simParameterDict['sps']               = float(self.CLI_dialg_num('Set SPS', '20'))
-        self.simParameterDict['diveType']          = self.CLI_dialg_choiceText('What dive Type schould be simulated ?', 'vShape', ['uShape','vShape'])
-        self.simParameterDict['durSec']            = float(self.CLI_dialg_num('How long should the dive simulation last?', '240'))    
-        self.simParameterDict['currentType']       = self.CLI_dialg_choiceText('What kind of current should be simulates? ', 'static', ['static','interp'])
-        if self.simParameterDict['currentType'] == 'static':
-            current_X = float(self.CLI_dialg_num('Set x-velocity in m/s:','0.0'))
-            current_Y = float(self.CLI_dialg_num('Set y-velocity in m/s:','2.0'))
-            current_Z = float(self.CLI_dialg_num('Set z-velocity in m/s:','0.0'))
-            self.simParameterDict['currentStaticVel'] = (current_X,current_Y,current_Z)
-        else:
-            # add standard cases after intial tests
-            print("For the interpolated type, you need to define the different currents in a tetraheder or choose one of the standard cases")
-        self.simParameterDict['oceanDepth']        = float(self.CLI_dialg_num('Set a depth of the oceans', '-70'))
-        self.simParameterDict['amountOfObstacles'] = int(self.CLI_dialg_num('How many obstacle should be simulates in the environment? ', '100'))
-        self.simParameterDict['max_particles']     = int(self.CLI_dialg_num('How many particles should be simulates in the particleCloud? ', '270'))
-        self.simParameterDict['particleSizeRange'] = (float(self.CLI_dialg_num('Set smallest Particle Size', '.00002')), float(self.CLI_dialg_num('Set biggest Particel Size', '0.00016')))
-        self.simParameterDict['cloudRadius']       = float(self.CLI_dialg_num('Set radius of the Cloud', '0.0018'))
-     
-        print(self.simParameterDict)
-        self.setParameters()
-
-    def setParameters(self):
-        """
-        This function sets the user defined parameter to the according parameters in the different classes
-        needed to run the simulation
-        """
-        self.sps                          = self.simParameterDict['sps']
-        self.protoMove.mode               = self.simParameterDict['diveType']
-        self.protoMove.traLenSec          = self.simParameterDict['durSec']
-        self.environment.waterCurrentMode = self.simParameterDict['currentType']
-        if self.simParameterDict['currentType'] == 'static':
-            self.environment.waterCurrent     = self.simParameterDict['currentStaticVel']
-        self.environment.oceanDepth       = self.simParameterDict['oceanDepth']
-        self.environment.maxObstacles     = self.simParameterDict['amountOfObstacles']
-        self.pCloud.max_particles         = self.simParameterDict['max_particles']
-        self.pCloud.sizeRange             = self.simParameterDict['particleSizeRange']
-        self.pCloud.maxVectorMagnitude    = self.simParameterDict['cloudRadius']
-
+    #def userDefParametersCLI(self):
+    #    """
+    #    This function opens a command line interface, asking the user to set 9 parameters,
+    #    which are a needed to simulate specified seal dives.
+#
+    #    1. diveType, choosing between vShape and uShape dives
+    #    2. dive duration, defining the duration of the dive in seconds
+    #    3. currentType, choosing between static or interpolated currents
+    #    4. currentStaticVal, defining x,y,and z velocities for static currents
+    #    5. oceanDepth, setting the depth of the ocean
+    #    6. amount of Obstacles, setting the number of obstacles simulated in the enviornment
+    #    7. max_Particles, setting the number of particles simulated in the particleCloud
+    #    8. particleSizeRange, setting the lower and upper limits for the size of particles in mm ?
+    #    9. cloudRadius, setting the Radius of the particleCloud surrounding the seal_agent
+    #    Next, it sets the user defined parameters in the specidifc classes, needed for the 
+    #    simulation.
+    #    """
+    #    self.simParameterDict['sps']               = float(self.CLI_dialg_num('Set SPS', '20'))
+    #    self.simParameterDict['diveType']          = self.CLI_dialg_choiceText('What dive Type schould be simulated ?', 'vShape', ['uShape','vShape'])
+    #    self.simParameterDict['durSec']            = float(self.CLI_dialg_num('How long should the dive simulation last?', '240'))    
+    #    self.simParameterDict['currentType']       = self.CLI_dialg_choiceText('What kind of current should be simulates? ', 'static', ['static','interp'])
+    #    if self.simParameterDict['currentType'] == 'static':
+    #        current_X = float(self.CLI_dialg_num('Set x-velocity in m/s:','0.0'))
+    #        current_Y = float(self.CLI_dialg_num('Set y-velocity in m/s:','2.0'))
+    #        current_Z = float(self.CLI_dialg_num('Set z-velocity in m/s:','0.0'))
+    #        self.simParameterDict['currentStaticVel'] = (current_X,current_Y,current_Z)
+    #    else:
+    #        # add standard cases after intial tests
+    #        print("For the interpolated type, you need to define the different currents in a tetraheder or choose one of the standard cases")
+    #    self.simParameterDict['oceanDepth']        = float(self.CLI_dialg_num('Set a depth of the oceans', '-70'))
+    #    self.simParameterDict['amountOfObstacles'] = int(self.CLI_dialg_num('How many obstacle should be simulates in the environment? ', '100'))
+    #    self.simParameterDict['max_particles']     = int(self.CLI_dialg_num('How many particles should be simulates in the particleCloud? ', '270'))
+    #    self.simParameterDict['particleSizeRange'] = (float(self.CLI_dialg_num('Set smallest Particle Size', '.00002')), float(self.CLI_dialg_num('Set biggest Particel Size', '0.00016')))
+    #    self.simParameterDict['cloudRadius']       = float(self.CLI_dialg_num('Set radius of the Cloud', '0.0018'))
+    # 
+    #    print(self.simParameterDict)
+    #    self.setParameters()
+#
+    #def setParameters(self):
+    #    """
+    #    This function sets the user defined parameter to the according parameters in the different classes
+    #    needed to run the simulation
+    #    """
+    #    self.sps                          = self.simParameterDict['sps']
+    #    self.protoMove.mode               = self.simParameterDict['diveType']
+    #    self.protoMove.traLenSec          = self.simParameterDict['durSec']
+    #    self.environment.waterCurrentMode = self.simParameterDict['currentType']
+    #    if self.simParameterDict['currentType'] == 'static':
+    #        self.environment.waterCurrent     = self.simParameterDict['currentStaticVel']
+    #    self.environment.oceanDepth       = self.simParameterDict['oceanDepth']
+    #    self.environment.maxObstacles     = self.simParameterDict['amountOfObstacles']
+    #    self.pCloud.max_particles         = self.simParameterDict['max_particles']
+    #    self.pCloud.sizeRange             = self.simParameterDict['particleSizeRange']
+    #    self.pCloud.maxVectorMagnitude    = self.simParameterDict['cloudRadius']
+#
     def setParametersInRunTimeData(self):
 
         self.runTimeData.setParameter('sps', float(self.CLI_dialg_num('Set SPS', '20')))
