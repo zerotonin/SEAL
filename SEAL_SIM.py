@@ -46,6 +46,7 @@ class SEAL_SIM:
         """
         # public objects
         self.runTimeData = runTimeData.runTimeData(self)
+        self.setParametersInRunTimeData()
         # objects from other classes
         self.environment = environment.environment(self) # velocity in meter per second will be transformed into an evironment object
         self.seal        = seal_agent.Seal(self)
@@ -55,7 +56,7 @@ class SEAL_SIM:
         self.math        = utilities.mathUtils()
         self.protoMove   = protoMov.ProtMov(self)
         self.runTimeData = runTimeData.runTimeData(self)
-        self.sps         = self.runTimeData.getParameter('sps')
+        
         # private?
         self.sealVelTra = list()
         
@@ -67,6 +68,8 @@ class SEAL_SIM:
         @return velocity per sample
         """
         # THis function should be inherited
+        self.sps = self.runTimeData.getParameter('sps')
+
         return copy.deepcopy(np.array(velocity)/self.sps)
     
     #def simulate_sample(self):
