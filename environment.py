@@ -48,8 +48,6 @@ class environment:
         self.oceanSurface           = 0 # [m] linkable
         self.oceanDepth             = -70 # [m] linkable
         self.oceanLimit             = (-70,70) # [m] linkable
-        self.activeMovement         = True 
-        self.visible                = True 
         self.waterCurrent           = np.array([0.0,2.0,0.0]) # just a simple example will be changed later 
         self.waterCurrentMode       = 'static'
         self.obstacleList           = []
@@ -187,17 +185,17 @@ class environment:
         Those that are between 0 and -70[m] are moving according to the randomWalk function. Also, particles
         which position is the same as position of obsticles are not moving. 
         """
-        if self.visible == True:
+        if parObj.visible == True:
             if parObj.absPosition[2]<= self.oceanDepth:
-                self.activeMovement = False
+                parObj.activeMovement = False
             else: 
-                self.activeMovement = True
+                parObj.activeMovement = True
                 for obstacle in self.observableObstacleList:
                     particleObstacleDist = np.linalg.norm(parObj.absPosition[0:2]-obstacle[0]) #obstale[0] = (x,y) 
                     if particleObstacleDist <= obstacle[1]: #obstacle[1] = radius
                         parObj.activeMovement = False
         else:
-            self.activeMovement = False  
+            parObj.activeMovement = False  
            
     def particleStateCheck(self,parObj):
         """
