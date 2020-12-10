@@ -27,15 +27,18 @@ class Seal:
             the seal agend is actively moving while below the oceanSurface(z=0)
             and the oceanFloor(-70)
         """
-
+        # objects from other classes
         self.simObj                 = simObj
+        self.mathUtils              = mathUtils()
+        # public objects
         self.sealPosition           = np.zeros(shape = 3) #centre of the coordinate system of the Seal in disctance to (0,0,0) of world
         self.sealOrientation        = np.zeros(shape = 3)  # orientation as yaw pitch roll
         self.sealStep               = np.zeros(shape =6) # change of position and orientation
-        self.sealTrajectory         = list()
+        self.sealTrajectory         = list() # public??
+        # private objects
         self.activeSealMovement     = True
         self.trajectoryRecording    = False # usually set to false as the protMov class already creates an entire trajectory
-        self.mathUtils              = mathUtils()
+        
 
     def SealStateCheck(self):
         """
