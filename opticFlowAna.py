@@ -14,7 +14,7 @@ class opticFlowAnalysis:
     at any given timepoint during the dive. Additionally it plots optic flow field during single 
     seal steps.
     '''
-
+.
     def __init__(self,simObj):
         """
         this class takes the trajectroy data from the particles and seal_agent to analyze the optic flow
@@ -41,8 +41,9 @@ class opticFlowAnalysis:
         self.mathUtils      = mathUtils()
         self.particleList   = simObj.pCloud.partclObjList #mutable
         self.sealTrajectory = simObj.seal.sealTrajectory #mutable
-        self.anaDataList  = list()
-        self.distRankDiff = list()
+        self.anaDataList    = list()
+        self.distRankDiff   = list()
+        self.traLen         =self.simObj.protoMove.traLen #mutable
     
     def createOpticFlow(self,frame):
         """
@@ -125,7 +126,7 @@ class opticFlowAnalysis:
         for this seal step the median error of all particles will be our quality value
         R = norm(phi1_-phi_0, z_1-z_0)
         """
-        for frameI in tqdm(range(self.simObj.protoMove.traLen-1),desc='calculating OF'):
+        for frameI in tqdm(range(self.traLen-1),desc='calculating OF'):
             distTrueList  = list()
             distOFestList = list()
             partCylList   = list()
