@@ -52,16 +52,33 @@ class ProtMov:
             in this case the straight phase is defined by a length of zero
             samples since it is not present in vShaped dives. 
         """
-        self.simObj       = simObj
-        self.sps          = simObj.sps #shorthand LINKED
-        self.oceanDepth   = simObj.environment.oceanDepth #shorthand LINKED
-        self.mathUtils    = mathUtils()
-        self.origDiveFPS  = 0.2 # the orginal data was recorded every 5th second 
-        self.origVideoFPS = 25 # video fps of the original footage
-        self.traIDX       = []
-        self.mode         = 'random'
-        self.traLenSec    = 240
-        self.traLen       = self.traLenSec*self.sps 
+        self.simObj        = simObj
+        self.sps           = simObj.sps #shorthand LINKED
+        self.oceanDepth    = simObj.environment.oceanDepth #shorthand LINKED
+        self.mathUtils     = mathUtils()
+        self.origDiveFPS   = 0.2 # the orginal data was recorded every 5th second 
+        self.origVideoFPS  = 25 # video fps of the original footage
+        self.traIDX        = []
+        self.pmIDX         = []
+        self.mode          = 'random'
+        self.traLenSec     = 240
+        self.traLen        = self.traLenSec*self.sps 
+        self.thrust        = []
+        self.slip          = []
+        self.yaw           = []
+        self.yawAngle      = []
+        self.zProfile      = []
+        self.pitchAngle    = []
+        self.xProfile      = np.zeros(shape=(self.traLen,))
+        self.yProfile      = np.zeros(shape=(self.traLen,))  
+        self.posTrajectory = ??
+        self.positions     = positions
+        self.angles        = angles 
+        self.sealHeading   = list()
+        self.xheading      = list()
+        self.yheading      = list()
+        self.zheading      = list()
+
 
         # dive phases are keywords for a tupel consisting of 0) duration normalised to total duration
         # 1) mean pitch angle [deg]  2)  standard deviation of the mean [deg] 3)  mean z-profil [m/s]
@@ -132,8 +149,8 @@ class ProtMov:
         This function creates the x and y profiles by rotating the 2D thrust and slip vector with 
         a rotation matrix of yaw.
         """
-        self.xProfile = np.zeros(shape=(self.traLen,))
-        self.yProfile = np.zeros(shape=(self.traLen,))
+        
+        
  
         for frameI in range(self.traLen-1):
             temp = self.mathUtils.agentBasedVels2worldBasedCoords(
@@ -348,13 +365,11 @@ class ProtMov:
         This function creats a 3D heading vector by rotating the 
         heading vector by the thrust pitch and roll angles.
         """
-        
-        sealHeading =list()
         for frameI in range(self.angles.shape[0]):
 
-            sealHeading.append(self.mathUtils.agentBasedVels2worldBasedCoords(headingVector,self.angles[frameI,:],'3D')) 
+            self.sealHeading.append(self.mathUtils.agentBasedVels2worldBasedCoords(headingVector,self.angles[frameI,:],'3D')) 
             
-        self.sealHeading = np.array(sealHeading)
+        self.sealHeading = np.array(self.sealHeading)
         #print(self.sealHeading[0:10])
         #print(len(self.sealHeading)) #is 60001 this is too big 
         self.xheading = self.sealHeading[0]
