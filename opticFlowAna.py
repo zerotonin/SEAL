@@ -176,7 +176,7 @@ class opticFlowAnalysis:
 
         @return array of cartisian coordinates
         """
-        r, phi, z = cs.cart2sp(x=cartPosition[0], y=cartPosition[1], z=cartPosition[2])
+        r, phi, z = cs.cart2cyl(x=cartPosition[0], y=cartPosition[1], z=cartPosition[2])
 
         return np.array([r, phi, z]) 
 
