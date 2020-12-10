@@ -34,6 +34,7 @@ class runTimeData:
         '''
         if parameterName == 'sps':
             self.sps = parameterValue
+            self.traLen = self.durSec*self.sps
         elif parameterName == 'oceanSurface':
             self.oceanSurface = parameterValue
         elif parameterName == 'oceanDepth':
@@ -60,6 +61,7 @@ class runTimeData:
             self.diveType  = parameterValue
         elif parameterName == 'durSec':
             self.durSec  = parameterValue
+            self.traLen = self.durSec*self.sps
         elif parameterName == 'currentType':
             self.currentType  = parameterValue
         elif parameterName == 'currentStaticVel':
