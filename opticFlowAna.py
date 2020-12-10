@@ -14,7 +14,7 @@ class opticFlowAnalysis:
     at any given timepoint during the dive. Additionally it plots optic flow field during single 
     seal steps.
     '''
-.
+
     def __init__(self,simObj):
         """
         this class takes the trajectroy data from the particles and seal_agent to analyze the optic flow
