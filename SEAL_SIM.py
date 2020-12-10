@@ -1,4 +1,4 @@
-import turbidity, seal_agent,copy,environment,utilities,protoMov
+import turbidity, seal_agent,copy,environment,utilities,protoMov, runTimeData
 from tqdm import tqdm
 import numpy as np
 
@@ -45,7 +45,8 @@ class SEAL_SIM:
             the created seal trajectories in the protomov class are stored in a list
         """
         # public objects
-        self.simParameterDict = {'diveType'          : 'vShape', # description and unit if av
+        self.simParameterDict = {'sps'               : 20
+                                 'diveType'          : 'vShape', # description and unit if av
                                  'durSec'            : 240, # duration of the simulation in seconds
                                  'currentType'       : 'static',
                                  'currentStaticVel'  : (0.0,2.0,0.0),
@@ -55,7 +56,7 @@ class SEAL_SIM:
                                  'particleSizeRange' : (.00002,0.00016),
                                  'cloudRadius'       : 0.0018, 
                                  }
-        self.sps         = 200 # samples per second
+        self.sps         = 20 # samples per second
         # objects from other classes
         self.environment = environment.environment(self) # velocity in meter per second will be transformed into an evironment object
         self.seal        = seal_agent.Seal(self)
@@ -64,6 +65,7 @@ class SEAL_SIM:
         self.plot        = utilities.plotUtils()
         self.math        = utilities.mathUtils()
         self.protoMove   = protoMov.ProtMov(self)
+        self.runTimeData = runTimeData.runTimeData(self)
         # private?
         self.sealVelTra = list()
         
@@ -144,6 +146,7 @@ class SEAL_SIM:
         Next, it sets the user defined parameters in the specidifc classes, needed for the 
         simulation.
         """
+        self.simParameterDict['sps']               = float(self.CLI_dialg_num('Set SPS', '20'))
         self.simParameterDict['diveType']          = self.CLI_dialg_choiceText('What dive Type schould be simulated ?', 'vShape', ['uShape','vShape'])
         self.simParameterDict['durSec']            = float(self.CLI_dialg_num('How long should the dive simulation last?', '240'))    
         self.simParameterDict['currentType']       = self.CLI_dialg_choiceText('What kind of current should be simulates? ', 'static', ['static','interp'])
@@ -179,6 +182,9 @@ class SEAL_SIM:
         self.pCloud.max_particles         = self.simParameterDict['max_particles']
         self.pCloud.sizeRange             = self.simParameterDict['particleSizeRange']
         self.pCloud.maxVectorMagnitude    = self.simParameterDict['cloudRadius']
+
+    def setParametersinRunTimeData(self):
+
         
     def CLI_dialg_choiceText(self,question,default = False,answers=["yes","no"]):
         """
