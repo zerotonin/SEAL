@@ -192,7 +192,7 @@ class SEAL_SIM:
         self.runTimeData.setParameter('currentType',self.CLI_dialg_choiceText('What kind of current should be sim)ulates? ', 'static', ['static','interp']))
         if self.runTimeData.currentType == 'static':
             current_X = float(self.CLI_dialg_num('Set x-velocity in m/s:','0.0'))
-            current_Y = float(self.CLI_dialg_num('Set y-velocity in m/s:','2.0'))
+            current_Y = float(self.CLI_dialg_num('Set y-velocity in m/s:','0.1'))
             current_Z = float(self.CLI_dialg_num('Set z-velocity in m/s:','0.0'))
             self.runTimeData.setParameter('currentStaticVel', (current_X,current_Y,current_Z))
         else:
