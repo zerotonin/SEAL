@@ -45,18 +45,7 @@ class SEAL_SIM:
             the created seal trajectories in the protomov class are stored in a list
         """
         # public objects
-        self.simParameterDict = {'sps'               : 20,
-                                 'diveType'          : 'vShape', # description and unit if av
-                                 'durSec'            : 240, # duration of the simulation in seconds
-                                 'currentType'       : 'static',
-                                 'currentStaticVel'  : (0.0,2.0,0.0),
-                                 'oceanDepth'        : -70,
-                                 'amountOfObstacles' : 100,
-                                 'max_particles'     : 270,
-                                 'particleSizeRange' : (.00002,0.00016),
-                                 'cloudRadius'       : 0.0018, 
-                                 }
-        self.sps         = 20 # samples per second
+        self.runTimeData = runTimeData.runTimeData(self)
         # objects from other classes
         self.environment = environment.environment(self) # velocity in meter per second will be transformed into an evironment object
         self.seal        = seal_agent.Seal(self)
@@ -105,24 +94,31 @@ class SEAL_SIM:
         are saved.
         """
         #set environment and particle cloud
-        self.setParameters()
+        #self.setParameters()
+        self.setParametersInRunTimeData()
         self.environment.creatObstacles() #create obstacle if maxObsticales >0
         #get trajectory
         self.protoMove.generator2()
         # set the seal class to the trajectories of the protoMove class
-        self.sealVelTra = self.protoMove.velTra # steps needed for movement
-        self.seal.sealTrajectory  = self.protoMove.posTrajectory # save trajectory to avoid trajectory recording by seal class
-        self.seal.sealPosition    = copy.deepcopy(self.protoMove.posTrajectory[0,0:3]) # get initial value
-        self.seal.sealOrientation = copy.deepcopy(self.protoMove.posTrajectory[0,3:])  # get initial value
+        self.sealVelTra = self.runTimeData.getParameter('velTra') # steps needed for movement
+        self.runTimeData.setParameter('sealTrajectory',self.protoMove.posTrajectory)
+        #self.seal.sealTrajectory  = self.protoMove.posTrajectory # save trajectory to avoid trajectory recording by seal class
+        self.runTimeData.setParameter('sealPosition', copy.deepcopy(self.protoMove.posTrajectory[0,0:3]))
+        self.runTimeData.setParameter('sealOrientation', copy.deepcopy(self.protoMove.posTrajectory[0,3:]))        
+        #self.seal.sealPosition    = copy.deepcopy(self.protoMove.posTrajectory[0,0:3]) # get initial value
+        #self.seal.sealOrientation = copy.deepcopy(self.protoMove.posTrajectory[0,3:])  # get initial value
         #run trajectory through particle cloud
         for step in tqdm(self.sealVelTra,'running simulation'):
             # get a step from the step trajectory
-            self.seal.sealStep = step
+            #self.seal.sealStep = step
+            self.runTimeData.setParameter('sealStep', step)
             # at this time point the seal has its old position but a new step
             # so let's move the particles accordingly
+            
             self.pCloud.moveParticles()
             # move the seal to new position
             self.seal.MoveSeal()
+
             # check if the seal left the environment
             if self.seal.activeSealMovement == False:
                 print("Seal left simulation environment! o.O")

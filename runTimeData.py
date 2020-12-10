@@ -10,25 +10,22 @@ class runTimeData:
         self.oceanDepth             = -70 # [m] linkable
         self.oceanLimit             = (-70,70) # [m] linkable
         self.waterCurrent           = np.array([0.0,0.1,0.0]) # just a simple example will be changed later 
-        #self.waterCurrentMode       = 'static' # static or interpolated
         self.maxObstacles           = 200
-        #self.mode                   = 'vShape' # needed when using self.divetype?
-        #self.traLenSec              = 240 # needed when using self.durSec?
-        self.traLen                 = self.traLenSec*self.sps # number of samples
+        self.durSec                 = 240 # duration of,
+        self.traLen                 = self.durSec*self.sps # number of samples
         self.velTra                 = list() # list of sealTrajectory per sample with (thrust,slip,lift,yaw,pitch,roll)        
         self.sealPosition           = np.zeros(shape = 3) #centre of the coordinate system of the Seal in disctance to (0,0,0) of world
         self.sealOrientation        = np.zeros(shape = 3)  # orientation as yaw pitch roll
         self.sealStep               = np.zeros(shape =6) # change of position and orientation
         self.sealTrajectory         = list() # public??
-        self.diveType               = 'vShape', # descri
-        self.durSec                 = 240, # duration of,
+        self.diveType               = 'vShape' # descri
         self.currentType            = 'static'
-        self.currentStaticVel       = (0.0,2.0,0.0),
-        self.oceanDepth             = -70,
-        self.amountOfObstacles      = 100,
-        self.max_particles          = 270,
-        self.particleSizeRange      = (.00002,0.00016),
-        self.cloudRadius            = 0.0018, 
+        self.currentStaticVel       = (0.0,2.0,0.0)
+        self.oceanDepth             = -70
+        self.amountOfObstacles      = 100
+        self.max_particles          = 270
+        self.particleSizeRange      = (.00002,0.00016)
+        self.cloudRadius            = 0.0018
 
     def setParameter(self, parameterName, parameterValue):
         ''' 
@@ -45,13 +42,11 @@ class runTimeData:
             self.oceanLimit = parameterValue
         elif parameterName == 'waterCurrent':
             self.waterCurrent = parameterValue
-        elif parameterName == 'waterCurrentMode':
-            self.waterCurrentMode = parameterValue
         elif parameterName == 'maxObstacles':
             self.maxObstacles = parameterValue
         elif parameterName == 'traLen':
             self.traLen = parameterValue
-        elif parameterName == 'velTra ':
+        elif parameterName == 'velTra':
             self.velTra  = parameterValue
         elif parameterName == 'sealPosition':
             self.sealPosition = parameterValue
@@ -80,7 +75,7 @@ class runTimeData:
         elif parameterName == 'cloudRadius':
             self.cloudRadius  = parameterValue
         else:
-            print('unknown parameter')
+            print('set unknown parameter'+str(parameterName))
 
     def getParameter(self,parameterName):
         '''
@@ -95,13 +90,11 @@ class runTimeData:
             return self.oceanLimit 
         elif parameterName == 'waterCurrent':
             return self.waterCurrent
-        elif parameterName == 'waterCurrentMode':
-            return self.waterCurrentMode 
         elif parameterName == 'maxObstacles':
             return self.maxObstacles 
         elif parameterName == 'traLen':
             return self.traLen 
-        elif parameterName == 'velTra ':
+        elif parameterName == 'velTra':
             return self.velTra  
         elif parameterName == 'sealPosition':
             return self.sealPosition 
@@ -130,7 +123,7 @@ class runTimeData:
         elif parameterName == 'cloudRadius':
             return self.cloudRadius  
         else:
-            print('unknown parameter')
+            print('get unknown parameter'+str(parameterName))
 
 
 

@@ -48,7 +48,7 @@ class Particle:
         """
         # objects from other classes
         self.cloudObj       = cloudObj # particles form cloud object
-        self.samplesPerSec  = self.cloudObj.simObj.sps #samples per second
+        self.samplesPerSec  = self.cloudObj.simObj.runTimeData.getParameter('sps') #samples per second
         self.size           = size # radius of the particles [µm]
         self.position       = position # tuple consisting of three coordinates x,y,z
         # private objects
@@ -248,15 +248,15 @@ class Cloud:
         """
         self.simObj            = simObj # string name
         #from simulation parameters dictionary
-        self.max_particles      = self.simObj.simParameterDict['max_particles'] # integer number of particles 
-        self.sizeRange          = self.simObj.simParameterDict['particleSizeRange'] # tuple with the min and max radius[µm]
-        self.maxVectorMagnitude = self.simObj.simParameterDict['cloudRadius'] # max radius of a cloud
+        self.max_particles      = (self.simObj.runTimeData.getParameter('max_particles') # integer number of particles )
+        self.sizeRange          = self.simObj.runTimeData.getParameter('particleSizeRange') # tuple with the min and max radius[µm]
+        self.maxVectorMagnitude = self.simObj.runTimeData.getParameter('cloudRadius') # max radius of a cloud
         #from seal object of the simulation object
-        self.sealStep          = self.simObj.seal.sealStep # change of position and orientation
-        self.sealPosition      = self.simObj.seal.sealPosition # change of position and orientation
+        self.sealStep          = self.simObj.runTimeData.getParameter('sealStep') # change of position and orientation
+        self.sealPosition      = self.simObj.runTimeData.getParameter('sealPosition') # change of position and orientation
         
-        self.partclObjList     = [] # list of particle objects
-        self.waterCurrent      = np.zeros(shape=3) # water current 
+        self.partclObjList     = [] # list of particle objects???
+        self.waterCurrent      = self.simObj.runTimeData.getParameter('waterCurrent') # water current 
     
     def add_particles(self):
         """
@@ -326,8 +326,8 @@ class Cloud:
         """    
         #update water current
         self.waterCurrent = self.simObj.environment.getWaterCurrent()
-        self.sealPosition = self.simObj.seal.sealPosition
-        self.sealStep     = self.simObj.seal.sealStep
+        self.sealPosition = self.simObj.runTimeData.getParameter('sealPosition')
+        self.sealStep     = self.simObj.runTimeData.getParameter('sealStep')
         for pObject in self.partclObjList:
             # transform from meter per second to meter per sample
             presentSealStep    = self.simObj.meterPerSecond2meterPerSample(self.sealStep)

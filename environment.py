@@ -48,12 +48,12 @@ class environment:
         self.simObj                 = simObj #name
         self.sealPosition           = None
         # public objects
-        self.oceanSurface           = 0 # [m] linkable
-        self.oceanDepth             = -70 # [m] linkable
-        self.oceanLimit             = (-70,70) # [m] linkable
-        self.waterCurrent           = np.array([0.0,2.0,0.0]) # just a simple example will be changed later 
-        self.waterCurrentMode       = 'static'
-        self.maxObstacles           = 200
+        self.oceanSurface           = self.simObj.runTimeData.getParameter('oceanSurface') # [m] linkable
+        self.oceanDepth             = self.simObj.runTimeData.getParameter('oceanDepth') # [m] linkable
+        self.oceanLimit             = self.simObj.runTimeData.getParameter('oceanLimit') # [m] linkable
+        self.waterCurrent           = self.simObj.runTimeData.getParameter('waterCurrent') # just a simple example will be changed later 
+        self.waterCurrentMode       = self.simObj.runTimeData.getParameter('currentType')
+        self.maxObstacles           = self.simObj.runTimeData.getParameter('amountOfObstacles')
         # privates objects
         self.obstacleList           = []
         self.observableObstacleList = []
@@ -127,7 +127,7 @@ class environment:
         This function calcuates the waterCurrent at the sealPosition based
         on the interpolated current matrix created in setCurrents.
         """
-        self.sealPosition = self.simObj.seal.sealPosition
+        self.sealPosition = self.simObj.runTimeData.getParameter('sealPosition')
 
         self.waterCurrent = np.array([self.waterCurrentFunc[0]((self.sealPosition[0],self.sealPosition[1],self.sealPosition[2])),
                                       self.waterCurrentFunc[1]((self.sealPosition[0],self.sealPosition[1],self.sealPosition[2])),

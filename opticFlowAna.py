@@ -40,7 +40,7 @@ class opticFlowAnalysis:
         self.simObj         = simObj
         self.mathUtils      = mathUtils()
         self.particleList   = simObj.pCloud.partclObjList #mutable
-        self.sealTrajectory = simObj.seal.sealTrajectory #mutable
+        self.sealTrajectory = simObj.runTimeData.getParameter('sealTrajectory') #mutable
         self.anaDataList    = list()
         self.distRankDiff   = list()
         self.traLen         =self.simObj.protoMove.traLen #mutable

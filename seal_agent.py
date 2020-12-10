@@ -31,10 +31,10 @@ class Seal:
         self.simObj                 = simObj
         self.mathUtils              = mathUtils()
         # public objects
-        self.sealPosition           = np.zeros(shape = 3) #centre of the coordinate system of the Seal in disctance to (0,0,0) of world
-        self.sealOrientation        = np.zeros(shape = 3)  # orientation as yaw pitch roll
-        self.sealStep               = np.zeros(shape =6) # change of position and orientation
-        self.sealTrajectory         = list() # public??
+        self.sealPosition           = simObj.runTimeData.getParameter('sealPosition') #centre of the coordinate system of the Seal in disctance to (0,0,0) of world
+        self.sealOrientation        = simObj.runTimeData.getParameter('sealOrientation')  # orientation as yaw pitch roll
+        self.sealStep               = simObj.runTimeData.getParameter('sealStep') # change of position and orientation
+        self.sealTrajectory         = simObj.runTimeData.getParameter('sealTrajectory') # public??
         # private objects
         self.activeSealMovement     = True
         self.trajectoryRecording    = False # usually set to false as the protMov class already creates an entire trajectory
@@ -100,15 +100,19 @@ class Seal:
         if self.activeSealMovement == True:
 
             # calculate m/s to m/sample
+            self.sealStep = self.simObj.runTimeData.getParameter('sealStep')
             presentStep = self.simObj.meterPerSecond2meterPerSample(self.sealStep)
             
             self.sealPosition += self.mathUtils.agentBasedVels2worldBasedCoords(presentStep[0:3],self.sealOrientation,'3D') # new Seal Position after one sealStep/Movement
-            self.sealOrientation += presentStep[3:6] # new sealOrientation after each sealStep (should be the same as during the   step?)
+            self.simObj.runTimeData.setParameter('sealPosition', self.sealPosition)
+            self.sealOrientation += presentStep[3:6] # new sealOrientation after each sealStep (should be the same as during the   step?
+            self.simObj.runTimeData.setParameter('sealOrientation', self.sealOrientation)
             
             SealOrientation = copy.deepcopy(self.sealOrientation)
             SealPosition = copy.deepcopy(self.sealPosition)
             
             if self.trajectoryRecording == True:            
                 self.sealTrajectory.append(np.hstack((SealPosition,SealOrientation)))
+                self.simObj.runTimeData.setParameter('sealTrajectory',self.sealTrajectory)
         else :
             self.activeSealMovement = False

@@ -58,15 +58,15 @@ class ProtMov:
         self.oceanDepth    = simObj.environment.oceanDepth #shorthand LINKED
         self.mathUtils     = mathUtils()
         # public objects
-        self.mode          = 'random'
-        self.traLenSec     = 240
+        self.mode          = simObj.runTimeData.getParameter('diveType')
+        self.traLenSec     = simObj.runTimeData.getParameter('durSec')
         self.traLen        = self.traLenSec*self.sps 
-        self.velTra = list()
+        self.velTra        = simObj.runTimeData.getParameter('velTra')
         # private objects
         self.origDiveFPS   = 0.2 # the orginal data was recorded every 5th second 
         self.origVideoFPS  = 25 # video fps of the original footage
         self.traIDX        = []
-        self.pmIDX         = []
+        self.pmIDX         = []  
         self.thrust        = []
         self.slip          = []
         self.yaw           = []
@@ -197,6 +197,7 @@ class ProtMov:
             self.velTra.append(np.hstack((transVel,rotVel)))
             
         self.velTra = np.array(self.velTra)
+        self.simObj.runTimeData.setParameter('velTra', self.velTra)
     
     def getPositionAndAngelTrajectoryFromVelTrajectory(self):
         """
