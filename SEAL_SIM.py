@@ -9,7 +9,9 @@ class SEAL_SIM:
     an output it saves a sealVelTra list with the trajectroies of the seal-agent throughout the 
     dive simulation and the simulation parameter dictionary saving all usere settings for the simulation
     """
-    def __init__(self):
+    def __init__(self,mode,spsInt=20,diveTypeStr='vShape',durSecFloat=240.0,currentTypeStr='static',currentStaticVelTuple=(1.0,0.0,0.0),
+                      oceanDepthFloat=-70.0,amountOfObstaclesInt=0,maxParticlesInt=260,particleSizeRangeTuple=(0.00002,0.00016),
+                      cloudRadiusFloat=0.0018):
         """
         This function initialises the sample per seconds,and connects the environment class, 
         the particle class, the particle cloud class , the seal agent class and the protoMov class,
@@ -43,18 +45,29 @@ class SEAL_SIM:
             protomov.py
         @param sealVelTra           ? default:none
             the created seal trajectories in the protomov class are stored in a list
+        @param mode
         """
         # public objects
         self.runTimeData = runTimeData.runTimeData(self)
-        self.setParametersInRunTimeData()
-        # objects from other classes
-        self.environment = environment.environment(self) # velocity in meter per second will be transformed into an evironment object
-        self.seal        = seal_agent.Seal(self)
-        self.pCloud      = turbidity.Cloud(self)
-        self.pCloud.add_particles()
-        self.plot        = utilities.plotUtils()
-        self.math        = utilities.mathUtils()
-        self.protoMove   = protoMov.ProtMov(self)
+
+        if mode == 'verbose':
+            self.setParametersInRunTimeDataCLI()
+        elif mode == 'headless':
+            self.setParameters(spsInt,diveTypeStr,durSecFloat,currentTypeStr,currentStaticVelTuple,
+                      oceanDepthFloat,amountOfObstaclesInt,maxParticlesInt,particleSizeRangeTuple,
+                      cloudRadiusFloat)
+        else:
+            raise ValueError('Unknown simulation input mode' + str(mode))
+
+        # objects from other classes, which are initialised at the beginning of a simulation
+        # This is done so that the user can set parameteres dynamically before starting the 
+        # simulation
+        self.environment = None 
+        self.seal        = None
+        self.pCloud      = None
+        self.plot        = None
+        self.math        = None
+        self.protoMove   = None
         
         # private?
         self.sealVelTra = list()
@@ -71,6 +84,28 @@ class SEAL_SIM:
 
         return copy.deepcopy(np.array(velocity)/self.sps)
     
+    def initSimulationObjects(self):
+        self.environment = environment.environment(self) # velocity in meter per second will be transformed into an evironment object
+        self.seal        = seal_agent.Seal(self)
+        self.pCloud      = turbidity.Cloud(self)
+        self.pCloud.add_particles()
+        self.plot        = utilities.plotUtils()
+        self.math        = utilities.mathUtils()
+        self.protoMove   = protoMov.ProtMov(self)
+    
+    def setParameters(self,spsInt,diveTypeStr,durSecFloat,currentTypeStr,currentStaticVelTuple,
+                      oceanDepthFloat,amountOfObstaclesInt,maxParticlesInt,particleSizeRangeTuple,
+                      cloudRadiusFloat):
+        self.runTimeData.setParameter('sps', spsInt)
+        self.runTimeData.setParameter('diveType',diveTypeStr)
+        self.runTimeData.setParameter('durSec',durSecFloat)    
+        self.runTimeData.setParameter('currentType',currentTypeStr)
+        self.runTimeData.setParameter('currentStaticVel', currentStaticVelTuple)
+        self.runTimeData.setParameter('oceanDepth',oceanDepthFloat)
+        self.runTimeData.setParameter('amountOfObstacles',amountOfObstaclesInt)
+        self.runTimeData.setParameter('max_particles',maxParticlesInt)
+        self.runTimeData.setParameter('particleSizeRange',particleSizeRangeTuple)
+        self.runTimeData.setParameter('cloudRadius',cloudRadiusFloat)
     #def simulate_sample(self):
     #    """
     #    can be deleted ? wAS JUST TO TRY THE SIMULATION
@@ -96,6 +131,8 @@ class SEAL_SIM:
         in the particle Cloud are moving in the opposite direction and the particle positons 
         are saved.
         """
+        # build new onjects based on the parameters of the runTimeDataObject
+        self.initSimulationObjects()
         #set environment and particle cloud
         #self.setParameters()
         self.environment.creatObstacles() #create obstacle if maxObsticales >0
@@ -182,7 +219,7 @@ class SEAL_SIM:
     #    self.pCloud.sizeRange             = self.simParameterDict['particleSizeRange']
     #    self.pCloud.maxVectorMagnitude    = self.simParameterDict['cloudRadius']
 #
-    def setParametersInRunTimeData(self):
+    def setParametersInRunTimeDataCLI(self):
 
         self.runTimeData.setParameter('sps', float(self.CLI_dialg_num('Set SPS', '20')))
         self.runTimeData.setParameter('diveType',self.CLI_dialg_choiceText('What dive Type schould be simulated ?', 'vShape', ['uShape','vShape']))

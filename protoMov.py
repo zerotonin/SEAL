@@ -121,8 +121,7 @@ class ProtMov:
         elif self.mode == 'vShape':
             currentDive = copy.deepcopy(self.diveShapeV)
         else:
-            print('Unkown dive type: ' + self.mode)
-            raise ValueError  # shorthand for 'raise ValueError()'
+            raise ValueError('Unkown dive type: ' + self.mode)  # shorthand for 'raise ValueError()'
 
         # create a HMM based trajectory for thrust slip and yaw VELOCITIES!
         # the resulting data is already in meters per sample
