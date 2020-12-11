@@ -1,5 +1,6 @@
 
 import numpy as np
+import pickle
 class runTimeData:
     '''
     '''
@@ -126,6 +127,16 @@ class runTimeData:
             return self.cloudRadius  
         else:
             print('get unknown parameter'+str(parameterName))
+    
+    def packToWriteOut(self):
+        self.partclObjList = self.simObj.pCloud.partclObjList
+    
+    def writeOutPickle(self,filename):
+        self.packToWriteOut()
+        fileHandler = open(filename,'wb')
+        pickle.dump(self,fileHandler)
+
+    
 
 
 
