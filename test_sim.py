@@ -21,42 +21,66 @@ currentSys[6,:] = [8,0,0]
 currentSys[7,:] = [5,7,0]     
 
 simObj.environment.setCurrents(currentSys)
-
+##########################################################################################
 # run Simulation with user settings
 
 from importlib import reload 
-import SEAL_SIM, opticFlowAna
+import utilities as util
+import SEAL_SIM
+import opticFlowAna
 import numpy as np 
 import matplotlib.pyplot as plt 
 from mpl_toolkits.mplot3d import Axes3D 
 reload(SEAL_SIM)
 reload(opticFlowAna)
-simObj = SEAL_SIM.SEAL_SIM()
+simObj = SEAL_SIM.SEAL_SIM('headless',spsInt=100, durSecFloat=30, currentStaticVelTuple=(0.0,0.0,0.0)) 
 #simObj.userDefParametersCLI()
 simObj.runSimulation()
 
- 
+#########################################################################################
+# plot particleCloud
+############################################################################################
+pU = util.plotUtils()
+pU.plot3D_positionSizeColorCoded(100,0,simObj.pCloud.partclObjList )
+pU.plot3D_positionSizeColorCoded(100,1,simObj.pCloud.partclObjList )
+
+###########################################################################################
+# plot OpticFlowAna in 2D
+###########################################################################################
+
+O = opticFlowAna.opticFlowAnalysis(simObj)
+O.opticFlowAbility()
+O.plot2DparticleDist(100)
+O.createOpticFlow(100)
+
+#########################################################################################
+#plotSealTrajectory
+#########################################################################################
+simObj.protoMove.getPositionAndAngelTrajectoryFromVelTrajectory()
+simObj.protoMove.getSealHeading()
+
 fig = plt.figure() 
 ax = fig.add_subplot(111, projection='3d') 
-for data in [simObj.protoMove.posTrajectory, np.array(simObj.seal.sealTrajectory)]:
+for data in [simObj.protoMove.posTrajectory, np.array(simObj.runTimeData.sealTrajectory)]:
     ax.plot(list(data[:,0]),list(data[:,1]),list(data[:,2]))
     ax.scatter3D(data[0,0],data[0,1],data[0,2], color = 'green')
     ax.scatter3D(data[-1,0],data[-1,1],data[-1,2], color = 'red')
+#plt.show()     
+
+frames4Quiver = range(simObj.runTimeData.traLen)
+for i in  frames4Quiver[0::5]:
+    X = simObj.protoMove.xProfile[i]
+    Y = simObj.protoMove.yProfile[i]
+    Z = simObj.protoMove.zProfile[i]
+    U = simObj.protoMove.sealHeading[i,0] 
+    V = simObj.protoMove.sealHeading[i,1] 
+    W = simObj.protoMove.sealHeading[i,2] 
+    ax.quiver(X,Y,Z,U*.1,V*.1,W*.1)
 plt.show()     
 
-    frames4Quiver = range(P.traLen)
-    for i in  frames4Quiver[0::5]:
-
-        X = P.xProfile[i]
-        Y = P.yProfile[i]
-        Z = P.zProfile[i]
-        U = P.sealHeading[i,0] 
-        V = P.sealHeading[i,1] 
-        W = P.sealHeading[i,2] 
-        ax.quiver(X,Y,Z,U*.1,V*.1,W*.1)
-plt.show()     
-
-simObj.protoMove.getPositionAndAngelTrajectoryFromVelTrajectory()
+##############################################################################################
+# check all velocities
+##############################################################################################
 
 sealPos = np.vstack(simObj.seal.sealTrajectory)
 
