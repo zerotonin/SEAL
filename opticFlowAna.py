@@ -61,7 +61,7 @@ class opticFlowAnalysis:
                 Y = self.anaDataList[frame][2][i][0][2] # z
                 U = direct[0] # phi direction
                 V = direct[1] # z direction
-                ax.quiver(X,Y,U,V, angles ='xy',scale_units='xy', scale =1)
+                ax.quiver(X,Y,U,V,angles ='xy',scale_units='xy', scale =1,width=0.001)
             else:
                 pass
             
@@ -177,7 +177,7 @@ class opticFlowAnalysis:
 
         @return array of cartisian coordinates
         """
-        r, phi, z = cs.cart2cyl(x=cartPosition[0], y=cartPosition[1], z=cartPosition[2])
+        r, phi, z = cs.cart2sp(x=cartPosition[0], y=cartPosition[1], z=cartPosition[2])
 
         return np.array([r, phi, z]) 
 
