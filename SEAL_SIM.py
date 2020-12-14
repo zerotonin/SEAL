@@ -144,8 +144,8 @@ class SEAL_SIM:
         #self.seal.sealTrajectory  = self.protoMove.posTrajectory # save trajectory to avoid trajectory recording by seal class
         self.runTimeData.setParameter('sealPosition', copy.deepcopy(self.protoMove.posTrajectory[0,0:3]))
         self.runTimeData.setParameter('sealOrientation', copy.deepcopy(self.protoMove.posTrajectory[0,3:]))        
-        #self.seal.sealPosition    = copy.deepcopy(self.protoMove.posTrajectory[0,0:3]) # get initial value
-        #self.seal.sealOrientation = copy.deepcopy(self.protoMove.posTrajectory[0,3:])  # get initial value
+        self.seal.sealPosition    = copy.deepcopy(self.protoMove.posTrajectory[0,0:3]) # get initial value
+        self.seal.sealOrientation = copy.deepcopy(self.protoMove.posTrajectory[0,3:])  # get initial value
         #run trajectory through particle cloud
         for step in tqdm(self.sealVelTra,'running simulation'):
             # get a step from the step trajectory
