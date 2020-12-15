@@ -175,7 +175,9 @@ class runTimeData:
         fileHandler = open(filename,'wb')
         pickle.dump(self,fileHandler)
 
-    
+    def writeOutYaml(self):
+        pass
+        # sealTra, particleTra, Paramater aus init
 
 
 
