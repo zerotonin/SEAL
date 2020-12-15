@@ -62,6 +62,7 @@ class plotUtils:
         fig.show()
 
     def plot3D_positionsMovement(self,frame,partclObjList):
+
         preCoordinates = self.particleObjList2CoordList(frame, 0, partclObjList)
         postCoordinates = self.particleObjList2CoordList(frame, 1, partclObjList)
         fig,ax = self.makeSquare3DAxis()
@@ -70,8 +71,30 @@ class plotUtils:
         ax.set_xlabel('X')
         ax.set_ylabel('Y')
         ax.set_zlabel('Depth (m)')
-        fig.show()
+        fig.show()       
+
     
+    def plot3D_OF(self,frame,partclObjList):
+ 
+        preCoordinates = self.particleObjList2CoordList(frame, 0, partclObjList)
+        postCoordinates = self.particleObjList2CoordList(frame, 1, partclObjList)
+        direct =  np.subtract(postCoordinates,preCoordinates)
+        fig,ax = self.makeSquare3DAxis()
+        h = ax.scatter3D(preCoordinates[0], preCoordinates[1], preCoordinates[2], color='red')
+        h = ax.scatter3D(postCoordinates[0], postCoordinates[1], postCoordinates[2], color='green')
+        X = preCoordinates[0]
+        Y = preCoordinates[1]
+        Z = preCoordinates[2]
+        U = direct[0]
+        V = direct[1]
+        W = direct[2]
+        ax.quiver(X,Y,Z,U,V,W,arrow_length_ratio=0.03)
+        ax.set_xlabel('X')
+        ax.set_ylabel('Y')
+        ax.set_zlabel('Depth (m)')
+        fig.show()
+
+
     def plot3D_positionRelSize(self,partclObjList):
         '''
         Function that builds 3d graph with zoomed * 10^3 particles sizes for better visualization 
