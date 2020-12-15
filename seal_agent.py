@@ -9,23 +9,30 @@ class Seal:
     """
     def __init__(self,simObj):
         """
-        @param simObj               string default: none
-           string that gives a name: simulation object.           
-        @param sealPosition         default: np.zeros(shape=3)
+        @param simObj                       string default: none
+           string that gives a name: simulation object.   
+        @param mathUtils            utilities.mathUtils
+            shortcut for the mathUtils class in utilities.py   
+
+        @param sealPosition                 default: np.zeros(shape=3)
             seal Position gives a specifi x,y,z position for the seal 
             starting at the surface of the ocean at startPosition(0,0,0)
-        @param sealOrientation      default: np.zeros(shape=3)
+        @param sealOrientation              default: np.zeros(shape=3)
             orientation is defined by three values between 0 and 2pi 
-            decribing pitch, yaw and roll ? 
-        @param sealStep             default: np.zeros(shape=6)
-            sealstep is defined by a movingVector of the agendt
-            with x,y,z beeing between -5 and 5 and and 
-            the respective sealOrientation values
-        @param sealTrajectory       list default: none
+            decribing pitch, yaw and roll  
+        @param sealStep                  default: np.zeros(shape=6)
+            sealstep is defined by a movingVector of the agent
+            with x,y,z  and the respective sealOrientation values
+        @param sealTrajectory            list default: none
             a list saving the sealPosition and sealOrientation for each sealStep
-        @param activeSealMovement   bool default: True 
+
+        @param activeSealMovement           bool default: True 
             the seal agend is actively moving while below the oceanSurface(z=0)
             and the oceanFloor(-70)
+        @param trajectoryRecording          bool default: False
+            Since the Seal Trajectory is allready simulated and saved in the protoMove
+            class the recording of the identical seal trajectory within the seal agent
+            class is set to false in order to make the simulation faster. 
         """
         # objects from other classes
         self.simObj                 = simObj
@@ -34,11 +41,10 @@ class Seal:
         self.sealPosition           = simObj.runTimeData.getParameter('sealPosition') #centre of the coordinate system of the Seal in disctance to (0,0,0) of world
         self.sealOrientation        = simObj.runTimeData.getParameter('sealOrientation')  # orientation as yaw pitch roll
         self.sealStep               = simObj.runTimeData.getParameter('sealStep') # change of position and orientation
-        self.sealTrajectory         = simObj.runTimeData.getParameter('sealTrajectory') # public??
+        self.sealTrajectory         = simObj.runTimeData.getParameter('sealTrajectory') # public
         # private objects
         self.activeSealMovement     = True
         self.trajectoryRecording    = False # usually set to false as the protMov class already creates an entire trajectory
-        
 
     def SealStateCheck(self):
         """
@@ -48,10 +54,8 @@ class Seal:
         """
         if self.sealPosition[2] > 0 or self.sealPosition[2] <= -70:
             self.activeSealMovement = False
-            #seal steps needs to go down (self.sealStep[2])
         else:
             self.activeSealMovement = True
-    
 
     def testCreateSealStep(self,mode):
         """
@@ -72,7 +76,6 @@ class Seal:
         else:
             print('Unkown step type: ' + mode)
 
- 
     def testCreateRandomStep(self):
         """
         Creating random sealStep consisting of randomly choosen StepCoordinates x,y,z 
