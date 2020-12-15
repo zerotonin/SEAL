@@ -5,11 +5,11 @@ import math as m
 
 class environment:
     '''
-    The 'Environment' class contains functions that are used for creating ocean' enviroment where particles are
-    moving in the visual field of a seal. Seal is the center of particles' cloud in cartesian space. The default 
+    The 'Environment' class contains functions that are used for creating an ocean environment, where particles are
+    moving in the visual field of a seal. Seal is the center of a particle cloud in a cartesian space. The default 
     depth limit of the ocean is -70 m. Ocean in the environment contains obstacles that should be bypassed by the seal.
     The obstacle is surrounded by visible but inactive particles and the core of the obstacle - invisible and 
-    inactive particles
+    inactive particles.
     '''
 
     def __init__(self,simObj):
@@ -18,31 +18,36 @@ class environment:
         0 and the oceanDepth[m]. Within the ocean coordinate system the seal is simulating a dive.
         During the simulation the Seal is the constant centers of the particle Cloud. 
         
-        @param simObj                   str default: none
+        @param simObj                   Str default: None
             the name of the environment simulation.
-        @param oceanSurface             float default: 0.0
+        @param sealPosition            array defeault: None
+            the current seal position in cartisian coordinates
+
+        @param oceanSurface             Float default: 0.0
             the upper limit of the ocean's surface [m]
-        @param oceanDepth               float default: -70.0
+        @param oceanDepth               Float default: -70.0
             the lower bottom limit of the ocean - 70 [m]
-        @param oceanLimit               list default: (-70[m],70[m])
-            the limitation of the coordinate system for x and y dimension
-        @param activeMovement           bool default: True
+        @param oceanLimit               List default: (-70[m],70[m])
+            the limitation of the coordinate system for x and y dimension ??
+        @param activeMovement           Bool default: True
             defines boundaries of the ocean' space, where partciles move actively. 
             Active movement of particles is true for ocean depth with the limit - 0 [m] to -70 [m],
             and true when particles are not in the area of obstacle.
-        @param visible                  bool default: True
+        @param visible                  Bool default: True
             particles are visible in the water for seal, and form opic flow. They are not
             visible above 0 [m] and below -70,1 [m] and if their position is same as a position of obstacle.
-        @ param waterCurrent            array default: none
+        @ param waterCurrent            Array default: None
             the position of a water current in the space of an ocean.
-        @ param waterCurrentMode        str default: none
+        @ param waterCurrentMode        Str default: None
             the state of the water current in the ocean.  
-        @param obstacleList             list default: none
-            list of obstacles within the ocean environment
-        @param observableObstacleList   list default: none       
-            list of obstacles in sight of the seal agent 
-        @param maxObstacles             float default: 200
+        @param maxObstacles             Float default: 200
             the number of obstacles to create in the ocean environment
+
+        @param obstacleList             List default: None
+            list of obstacles within the ocean environment
+        @param observableObstacleList   List default: None       
+            list of obstacles in sight of the seal agent 
+
         '''
         # objects from other classes
         self.simObj                 = simObj #name
@@ -68,7 +73,7 @@ class environment:
         is called calculating interpolated currents for the seal position for 
         each step.
 
-        @return 3D waterCurrent 
+        @return 3D waterCurrent in m/s [x,y,z]
         """
         if self.waterCurrentMode == 'static':
             return self.waterCurrent
@@ -148,7 +153,7 @@ class environment:
         The 'randomInit' function returns a list of random sized obstacles within a size range 
         of 10cm to 10m radius.
         
-        @returns 'initialCoord' as a random vector (x,y) with a range from -5000m to 5000m, radius[m] 
+        @returns 'initialCoord' as a random vector (x,y) with a range from -5000m to 5000m ??, radius[m] 
                   and innerRadius[m]  
         """  
         radius = np.random.uniform(0.1,10.0, size=(1)) # set size to 10cm to 10m radius
@@ -157,7 +162,7 @@ class environment:
 
     def checkObstacleDistance(self):
         """
-        this function checks if the obstacles is in sight of the seal. Only if the magnitute from the obstacle to the seal
+        This function checks if the obstacles is in sight of the seal. Only if the magnitute from the obstacle to the seal
         subtracktd by the radius of the obstacle and the radius of the particleCloud is < 0 the obstacle is in sight 
         of the seal and therefore needs to be checked for visibility and active movement 
         """
@@ -209,7 +214,7 @@ class environment:
         self.checkVisibility(parObj)
         self.checkActiveMovement(parObj)
 
-    def SealStateCheck(self, sealObj):
+    def ObstacleSealStateCheck(self, sealObj):
         """
         the sealStatecheck function defines activeSealMovement to be true or false. Only those sealPositions
         that have a activeSealMovement will be activly moved in the sealAgend class.
