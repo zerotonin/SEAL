@@ -11,7 +11,6 @@ class runTimeData:
         """
         This function initializes default values for all public data
 
-        
         @param simObj                          ? default: 
         @param sps                             int default: 100
             simulated samples per second
@@ -75,8 +74,9 @@ class runTimeData:
 
     def setParameter(self, parameterName, parameterValue):
         ''' 
-        missing self.mode and self.traLenSec as its the sa,e as 
-        self.diveType and durSec ?
+        This function sets the parameter in the init function to a 
+        userdefined value, or by other classes which are making changes
+        to a parameter throughout the simulation (eg. sealPosition)
         '''
         if parameterName == 'sps':
             self.sps = parameterValue
@@ -123,6 +123,8 @@ class runTimeData:
 
     def getParameter(self,parameterName):
         '''
+        this function allows other functions or classes to get the most
+        recent value for each parameter from the init function.
         '''
         if parameterName == 'sps':
             return self.sps
