@@ -19,16 +19,20 @@ class opticFlowAnalysis:
         """
         this class takes the trajectroy data from the particles and seal_agent to analyze the optic flow
 
-        @param simObj                  str default: none
-            the name of the environment simulation.
-        @param mathUtils               ? default: 
+        @param simObj                   
+            shortCut to the simulated Object 
+        @param mathUtils               utilities.mathUtils
             creates a shortcut to the mathUtils class stored in utilities.py
-        @param particleList            ? default: none
+
+        @param particleList            list default: none
             the particleList is a shortcut to the particleObjectList creates in the 
             Cloud class stored in turbidity.py
-        @param sealTrajectories        ? default: none
+        @param sealTrajectories        array default: none
             the sealTrajectories is a shortcut to the sealTrajectories stores in the 
             seal class in SEAL_SIM stored in SEAL_SIM.py
+        @param traLen                  int default: none
+            number of samples per simulation
+            
         @param anaDataList             list default: none
             creates a list holding information about
             distTrueList,distOFestList,partSphereList,OFvectorList
@@ -43,7 +47,7 @@ class opticFlowAnalysis:
         # public objects
         self.particleList   = simObj.pCloud.partclObjList #mutable
         self.sealTrajectory = simObj.runTimeData.getParameter('sealTrajectory') #mutable
-        self.traLen         =self.simObj.protoMove.traLen #mutable
+        self.traLen         = self.simObj.protoMove.traLen #mutable
         # private objects
         self.anaDataList    = list()
         self.distRankDiff   = list()
