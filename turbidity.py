@@ -201,7 +201,6 @@ class Cloud:
     b = ----------
         tan(alpha)
 
-
     alpha  = best visual resolution of a seal 0.08666667° R1)
     a =  20 -160µm R2)
                                                                                                   160
@@ -226,8 +225,8 @@ class Cloud:
         radius of the visual field of a seal (@ param maxVectorMagnitude). Particles are in cartesian 3D space 
         forming a cloud with the seal as a center (0,0,0). 
 
-        @param simObj                   string default: none
-           string that gives a name: simulation object.           
+        @param simObj                   SEAL_SIM.SEAL_SIM
+           shortCut to simulated object           
         @param max_particles            int default: 400
             this manual choosen number sets the number of particles being placed inside the 
             turbidity cloud, this parameter represent the density of the particle.
@@ -255,7 +254,7 @@ class Cloud:
         self.sealStep          = self.simObj.runTimeData.getParameter('sealStep') # change of position and orientation
         self.sealPosition      = self.simObj.runTimeData.getParameter('sealPosition') # change of position and orientation
         
-        self.partclObjList     = [] # list of particle objects???
+        self.partclObjList     = [] # list of particle objects
         self.waterCurrent      = self.simObj.runTimeData.getParameter('waterCurrent') # water current 
     
     def add_particles(self):
