@@ -8,7 +8,7 @@ Parameter,Runs:
 -current Interp,1
 -particle No,10 
 -basic Reps,100
---> 240 different conditions ? (needed 60CPUS to run, start with 8 static currents instead of 10 ?)
+--> 200 different conditions 
 
 --> totalNo of Runs,20000
 -sps,100
@@ -24,8 +24,10 @@ CPUs available = 52
 
 runs per CPU ,400 (4 conditions)
 
-Kathis PC: 4CPU, Annes PC: 8CPU, Miris PC: 4CPU, Laurins PC: 8CPU, EckPC: 8CPU, LabPC: 4CPU, Bart1 PC:8CPU, Bart2 PC:8CPU
-
+Kathis PC: 4CPU, Annes PC: 8CPU, 
+Miris PC: 4CPU, Laurins PC: 8CPU, 
+EckPC: 8CPU, LabPC: 4CPU,
+Bart1 PC:8CPU, Bart2 PC:8CPU
 """
 
 simObj = SEAL_SIM.SEAL_SIM('headless')
@@ -156,6 +158,4 @@ for diveType in diveTypeList:
                 simObj = SEAL_SIM.SEAL_SIM('headless',diveTypeStr=diveType,maxParticlesInt=pNo , currentStaticVelTuple=currentStatic) 
                 simObj.runSimulation()
                 i+=1
-#self,mode,spsInt=20,diveTypeStr='vShape',durSecFloat=240.0,currentTypeStr='static',currentStaticVelTuple=(1.0,0.0,0.0),
-#          oceanDepthFloat=-70.0,amountOfObstaclesInt=0,maxParticlesInt=260,particleSizeRangeTuple=(0.00002,0.00016),
-#          cloudRadiusFloat=0.0018
+
