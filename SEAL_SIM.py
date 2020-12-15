@@ -93,7 +93,7 @@ class SEAL_SIM:
         self.runTimeData.setParameter('diveType',diveTypeStr)
         self.runTimeData.setParameter('durSec',durSecFloat)    
         self.runTimeData.setParameter('currentType',currentTypeStr)
-        self.runTimeData.setParameter('currentStaticVel', currentStaticVelTuple)
+        self.runTimeData.setParameter('waterCurrent', currentStaticVelTuple)
         self.runTimeData.setParameter('oceanDepth',oceanDepthFloat)
         self.runTimeData.setParameter('amountOfObstacles',amountOfObstaclesInt)
         self.runTimeData.setParameter('max_particles',maxParticlesInt)
