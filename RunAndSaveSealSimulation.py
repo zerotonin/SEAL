@@ -42,120 +42,111 @@ currentInterp     = None
 particleNoList    = [0,5,10,50,150,250,500,1000] #8 + 2 ([300,750])
 basicReps         = 100 
 
-
+currentPC = 'Kathi'
 #Kathis PC:
-#how to do it with reloading the SealSim?
-#for diveType in diveTypeList:
-#    simObj.runTimeData.setParameter('diveType',diveType)
-#    for pNo in particleNoList:
-#        simObj.runTimeData.setParameter('maxParticles',pNo)
-#        i = 0
-#        while i < basicReps:
-#            simObj.runSimulation()
-#            i+=1
-#
-# or :
-for diveType in diveTypeList:
-    for pNo in particleNoList:
-        i = 0
-        while i < basicReps:
-            simObj = SEAL_SIM.SEAL_SIM('headless',diveTypeStr=diveType,maxParticlesInt=pNo , currentStaticVelTuple=(0.0,0.0,0.0)) 
-            simObj.runSimulation()
-            i+=1
-
-#Annes PC:
-
-currentStaticList= [(0.15,0.0,0.0),(0.0,0.15,0.0)]
-for diveType in diveTypeList:
-    for currentStatic in currentStaticList:
+if currentPC == 'Kathi':
+    for diveType in diveTypeList:
         for pNo in particleNoList:
             i = 0
             while i < basicReps:
-                simObj = SEAL_SIM.SEAL_SIM('headless',diveTypeStr=diveType,maxParticlesInt=pNo , currentStaticVelTuple=currentStatic) 
+                simObj = SEAL_SIM.SEAL_SIM('headless',diveTypeStr=diveType,maxParticlesInt=pNo , currentStaticVelTuple=(0.0,0.0,0.0)) 
                 simObj.runSimulation()
                 i+=1
 
-#Miris PC:
-
-for diveType in diveTypeList:
-    for pNo in particleNoList:
-        i = 0
-        while i < basicReps:
-            simObj = SEAL_SIM.SEAL_SIM('headless',diveTypeStr=diveType,maxParticlesInt=pNo , currentStaticVelTuple=(0.0,0.0,0.15)) 
-            simObj.runSimulation()
-            i+=1
-
-#Laurins PC:
-
-currentStaticList= [(-0.05,0.0,0.0), (0.0,-0.05,0.0)]
-for diveType in diveTypeList:
-    for currentStatic in currentStaticList:
+    #Annes PC:
+elif currentPC == 'Anne':    
+    currentStaticList= [(0.15,0.0,0.0),(0.0,0.15,0.0)]
+    for diveType in diveTypeList:
+        for currentStatic in currentStaticList:
+            for pNo in particleNoList:
+                i = 0
+                while i < basicReps:
+                    simObj = SEAL_SIM.SEAL_SIM('headless',diveTypeStr=diveType,maxParticlesInt=pNo , currentStaticVelTuple=currentStatic) 
+                    simObj.runSimulation()
+                    i+=1
+    
+    #Miris PC:
+elif currentPC == 'Miri':  
+    for diveType in diveTypeList:
         for pNo in particleNoList:
             i = 0
             while i < basicReps:
-                simObj = SEAL_SIM.SEAL_SIM('headless',diveTypeStr=diveType,maxParticlesInt=pNo , currentStaticVelTuple=currentStatic) 
+                simObj = SEAL_SIM.SEAL_SIM('headless',diveTypeStr=diveType,maxParticlesInt=pNo , currentStaticVelTuple=(0.0,0.0,0.15)) 
                 simObj.runSimulation()
                 i+=1
-
-#EckPC:
-
-currentStaticList= [(0.0,0.0,-0.05),(0.05,0.15,0.01)]
-for diveType in diveTypeList:
-    for currentStatic in currentStaticList:
+    
+    #Laurins PC:
+elif currentPC == 'Laurin':      
+    currentStaticList= [(-0.05,0.0,0.0), (0.0,-0.05,0.0)]
+    for diveType in diveTypeList:
+        for currentStatic in currentStaticList:
+            for pNo in particleNoList:
+                i = 0
+                while i < basicReps:
+                    simObj = SEAL_SIM.SEAL_SIM('headless',diveTypeStr=diveType,maxParticlesInt=pNo , currentStaticVelTuple=currentStatic) 
+                    simObj.runSimulation()
+                    i+=1
+    
+    #EckPC:
+elif currentPC == 'EckPC':      
+    currentStaticList= [(0.0,0.0,-0.05),(0.05,0.15,0.01)]
+    for diveType in diveTypeList:
+        for currentStatic in currentStaticList:
+            for pNo in particleNoList:
+                i = 0
+                while i < basicReps:
+                    simObj = SEAL_SIM.SEAL_SIM('headless',diveTypeStr=diveType,maxParticlesInt=pNo , currentStaticVelTuple=currentStatic) 
+                    simObj.runSimulation()
+                    i+=1
+    
+    #LabPC:
+elif currentPC == 'LabPC':      
+    for diveType in diveTypeList:
         for pNo in particleNoList:
             i = 0
             while i < basicReps:
-                simObj = SEAL_SIM.SEAL_SIM('headless',diveTypeStr=diveType,maxParticlesInt=pNo , currentStaticVelTuple=currentStatic) 
+                simObj = SEAL_SIM.SEAL_SIM('headless',diveTypeStr=diveType,maxParticlesInt=pNo , currentTypeStr='interp') 
                 simObj.runSimulation()
                 i+=1
-
-#LabPC:
-
-for diveType in diveTypeList:
-    for pNo in particleNoList:
-        i = 0
-        while i < basicReps:
-            simObj = SEAL_SIM.SEAL_SIM('headless',diveTypeStr=diveType,maxParticlesInt=pNo , currentTypeStr='interp') 
-            simObj.runSimulation()
-            i+=1
-
-#Bart1 PC:
-
-for diveType in diveTypeList:
-    for pNo in particleNoList:
-        i = 0
-        while i < basicReps:
-            simObj = SEAL_SIM.SEAL_SIM('headless',diveTypeStr=diveType,maxParticlesInt=pNo , currentStaticVelTuple=(-0.05,-0.15,-0.01)) 
-            simObj.runSimulation()
-            i+=1
-
-particleNoList = [300,750]
-for diveType in diveTypeList:
-    for pNo in particleNoList:
-        i = 0
-        while i < basicReps:
-            simObj = SEAL_SIM.SEAL_SIM('headless',diveTypeStr=diveType,maxParticlesInt=pNo , currentTypeStr='interp') 
-            simObj.runSimulation()
-            i+=1
-
-particleNoList = [300,750]
-for diveType in diveTypeList:
-    for pNo in particleNoList:
-        i = 0
-        while i < basicReps:
-            simObj = SEAL_SIM.SEAL_SIM('headless',diveTypeStr=diveType,maxParticlesInt=pNo , currentStaticVelTuple=(0.0,0.0,0.0)) 
-            simObj.runSimulation()
-            i+=1
-
-#Bart2 PC:
-
-particleNoList = [300,750]
-for diveType in diveTypeList:
-    for currentStatic in currentStaticList:
+    
+    #Bart1 PC:
+elif currentPC == 'Bart1':  
+    for diveType in diveTypeList:
         for pNo in particleNoList:
             i = 0
             while i < basicReps:
-                simObj = SEAL_SIM.SEAL_SIM('headless',diveTypeStr=diveType,maxParticlesInt=pNo , currentStaticVelTuple=currentStatic) 
+                simObj = SEAL_SIM.SEAL_SIM('headless',diveTypeStr=diveType,maxParticlesInt=pNo , currentStaticVelTuple=(-0.05,-0.15,-0.01)) 
                 simObj.runSimulation()
                 i+=1
-
+    
+    particleNoList = [300,750]
+    for diveType in diveTypeList:
+        for pNo in particleNoList:
+            i = 0
+            while i < basicReps:
+                simObj = SEAL_SIM.SEAL_SIM('headless',diveTypeStr=diveType,maxParticlesInt=pNo , currentTypeStr='interp') 
+                simObj.runSimulation()
+                i+=1
+    
+    particleNoList = [300,750]
+    for diveType in diveTypeList:
+        for pNo in particleNoList:
+            i = 0
+            while i < basicReps:
+                simObj = SEAL_SIM.SEAL_SIM('headless',diveTypeStr=diveType,maxParticlesInt=pNo , currentStaticVelTuple=(0.0,0.0,0.0)) 
+                simObj.runSimulation()
+                i+=1
+    
+    #Bart2 PC:
+elif currentPC == 'Bart2':      
+    particleNoList = [300,750]
+    for diveType in diveTypeList:
+        for currentStatic in currentStaticList:
+            for pNo in particleNoList:
+                i = 0
+                while i < basicReps:
+                    simObj = SEAL_SIM.SEAL_SIM('headless',diveTypeStr=diveType,maxParticlesInt=pNo , currentStaticVelTuple=currentStatic) 
+                    simObj.runSimulation()
+                    i+=1
+    
+    
