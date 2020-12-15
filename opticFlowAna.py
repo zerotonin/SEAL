@@ -261,7 +261,7 @@ class opticFlowAnalysis:
 
     def getDistancesFromsphereParticles(self,sphereParticles): 
         """
-        This function 
+        This function  
         """
         
         distance_groundTruth = (sphereParticles[0][0]+sphereParticles[1][0])/2
@@ -277,7 +277,7 @@ class opticFlowAnalysis:
          
     def cartTra2sphereTra(self,cartTra):
         '''
-        This function 
+        This function is not used ?
         '''
         sphereTra = list()
         for frame in cartTra:
