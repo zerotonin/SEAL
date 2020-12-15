@@ -74,21 +74,23 @@ class plotUtils:
         fig.show()       
 
     
-    def plot3D_OF(self,frame,partclObjList):
+    def plot3D_OF(self,frame,partclObjList,sealTrajectory):
  
         preCoordinates = self.particleObjList2CoordList(frame, 0, partclObjList)
         postCoordinates = self.particleObjList2CoordList(frame, 1, partclObjList)
+        sealStep = np.subtract(sealTrajectory[frame+1],sealTrajectory[frame])
         direct =  np.subtract(postCoordinates,preCoordinates)
         fig,ax = self.makeSquare3DAxis()
-        h = ax.scatter3D(preCoordinates[0], preCoordinates[1], preCoordinates[2], color='red')
-        h = ax.scatter3D(postCoordinates[0], postCoordinates[1], postCoordinates[2], color='green')
+        ax.scatter3D(preCoordinates[0], preCoordinates[1], preCoordinates[2], color='red')
+        ax.scatter3D(postCoordinates[0], postCoordinates[1], postCoordinates[2], color='green')
         X = preCoordinates[0]
         Y = preCoordinates[1]
         Z = preCoordinates[2]
         U = direct[0]
         V = direct[1]
         W = direct[2]
-        ax.quiver(X,Y,Z,U,V,W,arrow_length_ratio=0.03)
+        ax.quiver(X,Y,Z,U,V,W,arrow_length_ratio=0.03, color = 'black')
+        ax.quiver(0,0,0,sealStep[0],sealStep[1],sealStep[2], color ='red')
         ax.set_xlabel('X')
         ax.set_ylabel('Y')
         ax.set_zlabel('Depth (m)')
