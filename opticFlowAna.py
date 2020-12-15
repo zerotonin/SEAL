@@ -65,10 +65,10 @@ class opticFlowAnalysis:
         for i in range(len(self.particleList)): # po should be (oldPosition, newPosition, status) of particle per movement
             direct = self.anaDataList[frame][3][i]
             if  self.anaDataList[frame][2][i] != None: # richtungsvector between frames
-                X = self.anaDataList[frame][2][i][0][1] # theta
-                Y = self.anaDataList[frame][2][i][0][2] # phi
-                U = direct[0] # theta direction
-                V = direct[1] # phi direction
+                X = self.anaDataList[frame][2][i][0][2] # phi
+                Y = self.anaDataList[frame][2][i][0][1] # theta
+                U = direct[1] # phi direction
+                V = direct[0] # theta direction
                 ax.quiver(X,Y,U,V,angles ='xy',scale_units='xy', scale =1,width=0.001)
             else:
                 pass
@@ -77,23 +77,23 @@ class opticFlowAnalysis:
 
     def create2DParticleDistributionList(self,prePost, frame):
         """
-        This function creats x and y list for the theta(x) and phi(height) values of the particles from
+        This function creats theta and phi list for the theta(x) and phi(height) values of the particles from
         the sphereindric particle positions at a given frame for either the oldPosition (prePost = 0)
         or the new Position (prePost = 1)
 
-        @return xList and yList holding information about the azimuth and height
+        @return thetaList and phiList holding information about the azimuth and height
         """
-        xList = list()
-        yList = list()
+        thetaList = list()
+        phiList = list()
 
         for i in range(len(self.particleList)):
             if self.anaDataList[frame][2][i] != None:
-                xList.append(self.anaDataList[frame][2][i][prePost][1])
-                yList.append(self.anaDataList[frame][2][i][prePost][2])
+                thetaList.append(self.anaDataList[frame][2][i][prePost][1])
+                phiList.append(self.anaDataList[frame][2][i][prePost][2])
             else: 
-                xList.append(None)
-                yList.append(None)
-        return xList, yList
+                thetaList.append(None)
+                phiList.append(None)
+        return thetaList, phiList
 
     def plot2DparticleDist(self, frame):
         """
@@ -105,11 +105,12 @@ class opticFlowAnalysis:
         fig = plt.figure()
         ax = fig.add_subplot(111)
         thetaList, phiList = self.create2DParticleDistributionList(0,frame)
-        ax.scatter(thetaList, phiList, color = 'red')
+        ax.scatter(phiList, thetaList, color = 'red')
         postThetaList, postPhiList = self.create2DParticleDistributionList(1,frame)
-        ax.scatter(postThetaList, postPhiList, color='green')
-        ax.set_xlim(min(min(thetaList),min(postThetaList)),max(max(thetaList),max(postThetaList)))
-        ax.set_ylim(min(min(phiList),min(postPhiList)),max(max(phiList),max(postPhiList)))
+        ax.scatter(postPhiList,postThetaList, color='green')
+        ax.set_xlim(min(min(phiList),min(postPhiList)),max(max(phiList),max(postPhiList)))
+        ax.set_ylim(min(min(thetaList),min(postThetaList)),max(max(thetaList),max(postThetaList)))
+        
         plt.show()
 
     def opticFlowAbility(self):
@@ -117,8 +118,8 @@ class opticFlowAnalysis:
         The particle position is denoted in a spherical coordinate system.
         The spherical coordinate system is defiend as:
             r     = the distance to the coordinate origin (aka seal) [m]
-            theta = polar angle ??
-            phi   = the azimuth [degress]
+            theta = the 3D polar angle relative to z-axis
+            phi   = the 3D azimuthal angle, relative to the x-axis for the 3D vector projected onto the xy plane
         For each "step" of the seal we have two particle positions, one before (t0) and one after the step (t1).
         Hence there is a r_0, theta_0, and phi_0, as well as a r_1, theta_1, and phi_1.
         In Optic flow analysis the animal uses the difference between (theta_0,phi_0) and (theta_1,phi_1) to derive R.
