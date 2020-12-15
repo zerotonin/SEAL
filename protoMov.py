@@ -26,6 +26,19 @@ class ProtMov:
         @param mathUtils                ? default: True
             creates a shortcut to the mathUtils class stored in 
             utilities.py
+
+        @param mode                     str default: 'random'
+            mode defining which dive shape should be simulated
+            (uShape or vShape)
+        @param traLenSec                float default: 240
+            sets the length of the dive in seconds
+        @param traLen                   floar default: none
+            calculates the length of the dive in samples    
+        @param velTra                   list default : none
+            list of sealVelocities for simulated dive 
+            [thrust, slip,lift,
+            yaw,pitch,roll]
+
         @param origDiveFPS              float default: 0.2
             defines the original temporal resolution of the diveDate
             (zProfile and pitch values)
@@ -34,13 +47,40 @@ class ProtMov:
             for seal movement (thrust,slip,yaw) 
         @param traIDX                   list default: none
             list of thrust(m/s),Slip(m/s),Yaw(m/s) values per second
-        @param mode                     str default: 'random'
-            mode defining which dive shape should be simulated
-            (uShape or vShape)
-        @param traLenSec                float default: 240
-            sets the length of the dive in seconds
-        @param traLen                   floar default: none
-            calculates the length of the dive in samples    
+        @param pmIDX                    list default: none   
+            list of 2D prototyicalMovement
+        @param thrust                   list default: none       
+            list of thrust values (m/s)
+        @param slip                     list default: none        
+            list of slip values (m/s)
+        @param yaw                      list default: none
+            list of yaw velocity values 
+        @param yawAngle                 list default: none
+            list of yaw angle values 
+        @param zProfile                 list default: none
+            list of zProfile during dive  [m]
+        @param pitchAngle               list default: none
+            list of pitch angle values
+        @param xProfile                 array default: none    
+            list of xProfile during dive [m]
+        @param yProfile                 array default: none
+            list of yProfile during dive [m]
+        @param posTrajectory            array default: none
+            array of positional data 
+            x[m],y[m],z[m],
+            yawAngle[degree],pitchAngle[degree],rollAngle[degree]
+        @param positions                array default: none
+            array of Seal Position [x,y,z] in [m]
+        @param angles                   array default: none    
+            array of yaw,pitch,roll angles        
+        @param sealHeading              list default: none
+            list of 3D heading vector
+        @param xheading                 list default: none    
+            list of xHeading
+        @param yheading                 list default: none
+            list of yHeading
+        @param zheading                 list default: none
+            list of zHeading
         @param diveShapeU               dict 
             defines a dictionary for the 5 different phases of a uShaped
             dive with 5 values 
@@ -48,7 +88,7 @@ class ProtMov:
             (1) mean pitch angle [deg]  (2)  standard deviation of the mean [deg] 
             (3)  mean z-profil [m/s]    (4) standard deviation of z-profile [m/s])
         @param diveShapeV               dict
-            defines a dictionary for the 5 differen phases of a vShaped dive
+            defines a dictionary for the 5 different phases of a vShaped dive
             in this case the straight phase is defined by a length of zero
             samples since it is not present in vShaped dives. 
         """
@@ -101,14 +141,14 @@ class ProtMov:
 
     def generator2(self):
         """
-        this function randomly chooses between uShape and vShapes dives.
-        dependent on the diveType it sets the corresponding phases (surface, down, straight
+        This function randomly chooses between uShape and vShapes dives.
+        Dependent on the diveType it sets the corresponding phases (surface, down, straight
         up,surface2) to their percentage of time each of the phases last.
         Data taken from "Forschungsverbund MINOSplus - Weiterführender Arbeiten an Seevögeln
         und Meeressäugern zur Bewertung von Offshore - Windkraftanlagen Teilvorhaben TP6 
         – „Seehunde in See“ – Untersuchungen zur räumlichen und zeitlichen Nutzung 
         der Nordsee durch Seehunde im Zusammenhang mit der Entwicklung von 
-        OffshoreWindenergieanlagen" depth and pitch Data taken from figure 16.
+        OffshoreWindenergieanlagen", where depth and pitch Data were taken from figure 16.
         It calculates thrus, slip and yaw values as well as zProfile and pitch values.
         From this dataSet the x,y,z positions are calculated by a 2D rotation matrix
         and the sealStep thrust,slip,lift,yaw,pitch,roll by a 3D rotation matrix.
@@ -151,9 +191,6 @@ class ProtMov:
         This function creates the x and y profiles by rotating the 2D thrust and slip vector with 
         a rotation matrix of yaw.
         """
-        
-        
- 
         for frameI in range(self.traLen-1):
             temp = self.mathUtils.agentBasedVels2worldBasedCoords(
                 np.array([self.thrust[frameI],self.slip[frameI]]),np.deg2rad(self.yawAngle[frameI]),
@@ -205,7 +242,6 @@ class ProtMov:
         over the time of the dive is calculates. As for the positions the directionVectors from 
         seal point of view needed to be rotated around yaw and pitch in order to get the position 
         values in the world coordinates system(x,y,z)
-    
         """
         testAngle = np.array([np.deg2rad(self.yawAngle[0]),np.deg2rad(self.pitchAngle[0]),0])
         testVelAngle = self.velTra[:,3:]/self.sps
