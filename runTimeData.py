@@ -3,15 +3,62 @@ import numpy as np
 import pickle
 class runTimeData:
     '''
+    This class sets and gets all public data, which are needed to run a specific simulation.
+    Here all public data is stored and the other class get and set changes in these public data
+    via the runTimeData class.
     '''
     def __init__(self,simObj):
+        """
+        This function initializes default values for all public data
+
+        
+        @param simObj                          ? default: 
+        @param sps                             int default: 100
+            simulated samples per second
+        @param oceanSurface                    int default: 0
+            oceanSurface an 0m
+        @param oceanDepth                      float default: -70.0
+            depth of ocenan set to -70m
+        @param oceanLimit                      tuple default: (-70, 70)
+            limits of simulated 2D ocean in x and y plane
+        @param waterCurrent                    array default: ([0. , 0.1, 0. ])
+            ???
+        @param amountOfObstacles               int default: 100
+            number of obstcles simulates
+        @param durSec                          int default: 240 
+            runTime in seconds
+        @param traLen                          int default: 100*240
+            calculated runtime in samples
+        @param velTra                          list default: None
+            list to store seal velocitiy trajectory
+        @param sealPosition                    array default: ([0. , 0. , 0. ])
+            position of seal (x,y,z)
+        @param sealOrientation                 array default: ([0. , 0. , 0. ])
+            orientation of seal
+        @param sealStep                        str default: ([0. , 0. , 0. ,0. , 0. , 0. ])
+            change is position and orientation(from veltra)
+        @param sealTrajectory                  list default: None 
+            calculates sealTrajectory based of veltra
+        @param diveType                        str default: 'vShape'
+            dive type can be uShape or vShape
+        @param currentType                     str default: 'static'
+            type of current (static,interpolated)
+        @param currentStaticVel                tuple default: (0. , 0.1, 0. )
+            needed??
+        @param max_particles                   int default: 270
+            number of particles within the sphere
+        @param particleSizeRange               tuple default: (0.00002,0.00016)
+            size range of particles in m 
+        @param cloudRadius                     float default: 0.0018
+            radius of particle cloud in m 
+        """
         self.simObj                 = simObj
-        self.sps                    = 20 # number of samples per second
+        self.sps                    = 100 # number of samples per second
         self.oceanSurface           = 0 # [m] linkable
         self.oceanDepth             = -70 # [m] linkable
         self.oceanLimit             = (-70,70) # [m] linkable
         self.waterCurrent           = np.array([0.0,0.1,0.0]) # just a simple example will be changed later 
-        self.maxObstacles           = 200
+        self.amountOfObstacles      = 100
         self.durSec                 = 240 # duration of,
         self.traLen                 = self.durSec*self.sps # number of samples
         self.velTra                 = list() # list of sealTrajectory per sample with (thrust,slip,lift,yaw,pitch,roll)        
@@ -21,11 +68,9 @@ class runTimeData:
         self.sealTrajectory         = list() # public??
         self.diveType               = 'vShape' # descri
         self.currentType            = 'static'
-        self.currentStaticVel       = (0.0,2.0,0.0)
-        self.oceanDepth             = -70
-        self.amountOfObstacles      = 100
+        self.currentStaticVel       = (0.0,0.1,0.0)
         self.max_particles          = 270
-        self.particleSizeRange      = (.00002,0.00016)
+        self.particleSizeRange      = (0.00002,0.00016)
         self.cloudRadius            = 0.0018
 
     def setParameter(self, parameterName, parameterValue):
@@ -44,8 +89,8 @@ class runTimeData:
             self.oceanLimit = parameterValue
         elif parameterName == 'waterCurrent':
             self.waterCurrent = parameterValue
-        elif parameterName == 'maxObstacles':
-            self.maxObstacles = parameterValue
+        elif parameterName == 'amountOfObstacles':
+            self.amountOfObstacles = parameterValue
         elif parameterName == 'traLen':
             self.traLen = parameterValue
         elif parameterName == 'velTra':
@@ -67,10 +112,6 @@ class runTimeData:
             self.currentType  = parameterValue
         elif parameterName == 'currentStaticVel':
             self.currentStaticVel  = parameterValue
-        elif parameterName == 'oceanDepth':
-            self.oceanDepth  = parameterValue
-        elif parameterName == 'amountOfObstacles':
-            self.amountOfObstacles  = parameterValue
         elif parameterName == 'max_particles':
             self.max_particles  = parameterValue
         elif parameterName == 'particleSizeRange':
@@ -93,8 +134,8 @@ class runTimeData:
             return self.oceanLimit 
         elif parameterName == 'waterCurrent':
             return self.waterCurrent
-        elif parameterName == 'maxObstacles':
-            return self.maxObstacles 
+        elif parameterName == 'amountOfObstacles':
+            return self.amountOfObstacles 
         elif parameterName == 'traLen':
             return self.traLen 
         elif parameterName == 'velTra':
@@ -115,10 +156,6 @@ class runTimeData:
             return self.currentType  
         elif parameterName == 'currentStaticVel':
             return self.currentStaticVel  
-        elif parameterName == 'oceanDepth':
-            return self.oceanDepth  
-        elif parameterName == 'amountOfObstacles':
-            return self.amountOfObstacles  
         elif parameterName == 'max_particles':
             return self.max_particles  
         elif parameterName == 'particleSizeRange':
