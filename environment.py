@@ -18,34 +18,34 @@ class environment:
         0 and the oceanDepth[m]. Within the ocean coordinate system the seal is simulating a dive.
         During the simulation the Seal is the constant centers of the particle Cloud. 
         
-        @param simObj                   Str default: None
+        @param simObj                   str default: None
             the name of the environment simulation.
-        @param sealPosition            array defeault: None
+        @param sealPosition             array defeault: None
             the current seal position in cartisian coordinates
 
-        @param oceanSurface             Float default: 0.0
+        @param oceanSurface             float default: 0.0
             the upper limit of the ocean's surface [m]
-        @param oceanDepth               Float default: -70.0
+        @param oceanDepth               float default: -70.0
             the lower bottom limit of the ocean - 70 [m]
-        @param oceanLimit               List default: (-70[m],70[m])
+        @param oceanLimit               list default: (-70[m],70[m])
             the limitation of the coordinate system for x and y dimension ??
-        @param activeMovement           Bool default: True
+        @param activeMovement           bool default: True
             defines boundaries of the ocean' space, where partciles move actively. 
             Active movement of particles is true for ocean depth with the limit - 0 [m] to -70 [m],
             and true when particles are not in the area of obstacle.
-        @param visible                  Bool default: True
+        @param visible                  bool default: True
             particles are visible in the water for seal, and form opic flow. They are not
             visible above 0 [m] and below -70,1 [m] and if their position is same as a position of obstacle.
-        @ param waterCurrent            Array default: None
+        @ param waterCurrent            array default: None
             the position of a water current in the space of an ocean.
-        @ param waterCurrentMode        Str default: None
+        @ param waterCurrentMode        str default: None
             the state of the water current in the ocean.  
-        @param maxObstacles             Float default: 200
+        @param maxObstacles             float default: 200
             the number of obstacles to create in the ocean environment
 
-        @param obstacleList             List default: None
+        @param obstacleList             list default: None
             list of obstacles within the ocean environment
-        @param observableObstacleList   List default: None       
+        @param observableObstacleList   list default: None       
             list of obstacles in sight of the seal agent 
 
         '''
@@ -216,7 +216,7 @@ class environment:
 
     def ObstacleSealStateCheck(self, sealObj):
         """
-        the sealStatecheck function defines activeSealMovement to be true or false. Only those sealPositions
+        the ObstacleSealStatecheck function defines activeSealMovement to be true or false. Only those sealPositions
         that have a activeSealMovement will be activly moved in the sealAgend class.
         The Seals active movement is false if the agends is above water or below the seafloor or within an 
         obstacle.
