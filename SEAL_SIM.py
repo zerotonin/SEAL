@@ -18,38 +18,31 @@ class SEAL_SIM:
         in order to transfor all important information between the classes to simulate a seal dive 
         and gain information about the optic flow perception at any point during the dive.
 
-        @param simParameterDict     dict  
-            creates a Dictionary with default values for the type of dive (u or v shape), 
-            the dive duration, the current type (static or interpolated), the depth of the ocean,
-            the amount of obstacles, maximal number of particles beeing simulated, size range of 
-            theses particles and the radius of the particle cloud.
-        @param sps                  float default: none
-            defines the number of samples simulated per second
-        @param environment          ? default: none
+        @param runTimeData           runTimeData.runTimeData(self)
+            shortcut to runTimeData class stored in runTimeData.py
+        @param environment           default: none
             creates a shortcut to the environment class stored in 
             environment.py
-        @param seal                 ? default: none
+        @param seal                  default: none
             creates a shortcut to the Seal class stored in 
             seal_agent.py
-        @param pCloud               ? default: none
+        @param pCloud                default: none
             creates a shortcut to the Cloud class stored in 
             turbidity.py
-        @param plot                 ? default: True
+        @param plot                  default: True
             creates a shortcut to the plotUtils class stored in 
             utilities.py
-        @param math                 ? default: True
+        @param math                  default: True
             creates a shortcut to the mathUtils class stored in 
             utilities.py
-        @param protoMove             ? default: ?
+        @param protoMove             default: ?
             creates a shortcut to the protoMov class stored in 
             protomov.py
-        @param sealVelTra           ? default:none
+        @param sealVelTra            default:none
             the created seal trajectories in the protomov class are stored in a list
-        @param mode
         """
         # public objects
         self.runTimeData = runTimeData.runTimeData(self)
-
         if mode == 'verbose':
             self.setParametersInRunTimeDataCLI()
         elif mode == 'headless':
@@ -58,33 +51,30 @@ class SEAL_SIM:
                       cloudRadiusFloat)
         else:
             raise ValueError('Unknown simulation input mode' + str(mode))
-
-        # objects from other classes, which are initialised at the beginning of a simulation
-        # This is done so that the user can set parameteres dynamically before starting the 
-        # simulation
         self.environment = None 
         self.seal        = None
         self.pCloud      = None
         self.plot        = None
         self.math        = None
         self.protoMove   = None
-        
-        # private?
-        self.sealVelTra = list()
+        # private objects
+        self.sealVelTra  = list()
         
     def meterPerSecond2meterPerSample(self,velocity):
         """
         This function calculates the velocity per sample with the velocity per second,
-        to be used for the  
+        to be used for the simulation.
 
         @return velocity per sample
         """
-        # THis function should be inherited
         self.sps = self.runTimeData.getParameter('sps')
 
         return copy.deepcopy(np.array(velocity)/self.sps)
     
     def initSimulationObjects(self):
+        """
+        This function initialises all classes needed for simulation.
+        """
         self.environment = environment.environment(self) # velocity in meter per second will be transformed into an evironment object
         self.seal        = seal_agent.Seal(self)
         self.pCloud      = turbidity.Cloud(self)
@@ -96,6 +86,9 @@ class SEAL_SIM:
     def setParameters(self,spsInt,diveTypeStr,durSecFloat,currentTypeStr,currentStaticVelTuple,
                       oceanDepthFloat,amountOfObstaclesInt,maxParticlesInt,particleSizeRangeTuple,
                       cloudRadiusFloat):
+        """
+        This function sets the Parameters in the runTimeData class accoring to user input.
+        """
         self.runTimeData.setParameter('sps', spsInt)
         self.runTimeData.setParameter('diveType',diveTypeStr)
         self.runTimeData.setParameter('durSec',durSecFloat)    
@@ -106,19 +99,6 @@ class SEAL_SIM:
         self.runTimeData.setParameter('max_particles',maxParticlesInt)
         self.runTimeData.setParameter('particleSizeRange',particleSizeRangeTuple)
         self.runTimeData.setParameter('cloudRadius',cloudRadiusFloat)
-    #def simulate_sample(self):
-    #    """
-    #    can be deleted ? wAS JUST TO TRY THE SIMULATION
-    #    """
-    #    # create a step
-    #    self.seal.createSealStep('45down')
-    #    print(self.seal.sealStep)
-    #    # move da particles
-    #    self.pCloud.moveParticles()
-    #    for po in self.pCloud.partclObjList:  
-    #        print(po.position)
-    #    # move da seal
-    #    self.seal.MoveSeal()
 
     def runSimulation(self):
         """
@@ -164,63 +144,11 @@ class SEAL_SIM:
                 break
         print(self.protoMove.posTrajectory[0,:])
 
-    #def userDefParametersCLI(self):
-    #    """
-    #    This function opens a command line interface, asking the user to set 9 parameters,
-    #    which are a needed to simulate specified seal dives.
-#
-    #    1. diveType, choosing between vShape and uShape dives
-    #    2. dive duration, defining the duration of the dive in seconds
-    #    3. currentType, choosing between static or interpolated currents
-    #    4. currentStaticVal, defining x,y,and z velocities for static currents
-    #    5. oceanDepth, setting the depth of the ocean
-    #    6. amount of Obstacles, setting the number of obstacles simulated in the enviornment
-    #    7. max_Particles, setting the number of particles simulated in the particleCloud
-    #    8. particleSizeRange, setting the lower and upper limits for the size of particles in mm ?
-    #    9. cloudRadius, setting the Radius of the particleCloud surrounding the seal_agent
-    #    Next, it sets the user defined parameters in the specidifc classes, needed for the 
-    #    simulation.
-    #    """
-    #    self.simParameterDict['sps']               = float(self.CLI_dialg_num('Set SPS', '20'))
-    #    self.simParameterDict['diveType']          = self.CLI_dialg_choiceText('What dive Type schould be simulated ?', 'vShape', ['uShape','vShape'])
-    #    self.simParameterDict['durSec']            = float(self.CLI_dialg_num('How long should the dive simulation last?', '240'))    
-    #    self.simParameterDict['currentType']       = self.CLI_dialg_choiceText('What kind of current should be simulates? ', 'static', ['static','interp'])
-    #    if self.simParameterDict['currentType'] == 'static':
-    #        current_X = float(self.CLI_dialg_num('Set x-velocity in m/s:','0.0'))
-    #        current_Y = float(self.CLI_dialg_num('Set y-velocity in m/s:','2.0'))
-    #        current_Z = float(self.CLI_dialg_num('Set z-velocity in m/s:','0.0'))
-    #        self.simParameterDict['currentStaticVel'] = (current_X,current_Y,current_Z)
-    #    else:
-    #        # add standard cases after intial tests
-    #        print("For the interpolated type, you need to define the different currents in a tetraheder or choose one of the standard cases")
-    #    self.simParameterDict['oceanDepth']        = float(self.CLI_dialg_num('Set a depth of the oceans', '-70'))
-    #    self.simParameterDict['amountOfObstacles'] = int(self.CLI_dialg_num('How many obstacle should be simulates in the environment? ', '100'))
-    #    self.simParameterDict['max_particles']     = int(self.CLI_dialg_num('How many particles should be simulates in the particleCloud? ', '270'))
-    #    self.simParameterDict['particleSizeRange'] = (float(self.CLI_dialg_num('Set smallest Particle Size', '.00002')), float(self.CLI_dialg_num('Set biggest Particel Size', '0.00016')))
-    #    self.simParameterDict['cloudRadius']       = float(self.CLI_dialg_num('Set radius of the Cloud', '0.0018'))
-    # 
-    #    print(self.simParameterDict)
-    #    self.setParameters()
-#
-    #def setParameters(self):
-    #    """
-    #    This function sets the user defined parameter to the according parameters in the different classes
-    #    needed to run the simulation
-    #    """
-    #    self.sps                          = self.simParameterDict['sps']
-    #    self.protoMove.mode               = self.simParameterDict['diveType']
-    #    self.protoMove.traLenSec          = self.simParameterDict['durSec']
-    #    self.environment.waterCurrentMode = self.simParameterDict['currentType']
-    #    if self.simParameterDict['currentType'] == 'static':
-    #        self.environment.waterCurrent     = self.simParameterDict['currentStaticVel']
-    #    self.environment.oceanDepth       = self.simParameterDict['oceanDepth']
-    #    self.environment.maxObstacles     = self.simParameterDict['amountOfObstacles']
-    #    self.pCloud.max_particles         = self.simParameterDict['max_particles']
-    #    self.pCloud.sizeRange             = self.simParameterDict['particleSizeRange']
-    #    self.pCloud.maxVectorMagnitude    = self.simParameterDict['cloudRadius']
-#
     def setParametersInRunTimeDataCLI(self):
-
+        """
+        This function sets the public parameters in the runTimeData class according to user settings
+        by command line interface
+        """
         self.runTimeData.setParameter('sps', float(self.CLI_dialg_num('Set SPS', '20')))
         self.runTimeData.setParameter('diveType',self.CLI_dialg_choiceText('What dive Type schould be simulated ?', 'vShape', ['uShape','vShape']))
         self.runTimeData.setParameter('durSec',float(self.CLI_dialg_num('How long should the dive simulation last?', '240')))    
@@ -245,7 +173,6 @@ class SEAL_SIM:
 
         @return text choice answer of the user 
         """
-
         userAnswer = self.CLI_quest(question,answers,default)
         while userAnswer not in answers:
             print(str(userAnswer) + " unrecognised, please answer with: " + str(answers))
@@ -270,7 +197,6 @@ class SEAL_SIM:
 
         @return the answer typed in the command line by the user
         """
-
         if default != False:
             userAnswer = input(question + " [" + str(answers) +" | default: "+ str(default)+"] :")
             if userAnswer == "":
