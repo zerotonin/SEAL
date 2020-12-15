@@ -123,7 +123,7 @@ class runTimeData:
 
     def getParameter(self,parameterName):
         '''
-        this function allows other functions or classes to get the most
+        This function allows other functions or classes to get the most
         recent value for each parameter from the init function.
         '''
         if parameterName == 'sps':
