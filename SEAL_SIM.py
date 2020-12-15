@@ -135,7 +135,7 @@ class SEAL_SIM:
         self.initSimulationObjects()
         #set environment and particle cloud
         #self.setParameters()
-        self.environment.creatObstacles() #create obstacle if maxObsticales >0
+        self.environment.creatObstacles() #create obstacle if amountOfObstacles >0
         #get trajectory
         self.protoMove.generator2()
         # set the seal class to the trajectories of the protoMove class
