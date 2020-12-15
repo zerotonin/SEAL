@@ -60,6 +60,17 @@ class plotUtils:
         ax.set_zlabel('Depth (m)')
         fig.colorbar(h)
         fig.show()
+
+    def plot3D_positionsMovement(self,frame,partclObjList):
+        preCoordinates = self.particleObjList2CoordList(frame, 0, partclObjList)
+        postCoordinates = self.particleObjList2CoordList(frame, 1, partclObjList)
+        fig,ax = self.makeSquare3DAxis()
+        h = ax.scatter3D(preCoordinates[0], preCoordinates[1], preCoordinates[2], color='red')
+        h = ax.scatter3D(postCoordinates[0], postCoordinates[1], postCoordinates[2], color='green')
+        ax.set_xlabel('X')
+        ax.set_ylabel('Y')
+        ax.set_zlabel('Depth (m)')
+        fig.show()
     
     def plot3D_positionRelSize(self,partclObjList):
         '''
@@ -144,7 +155,7 @@ class mathUtils:
         The Cloudcart2sphere function converts the postion of each particle from 
         cartasian coordinates (x,y,z) to spheric coordinates (radius,theta,phi)
         """
-        for pobject in self.partclObjList:
+        for pobject in partclObjList:
             pobject.cart2sphere()
 
     def agentBasedVels2worldBasedCoords(self,transVel,angles,mode='2D'):
