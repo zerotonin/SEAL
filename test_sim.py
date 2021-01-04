@@ -41,6 +41,7 @@ simObj.runSimulation()
 # plot particleCloud
 ############################################################################################
 pU = util.plotUtils()
+pU.plot3D_OF(1600,simObj.pCloud.partclObjList,simObj.runTimeData.sealTrajectory)                                                                                                                                                         
 pU.plot3D_positionSizeColorCoded(100,0,simObj.pCloud.partclObjList )
 pU.plot3D_positionSizeColorCoded(100,1,simObj.pCloud.partclObjList )
 
@@ -82,7 +83,7 @@ plt.show()
 # check all velocities
 ##############################################################################################
 
-sealPos = np.vstack(simObj.seal.sealTrajectory)
+sealPos = np.vstack(simObj.runTimeData.sealTrajectory)
 
 #########
 # pitch values, depth, yaw
@@ -123,25 +124,20 @@ plt.show()
 #yx,y,z profile values 
 #######
 fig4 = plt.figure()
-fig, ((ax1, ax2, ax3),  (ax4, ax5, ax6), (ax7, ax8, ax9)) = plt.subplots(3, 3)
-ax1.plot(np.rad2deg(simObj.protoMove.xProfile))
+fig, ((ax1, ax2, ax3),  (ax4, ax5, ax6)) = plt.subplots(2, 3)
+ax1.plot(simObj.protoMove.xProfile))
 ax1.set_ylabel('xProfile')
-ax2.plot(np.rad2deg(simObj.protoMove.yProfile))
+ax2.plot(simObj.protoMove.yProfile))
 ax2.set_ylabel('yProfile')
-ax3.plot(np.rad2deg(simObj.protoMove.zProfile))
+ax3.plot(simObj.protoMove.zProfile))
 ax3.set_ylabel('zProfile')
-ax4.plot(np.rad2deg(simObj.protoMove.posTrajectory[:,0]))
+ax4.plot(simObj.protoMove.posTrajectory[:,0]))
 ax4.set_ylabel('x from posTrajectory')
-ax5.plot(np.rad2deg(simObj.protoMove.posTrajectory[:,1]))
+ax5.plot(simObj.protoMove.posTrajectory[:,1]))
 ax5.set_ylabel('y from posTrajectory')
-ax6.plot(np.rad2deg(simObj.protoMove.posTrajectory[:,2]))
+ax6.plot(simObj.protoMove.posTrajectory[:,2]))
 ax6.set_ylabel('z from posTrajectory')
-ax7.plot(np.rad2deg(sealPos[:,0]))
-ax7.set_ylabel('x from sealTrajectory')
-ax8.plot(np.rad2deg(sealPos[:,1]))
-ax8.set_ylabel('y from sealTrajectory')
-ax9.plot(np.rad2deg(sealPos[:,2]))
-ax9.set_ylabel('z from sealTrajectory')
+
 
 plt.show()
 
