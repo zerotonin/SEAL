@@ -79,7 +79,7 @@ class SEAL_SIM:
         self.seal        = seal_agent.Seal(self)
         self.pCloud      = turbidity.Cloud(self)
         self.pCloud.add_particles()
-        self.plot        = utilities.plotUtils()
+        self.plot        = utilities.plotUtils(self)
         self.math        = utilities.mathUtils()
         self.protoMove   = protoMov.ProtMov(self)
     
