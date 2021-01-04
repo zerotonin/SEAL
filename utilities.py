@@ -2,16 +2,17 @@ import matplotlib as mpl
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 import numpy as np
-
+import math as m 
 
 class plotUtils:
     '''
     Class 'plotUtilities' contains functions for creating plots for 3D particles' cloud 
     visialization, for plotting vectors distribution, and for optic flow field visualization 
     '''
-    def __init__(self):
+    def __init__(self,simObj):
         # maybe later on we want to keep our particle object list here
         self.name = 'plotting utilities for turbidity model'
+        self.simObj = simObj
 
     def particleObjList2CoordList(self,frame,prePost,partclObjList):
         '''
@@ -75,10 +76,9 @@ class plotUtils:
 
     
     def plot3D_OF(self,frame,partclObjList,sealTrajectory):
- 
+        # plot pre and post position of particle with direction vector
         preCoordinates = self.particleObjList2CoordList(frame, 0, partclObjList)
         postCoordinates = self.particleObjList2CoordList(frame, 1, partclObjList)
-        sealStep = np.subtract(sealTrajectory[frame+1],sealTrajectory[frame])
         direct =  np.subtract(postCoordinates,preCoordinates)
         fig,ax = self.makeSquare3DAxis()
         ax.scatter3D(preCoordinates[0], preCoordinates[1], preCoordinates[2], color='red')
@@ -90,7 +90,16 @@ class plotUtils:
         V = direct[1]
         W = direct[2]
         ax.quiver(X,Y,Z,U,V,W,arrow_length_ratio=0.03, color = 'black')
+        # plot sealStep direction from simObj.runTimeData.sealTrajectory(x,y,z)
+        sealStep = np.subtract(sealTrajectory[frame+1],sealTrajectory[frame])
+        ax.scatter3D(sealStep[0],sealStep[1],sealStep[2])
         ax.quiver(0,0,0,sealStep[0],sealStep[1],sealStep[2], color ='red')
+        # plot the heading vector during the sealStep taken from the sealTrajectory from the plotted seal
+        # yawAngle, pitchAngle, rollAngle
+        headingVector=np.array([0.01,0,0])
+        self.sealHeading = self.simObj.math.agentBasedVels2worldBasedCoords(headingVector,(sealTrajectory[frame][3:6]),'3D') 
+        ax.quiver(0,0,0,self.sealHeading[0],self.sealHeading[1],self.sealHeading[2], color ='green')
+        
         ax.set_xlabel('X')
         ax.set_ylabel('Y')
         ax.set_zlabel('Depth (m)')
@@ -155,7 +164,7 @@ class mathUtils:
         """
         self.name = 'math utilities for coordinate stuff'
 
-    def cart2sphere(self):
+    def cart2sphere(self, position):
         """
         Converts cartasian coordinates (x = pobject.positison[0],y = pobject.positison[1],
         z = pobject.positison[2]) of pobjects in self.partclObjList to sperical coordinates
@@ -167,10 +176,10 @@ class mathUtils:
 
         @return list of radius, theta and phi
         """
-        XsqPlusYsq    = self.position[0]**2 + self.position[1]**2
-        r             = m.sqrt(XsqPlusYsq + self.position[2]**2)               # r
-        theta         = m.atan2(m.sqrt(XsqPlusYsq),self.position[2])     # theta 
-        phi           = m.atan2(self.position[1],self.position[0])          # phi not correct 
+        XsqPlusYsq    = position[0]**2 + position[1]**2
+        r             = m.sqrt(XsqPlusYsq + position[2]**2)               # r
+        theta         = m.atan2(m.sqrt(XsqPlusYsq),position[2])     # theta 
+        phi           = m.atan2(position[1],position[0])         # phi not correct 
         self.position = [r,theta,phi]
 
         return [r,theta,phi]
