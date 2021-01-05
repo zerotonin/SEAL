@@ -91,9 +91,14 @@ class plotUtils:
         W = direct[2]
         ax.quiver(X,Y,Z,U,V,W,arrow_length_ratio=0.03, color = 'black')
         # plot sealStep direction from simObj.runTimeData.sealTrajectory(x,y,z)
-        sealStep = np.subtract(sealTrajectory[frame+1],sealTrajectory[frame])
+        sealStep = np.subtract(sealTrajectory[frame+1],sealTrajectory[frame]) # sealTrajectory --> simObj.runTimeData.sealTrajectory[0:3]
         ax.scatter3D(sealStep[0],sealStep[1],sealStep[2])
         ax.quiver(0,0,0,sealStep[0],sealStep[1],sealStep[2], color ='red')
+        # or:
+        #sealStep = sealTrajectory[0:3] # sealTrajectors --> simObj.runTimeData.velTra
+        #ax.scatter3D(sealStep[0],sealStep[1],sealStep[2])
+        #ax.quiver(0,0,0,sealStep[0],sealStep[1],sealStep[2], color ='red')
+
         # plot the heading vector during the sealStep taken from the sealTrajectory from the plotted seal
         # yawAngle, pitchAngle, rollAngle
         headingVector=np.array([0.01,0,0])
