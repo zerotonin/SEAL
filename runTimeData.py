@@ -206,6 +206,5 @@ class runTimeData:
         g3 = hf.create_group('particleList')
         for pObject in self.simObj.pCloud.partclObjList:
             g3.create_dataset('particleTra_'+str(pObject),data=self.simObj.pCloud.partclObjList[pObject].trajectory)
-#
-
+#       # data=self.simObj.pCloud.partclObjList[pObject].trajectory[i] --> prePosition ARRAY, postPosition ARRAY StateCheck BOOL
 
