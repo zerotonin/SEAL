@@ -203,9 +203,9 @@ class runTimeData:
 #
         hf.create_dataset('sealTrajectory',data=self.sealTrajectory)
 
-#        g3 = hf.create_group('particleList')
-#        for pObject in self.simObj.pCloud.partclObjList:
-#            g3.create_dataset('particleTra_pObject',data=self.simObj.pCloud.partclObjList[pObject].trajectory)
+        g3 = hf.create_group('particleList')
+        for pObject in self.simObj.pCloud.partclObjList:
+            g3.create_dataset('particleTra_'+str(pObject),data=self.simObj.pCloud.partclObjList[pObject].trajectory)
 #
 
 
