@@ -40,8 +40,8 @@ simObj.runSimulation()
 #########################################################################################
 # plot particleCloud
 ############################################################################################
-pU = util.plotUtils()
-pU.plot3D_OF(1600,simObj.pCloud.partclObjList,simObj.runTimeData.sealTrajectory)                                                                                                                                                         
+pU = util.plotUtils(simObj)
+pU.plot3D_OF(100,simObj.pCloud.partclObjList,simObj.runTimeData.sealTrajectory)                                                                                                                                                         
 pU.plot3D_positionSizeColorCoded(100,0,simObj.pCloud.partclObjList )
 pU.plot3D_positionSizeColorCoded(100,1,simObj.pCloud.partclObjList )
 
@@ -53,11 +53,12 @@ O = opticFlowAna.opticFlowAnalysis(simObj)
 O.opticFlowAbility()
 O.plot2DparticleDist(100)
 O.createOpticFlow(100)
+O.createOpticFlowViewField(100)
 
 #########################################################################################
 #plotSealTrajectory
 #########################################################################################
-simObj.protoMove.getPositionAndAngelTrajectoryFromVelTrajectory()
+
 simObj.protoMove.getSealHeading()
 
 fig = plt.figure() 
