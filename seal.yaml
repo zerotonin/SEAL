@@ -19,8 +19,10 @@ dependencies:
 - matplotlib
 - ipython  
 - tqdm 
-- pip   
+- pip
+- pandas   
 - pip:
     - ai.cs
     - tqdm
     - pickle-mixin
+    - tables
