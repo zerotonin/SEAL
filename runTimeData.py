@@ -225,10 +225,10 @@ class runTimeData:
         # add file location to meta data
         outDict['yamlFile'] = fileBaseName + '.yaml'
         outDict['hdf5File'] = fileBaseName + '.h5' 
-
+        # write out yaml
         with open(outDict['yamlFile'], 'w') as file:
             documents = yaml.dump(outDict, file)
-        
+        #write out data frame
         resultDF.to_hdf(outDict['hdf5File'],key='df',mode='w',complevel=9)
 
 
