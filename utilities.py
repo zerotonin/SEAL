@@ -63,6 +63,10 @@ class plotUtils:
         fig.show()
 
     def plot3D_positionsMovement(self,frame,partclObjList):
+        '''
+        This function plots the prePositions of all particle for a specifc frame in red
+        and all postPositions in green.
+        '''
 
         preCoordinates = self.particleObjList2CoordList(frame, 0, partclObjList)
         postCoordinates = self.particleObjList2CoordList(frame, 1, partclObjList)
@@ -76,6 +80,10 @@ class plotUtils:
 
     
     def plot3D_OF(self,frame,partclObjList,sealTrajectory):
+        '''
+        This function plot both, the particle movement (red to green)for a specific frame
+        as well as the sealStep(magenta) and heading(green). 
+        '''
         # plot pre and post position of particle with direction vector
         preCoordinates = self.particleObjList2CoordList(frame, 0, partclObjList)
         postCoordinates = self.particleObjList2CoordList(frame, 1, partclObjList)
@@ -166,7 +174,6 @@ class mathUtils:
     def __init__(self):
         """
         @param name           str default: none
-            ??
         """
         self.name = 'math utilities for coordinate stuff'
 
