@@ -95,15 +95,16 @@ class plotUtils:
         ax.scatter3D(sealStep[0],sealStep[1],sealStep[2])
         ax.quiver(0,0,0,sealStep[0],sealStep[1],sealStep[2], color ='red')
         # or:
-        #sealStep = sealTrajectory[0:3] # sealTrajectors --> simObj.runTimeData.velTra
-        #ax.scatter3D(sealStep[0],sealStep[1],sealStep[2])
-        #ax.quiver(0,0,0,sealStep[0],sealStep[1],sealStep[2], color ='red')
+        sealStep1 = self.simObj.runTimeData.velTra[frame][0:3]/self.simObj.runTimeData.sps # sealTrajectors --> simObj.runTimeData.velTra
+        ax.scatter3D(sealStep1[0],sealStep1[1],sealStep1[2])
+        ax.quiver(0,0,0,sealStep1[0],sealStep1[1],sealStep1[2], color ='magenta')
 
         # plot the heading vector during the sealStep taken from the sealTrajectory from the plotted seal
         # yawAngle, pitchAngle, rollAngle
-        headingVector=np.array([0.01,0,0])
-        self.sealHeading = self.simObj.math.agentBasedVels2worldBasedCoords(headingVector,(sealTrajectory[frame][3:6]),'3D') 
-        ax.quiver(0,0,0,self.sealHeading[0],self.sealHeading[1],self.sealHeading[2], color ='green')
+        #headingVector=np.array([0.01,0,0])
+        self.sealHeading = self.simObj.protoMove.sealHeading
+        #self.sealHeading = self.simObj.math.agentBasedVels2worldBasedCoords(headingVector,(sealTrajectory[frame][3:6]),'3D') 
+        ax.quiver(0,0,0,self.sealHeading[0]*0.01,self.sealHeading[1]*0.01,self.sealHeading[2]*0.01, color ='green')
         
         ax.set_xlabel('X')
         ax.set_ylabel('Y')
