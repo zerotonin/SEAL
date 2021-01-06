@@ -177,6 +177,10 @@ class runTimeData:
         pickle.dump(self,fileHandler)
 
     def writeOutYaml(self):
+        '''
+        This function saves the simulated sealTrajectories and particle Trajectories
+        as well as all public data for this simulation in a hdf5 file format.
+        '''
         # sealTra, particleTra(for each particle list of duration ( including list of prePosition, postPosition and state)), Paramater aus init
         hf = h5py.File('data.h5', 'w')
 
