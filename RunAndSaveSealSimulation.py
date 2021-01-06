@@ -2,25 +2,26 @@ import SEAL_SIM
 """
 Parameter,Runs:
 
--dive type,2
--current Static,8 
--current None,1
--current Interp,1
--particle No,10 
--basic Reps,100
+-dive type        2
+-current Static   8 
+-current None     1
+-current Interp   1
+-particle No      10 
+-basic Reps       100
+
 --> 200 different conditions 
-
 --> totalNo of Runs,20000
--sps,100
--traDurSec,240
--simulatedFrames,480000000
 
--sim Rate,0.05
+-sps              100
+-traDurSec        240
+-simulatedFrames  480000000
+
+-sim Rate         0.05
 -Total sim Duration in h ,6666.66666666667
 
-CPUs available = 52
+CPUs available    52
 
---> real time in days,5.55555555555556
+--> real time in days ,5.55555555555556
 
 runs per CPU ,400 (4 conditions)
 
