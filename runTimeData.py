@@ -209,11 +209,35 @@ class runTimeData:
         # dictionary to create final data frame
         return pd.concat(dataDict,axis = 1)
 
-    def writeOutYaml(self):
+    def metaData2Dict(self):
+        # dict that shit
+        outDict = { 'diveType'       : self.diveType,
+                    'oceanLowerLim'  : float(self.oceanLimit[0]),
+                     }
+
+        return outDict
+
+    def standardOut(self,fileBaseName)
+        # get data as DataFrame
+        resultDF = self.data2pandaShit()
+        # get meta data as yaml conform dictionary
+        outDict = self.metaData2Dict()
+        # add file location to meta data
+        outDict['yamlFile'] = fileBaseName + '.yaml'
+        outDict['hdf5File'] = fileBaseName + '.h5' 
+
+        with open(outDict['yamlFile'], 'w') as file:
+            documents = yaml.dump(outDict, file)
+        
+        resultDF.to_hdf(outDict['hdf5File'],key='df',mode='w',complevel=9)
+
+
+
+
         '''
         This function saves the simulated sealTrajectories and particle Trajectories
         as well as all public data for this simulation in a hdf5 file format.
-        '''
+        
         # sealTra, particleTra(for each particle list of duration ( including list of prePosition, postPosition and state)), Paramater aus init
         hf = h5py.File('data.h5', 'w')
 
@@ -244,4 +268,5 @@ class runTimeData:
         for pObject in self.simObj.pCloud.partclObjList:
             g3.create_dataset('particleTra_'+str(pObject),data=self.simObj.pCloud.partclObjList[pObject].trajectory)
 #       # data=self.simObj.pCloud.partclObjList[pObject].trajectory[i] --> prePosition ARRAY, postPosition ARRAY StateCheck BOOL
+        '''
 
