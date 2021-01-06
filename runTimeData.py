@@ -1,7 +1,8 @@
 
 import numpy as np
+import pandas as pd
 import pickle
-import h5py
+#import h5py
 class runTimeData:
     '''
     This class sets and gets all public data, which are needed to run a specific simulation.
@@ -175,6 +176,38 @@ class runTimeData:
         self.packToWriteOut()
         fileHandler = open(filename,'wb')
         pickle.dump(self,fileHandler)
+
+    def data2pandaShit(self):
+        # labels for the dataframes
+        coordinateLable  = ['x_m','y_m','z_m']
+        orientationLable = ['yaw_rad','pitch_rad','roll_rad']
+        
+        # make a seal data frame we use a second hierarchical level to have the same amount of levels as 
+        # for the particles. There might be more elegant ways to program this. Please improve
+        sealCoordsDF = pd.DataFrame(self.sealTrajectory[0::,0:3],columns= coordinateLable)
+        sealOrientDF = pd.DataFrame(self.sealTrajectory[0::,3::],columns= orientationLable)
+        sealDF       = pd.concat(dict(coordinates = sealCoordsDF,orientation=sealOrientDF),axis = 1)
+        
+        # counter for particles
+        c = 0
+        
+        # data dictionary for the final dataframe
+        dataDict = dict(seal = sealDF)
+        # run through all particles
+        for particle in self.simObj.pCloud.partclObjList:
+            # we use a list constructor to get the data out of the list of tuples and 
+            # directly write them into individual data frames
+            pre     = pd.DataFrame([ x[0] for x in particle.trajectory],columns= coordinateLable)
+            post    = pd.DataFrame([ x[1] for x in particle.trajectory],columns= coordinateLable)
+            flag    = pd.DataFrame([ x[2] for x in particle.trajectory],columns= ['flag'])
+            # combine pre-step-coordinates and post-step-coordinates with the visibility flag into one df
+            particleDF = pd.concat(dict(preStep = pre,postStep = post,visible = flag),axis = 1)
+            # save the new df in the data dictionary
+            dataDict['particle_'+str(c).zfill(4)] = particleDF
+            # increase counter
+            c+=1
+        # dictionary to create final data frame
+        return pd.concat(dataDict,axis = 1)
 
     def writeOutYaml(self):
         '''
