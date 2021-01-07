@@ -1,4 +1,4 @@
-import turbidity, seal_agent,copy,environment,utilities,protoMov,runTimeData
+import turbidity, seal_agent,copy,environment,utilities,protoMov,runTimeData, opticFlowAna
 from tqdm import tqdm
 import numpy as np
 
@@ -51,12 +51,13 @@ class SEAL_SIM:
                       cloudRadiusFloat)
         else:
             raise ValueError('Unknown simulation input mode' + str(mode))
-        self.environment = None 
-        self.seal        = None
-        self.pCloud      = None
-        self.plot        = None
-        self.math        = None
-        self.protoMove   = None
+        self.environment  = None 
+        self.seal         = None
+        self.pCloud       = None
+        self.plot         = None
+        self.math         = None
+        self.protoMove    = None
+        self.opticFlowAna = None
         # private objects
         self.sealVelTra  = list()
         
@@ -75,13 +76,13 @@ class SEAL_SIM:
         """
         This function initialises all classes needed for simulation.
         """
-        self.environment = environment.environment(self) # velocity in meter per second will be transformed into an evironment object
-        self.seal        = seal_agent.Seal(self)
-        self.pCloud      = turbidity.Cloud(self)
+        self.environment  = environment.environment(self) # velocity in meter per second will be transformed into an evironment object
+        self.seal         = seal_agent.Seal(self)
+        self.pCloud       = turbidity.Cloud(self)
         self.pCloud.add_particles()
-        self.plot        = utilities.plotUtils(self)
-        self.math        = utilities.mathUtils()
-        self.protoMove   = protoMov.ProtMov(self)
+        self.plot         = utilities.plotUtils(self)
+        self.math         = utilities.mathUtils()
+        self.protoMove    = protoMov.ProtMov(self)
     
     def setParameters(self,spsInt,diveTypeStr,durSecFloat,currentTypeStr,currentStaticVelTuple,
                       oceanDepthFloat,amountOfObstaclesInt,maxParticlesInt,particleSizeRangeTuple,
@@ -143,6 +144,7 @@ class SEAL_SIM:
                 print("Seal left simulation environment! o.O")
                 break
         print(self.protoMove.posTrajectory[0,:])
+        self.opticFlowAna = opticFlowAna.opticFlowAnalysis(self)
 
     def setParametersInRunTimeDataCLI(self):
         """
@@ -157,7 +159,7 @@ class SEAL_SIM:
             current_X = float(self.CLI_dialg_num('Set x-velocity in m/s:','0.0'))
             current_Y = float(self.CLI_dialg_num('Set y-velocity in m/s:','0.1'))
             current_Z = float(self.CLI_dialg_num('Set z-velocity in m/s:','0.0'))
-            self.runTimeData.setParameter('currentStaticVel', (current_X,current_Y,current_Z))
+            self.runTimeData.setParameter('waterCurrent', (current_X,current_Y,current_Z))
         else:
             # add standard cases after intial tests
             print("For the interpolated type, you need to define the different currents in a tetraheder or choose one of the standard cases")
