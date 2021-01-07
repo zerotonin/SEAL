@@ -47,7 +47,7 @@ class opticFlowAnalysis:
         # public objects
         self.particleList   = simObj.pCloud.partclObjList #mutable
         self.sealTrajectory = simObj.runTimeData.getParameter('sealTrajectory') #mutable
-        self.traLen         = self.simObj.protoMove.traLen #mutable
+        self.traLen         = simObj.protoMove.traLen #mutable
         # private objects
         self.anaDataList    = list()
         self.distRankDiff   = list()
@@ -67,11 +67,35 @@ class opticFlowAnalysis:
             if  self.anaDataList[frame][2][i] != None: # richtungsvector between frames
                 X = self.anaDataList[frame][2][i][0][2] # phi
                 Y = self.anaDataList[frame][2][i][0][1] # theta
-                U = direct[1] # phi direction
-                V = direct[0] # theta direction
+                U = direct[2] # phi direction
+                V = direct[1] # theta direction
                 ax.quiver(X,Y,U,V,angles ='xy',scale_units='xy', scale =1,width=0.001)
             else:
                 pass
+            
+        plt.show() 
+
+    def createOpticFlowViewField(self,frame):
+        """
+        This function plotts a 2D optic flow field for a single sealStep, by calculating the 
+        magnitute ot the movement vector from the oldPosition of the particle to the newPosition 
+        for theta and phi (ignoring the radius, since the retina only has 2 dimensions)
+        """
+        fig = plt.figure() 
+        ax = fig.add_subplot(111) 
+        #for specific frame it calcultates the magnitute between the old and new position of each visibile? particle
+        for i in range(len(self.particleList)): # po should be (oldPosition, newPosition, status) of particle per movement
+            direct = self.anaDataList[frame][3][i]
+            if  self.anaDataList[frame][2][i] != None: # richtungsvector between frames
+                X = self.anaDataList[frame][2][i][0][2] # phi
+                Y = self.anaDataList[frame][2][i][0][1] # theta
+                U = direct[2] # phi direction
+                V = direct[1] # theta direction
+                ax.quiver(X,Y,U*0.1,V*0.1,angles ='xy',scale_units='xy', scale =1,width=0.001)
+            else:
+                pass
+        ax.set_xlim(-1.815,1.815) # visual field from -104 to 104° horizontally
+        ax.set_ylim(-0.209,1.204) # vidual field from−12°to+69°vertically
             
         plt.show() 
 
@@ -114,7 +138,7 @@ class opticFlowAnalysis:
         plt.show()
 
     def opticFlowAbility(self):
-        """
+        """das
         The particle position is denoted in a spherical coordinate system.
         The spherical coordinate system is defiend as:
             r     = the distance to the coordinate origin (aka seal) [m]
@@ -274,8 +298,28 @@ class opticFlowAnalysis:
         """
         magnitude between the particle before and after sealMovement,
         describing the shift on the retina for optic flow
+
+        ofVec = sphP2-sphP1 
+        |ofVec(1)| > pi -> mod(ofVec(1),pi)*-1
+        |ofVec(2)| > pi/2 -> mod(ofVec(2),pi/2)*-1 
         """
-        OFvector = np.subtract(sphereParticles[1][1:3],sphereParticles[0][1:3]) # magnitude of 2D vector p1(phi,z) to p2(phi,z)
+        OFvector = np.subtract(sphereParticles[1],sphereParticles[0]) # magnitude of 2D vector p1(phi,z) to p2(phi,z)
+        if np.linalg.norm(OFvector[1]) > np.pi/2:
+            #OFvector[2]= OFvector[2]*-1
+            if OFvector[1] < 0:
+                OFvector[1]= -(OFvector[1]%(np.pi/2))*-1
+                OFvector
+            else: 
+                OFvector[1]= (OFvector[1]%(np.pi/2))*-1    
+
+        if np.linalg.norm(OFvector[2]) > np.pi:
+            #OFvector[2]= OFvector[2]*-1
+            if OFvector[2] < 0:
+                OFvector[2]= -(OFvector[2]%(np.pi))*-1
+            else: 
+                OFvector[2]= (OFvector[2]%(np.pi))*-1    
+        
+        OFvector = OFvector
         distance_OFestimate = np.linalg.norm(OFvector)
         
         return OFvector,distance_groundTruth,distance_OFestimate
@@ -292,8 +336,6 @@ class opticFlowAnalysis:
             newPosition = self.cart2spheric(frame[1])
             sphereTra.append((oldPosition,newPosition,frame[2]))
         return sphereTra
-
-        pass
 
     def testVisibility(self):
         """
