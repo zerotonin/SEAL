@@ -99,21 +99,26 @@ class plotUtils:
         W = direct[2]
         ax.quiver(X,Y,Z,U,V,W,arrow_length_ratio=0.03, color = 'black')
         # plot sealStep direction from simObj.runTimeData.sealTrajectory(x,y,z)
-        sealStep = np.subtract(sealTrajectory[frame+1],sealTrajectory[frame]) # sealTrajectory --> simObj.runTimeData.sealTrajectory[0:3]
-        ax.scatter3D(sealStep[0],sealStep[1],sealStep[2])
-        ax.quiver(0,0,0,sealStep[0],sealStep[1],sealStep[2], color ='red')
+        #sealStep = np.subtract(sealTrajectory[frame+1],sealTrajectory[frame]) # sealTrajectory --> simObj.runTimeData.sealTrajectory[0:3]
+        #ax.scatter3D(sealStep[0],sealStep[1],sealStep[2])
+        #ax.quiver(0,0,0,sealStep[0],sealStep[1],sealStep[2], color ='red')
+        #or:
+        R = self.simObj.math.getRotMatrix3D(sealTrajectory[frame][3:][0],sealTrajectory[frame][3:][1],sealTrajectory[frame][3:][2],'passive')
+        sealStep3 = np.dot(R,(np.subtract(sealTrajectory[frame+1][0:3],sealTrajectory[frame][0:3]))) 
+        ax.scatter3D(sealStep3[0],sealStep3[1],sealStep3[2])
+        ax.quiver(0,0,0,sealStep3[0],sealStep3[1],sealStep3[2], color ='red')
         # or:
-        sealStep1 = self.simObj.runTimeData.velTra[frame][0:3]/self.simObj.runTimeData.sps # sealTrajectors --> simObj.runTimeData.velTra
-        ax.scatter3D(sealStep1[0],sealStep1[1],sealStep1[2])
-        ax.quiver(0,0,0,sealStep1[0],sealStep1[1],sealStep1[2], color ='magenta')
+        #sealStep1 = self.simObj.runTimeData.velTra[frame][0:3]/self.simObj.runTimeData.sps # sealTrajectors --> simObj.runTimeData.velTra
+        #ax.scatter3D(sealStep1[0],sealStep1[1],sealStep1[2])
+        #ax.quiver(0,0,0,sealStep1[0],sealStep1[1],sealStep1[2], color ='magenta')
 
         # plot the heading vector during the sealStep taken from the sealTrajectory from the plotted seal
         # yawAngle, pitchAngle, rollAngle
         #headingVector=np.array([0.01,0,0])
-        self.sealHeading = self.simObj.protoMove.sealHeading
-        #self.sealHeading = self.simObj.math.agentBasedVels2worldBasedCoords(headingVector,(sealTrajectory[frame][3:6]),'3D') 
+        self.sealHeading = self.simObj.protoMove.sealHeading[frame]
+        self.sealHeading1 = sealTrajectory[frame][3:] 
         ax.quiver(0,0,0,self.sealHeading[0]*0.01,self.sealHeading[1]*0.01,self.sealHeading[2]*0.01, color ='green')
-        
+        ax.quiver(0,0,0,self.sealHeading1[0]*0.01,self.sealHeading1[1]*0.01,self.sealHeading1[2]*0.01, color ='magenta')
         ax.set_xlabel('X')
         ax.set_ylabel('Y')
         ax.set_zlabel('Depth (m)')
