@@ -2,6 +2,7 @@
 import numpy as np
 import pandas as pd
 import pickle
+import yaml
 #import h5py
 class runTimeData:
     '''
@@ -69,7 +70,6 @@ class runTimeData:
         self.sealTrajectory         = list() # public??
         self.diveType               = 'vShape' # descri
         self.currentType            = 'static'
-        self.currentStaticVel       = (0.0,0.1,0.0)
         self.max_particles          = 270
         self.particleSizeRange      = (0.00002,0.00016)
         self.cloudRadius            = 0.0018
@@ -112,8 +112,6 @@ class runTimeData:
             self.traLen = self.durSec*self.sps
         elif parameterName == 'currentType':
             self.currentType  = parameterValue
-        elif parameterName == 'currentStaticVel':
-            self.currentStaticVel  = parameterValue
         elif parameterName == 'max_particles':
             self.max_particles  = parameterValue
         elif parameterName == 'particleSizeRange':
@@ -158,8 +156,6 @@ class runTimeData:
             return self.durSec  
         elif parameterName == 'currentType':
             return self.currentType  
-        elif parameterName == 'currentStaticVel':
-            return self.currentStaticVel  
         elif parameterName == 'max_particles':
             return self.max_particles  
         elif parameterName == 'particleSizeRange':
@@ -210,16 +206,47 @@ class runTimeData:
         return pd.concat(dataDict,axis = 1)
 
     def metaData2Dict(self):
-        # dict that shit
-        outDict = { 'diveType'       : self.diveType,
-                    'oceanLowerLim'  : float(self.oceanLimit[0]),
+        # dict that shit   
+        outDict = { 'sps'                  : self.sps,
+                    'oceanSurface'         : self.oceanSurface,
+                    'oceanDepth'           : self.oceanDepth,
+                    'oceanLowerLim'        : float(self.oceanLimit[0]), 
+                    'oceanUpperLim'        : float(self.oceanLimit[1]),      
+                    'waterCurrentX'        : float(self.waterCurrent[0]), 
+                    'waterCurrentY'        : float(self.waterCurrent[1]),
+                    'waterCurrentZ'        : float(self.waterCurrent[2]),     
+                    'amountOfObstacles'    : self.amountOfObstacles, 
+                    'durSec'               : self.durSec,            
+                    'traLen'               : self.traLen,            
+                    #'velTra:self.velTra              
+                    'sealPositionX'        : float(self.sealPosition[0]),  
+                    'sealPositionY'        : float(self.sealPosition[1]), 
+                    'sealPositionZ'        : float(self.sealPosition[2]),     
+                    'sealOrientationX'     : float(self.sealOrientation[0]),
+                    'sealOrientationY'     : float(self.sealOrientation[1]),
+                    'sealOrientationZ'     : float(self.sealOrientation[2]),   
+                    'sealStepX'            : float(self.sealStep[0]),
+                    'sealStepY'            : float(self.sealStep[1]),
+                    'sealStepZ'            : float(self.sealStep[2]),
+                    'sealStepYaw'          : float(self.sealStep[3]),
+                    'sealStepPitch'        : float(self.sealStep[4]),
+                    'sealStepRoll'         : float(self.sealStep[5]),          
+                    #'sealTrajectory'  : self.sealTrajectory,    
+                    'diveType'             : self.diveType,          
+                    'currentType'          : self.currentType,       
+                    #'currentStaticVelX'   : self.currentStaticVel[0], same as waterCurrent 
+                    'max_particles'        : self.max_particles,     
+                    'smallestParticleSize' : float(self.particleSizeRange[0]),
+                    'largestParticleSize'  : float(self.particleSizeRange[1]), 
+                    'cloudRadius'          : self.cloudRadius,       
                      }
 
         return outDict
 
-    def standardOut(self,fileBaseName)
+    def standardOut(self,fileBaseName):
         # get data as DataFrame
         resultDF = self.data2pandaShit()
+        resultDF.columns = resultDF.columns.map(str)
         # get meta data as yaml conform dictionary
         outDict = self.metaData2Dict()
         # add file location to meta data
@@ -227,10 +254,21 @@ class runTimeData:
         outDict['hdf5File'] = fileBaseName + '.h5' 
         # write out yaml
         with open(outDict['yamlFile'], 'w') as file:
-            documents = yaml.dump(outDict, file)
+            yaml.dump(outDict, file, sort_keys=False)
         #write out data frame
         resultDF.to_hdf(outDict['hdf5File'],key='df',mode='w',complevel=9)
-
+        #or
+        #compression_opts = dict(method='zip',archive_name='out.csv')  
+        resultDF.to_csv(fileBaseName + '.csv.gz',compression= 'gzip')
+        resultDF.to_csv(fileBaseName + '.csv.zip',compression= 'zip')
+        resultDF.to_pickle(fileBaseName + '.pickle')
+        resultDF.to_pickle(fileBaseName + '.pickle.gz', compression='gzip')
+        resultDF.to_pickle(fileBaseName + '.pickle.bz2', compression='bz2')
+        resultDF.to_pickle(fileBaseName + '.pickle.zip', compression='zip')
+        resultDF.to_pickle(fileBaseName + '.pickle.xz', compression='xz')
+        resultDF.to_feather(fileBaseName + '.feather')
+        resultDF.to_parquet(fileBaseName + '.parquet.gz', compression='gzip')
+ 
 
 
 
