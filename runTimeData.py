@@ -173,9 +173,10 @@ class runTimeData:
         fileHandler = open(filename,'wb')
         pickle.dump(self,fileHandler)
 
-    def data2pandaShit(self):
+    def data2pandaShit(self,lightWeight=True):
         # labels for the dataframes
         coordinateLable  = ['x_m','y_m','z_m']
+        sphericLable     = ['r_m' ,'theta_rad','phi_rad']
         orientationLable = ['yaw_rad','pitch_rad','roll_rad']
         
         # make a seal data frame we use a second hierarchical level to have the same amount of levels as 
@@ -193,11 +194,27 @@ class runTimeData:
         for particle in self.simObj.pCloud.partclObjList:
             # we use a list constructor to get the data out of the list of tuples and 
             # directly write them into individual data frames
-            pre     = pd.DataFrame([ x[0] for x in particle.trajectory],columns= coordinateLable)
-            post    = pd.DataFrame([ x[1] for x in particle.trajectory],columns= coordinateLable)
-            flag    = pd.DataFrame([ x[2] for x in particle.trajectory],columns= ['flag'])
-            # combine pre-step-coordinates and post-step-coordinates with the visibility flag into one df
-            particleDF = pd.concat(dict(preStep = pre,postStep = post,visible = flag),axis = 1)
+            if lightWeight:
+            
+                pre       = pd.DataFrame([ self.simObj.opticFlowAna.cart2spheric(x[0]) for x in particle.trajectory],columns= sphericLable)
+                post      = pd.DataFrame([ self.simObj.opticFlowAna.cart2spheric(x[1])  for x in particle.trajectory],columns= sphericLable)
+                flag      = pd.DataFrame([ x[2] for x in particle.trajectory],columns= ['flag'])
+                radii     = pd.concat(dict(preR=pre['r_m'],postR=post['r_m']),axis=1).mean(axis=1)
+                inSideFoV = pd.concat(dict( prePhiLT = pre['phi_rad'].gt(-1.815), 
+                                            prePhiGT = pre['phi_rad'].lt(1.815)),
+                                            axis=1)
+
+                # combine pre-step-coordinates and post-step-coordinates with the visibilaity flag into one df
+                particleDF = pd.concat(dict(preStep = pre,postStep = post,visible = flag),axis = 1)
+
+
+            else:
+
+                pre     = pd.DataFrame([x[0] for x in particle.trajectory],columns= coordinateLable)
+                post    = pd.DataFrame([x[1]  for x in particle.trajectory],columns= coordinateLable)
+                flag    = pd.DataFrame([ x[2] for x in particle.trajectory],columns= ['flag'])
+                # combine pre-step-coordinates and post-step-coordinates with the visibility flag into one df
+                particleDF = pd.concat(dict(preStep = pre,postStep = post,visible = flag),axis = 1)
             # save the new df in the data dictionary
             dataDict['particle_'+str(c).zfill(4)] = particleDF
             # increase counter
@@ -259,15 +276,15 @@ class runTimeData:
         resultDF.to_hdf(outDict['hdf5File'],key='df',mode='w',complevel=9)
         #or
         #compression_opts = dict(method='zip',archive_name='out.csv')  
-        resultDF.to_csv(fileBaseName + '.csv.gz',compression= 'gzip')
-        resultDF.to_csv(fileBaseName + '.csv.zip',compression= 'zip')
-        resultDF.to_pickle(fileBaseName + '.pickle')
-        resultDF.to_pickle(fileBaseName + '.pickle.gz', compression='gzip')
-        resultDF.to_pickle(fileBaseName + '.pickle.bz2', compression='bz2')
-        resultDF.to_pickle(fileBaseName + '.pickle.zip', compression='zip')
-        resultDF.to_pickle(fileBaseName + '.pickle.xz', compression='xz')
-        resultDF.to_feather(fileBaseName + '.feather')
-        resultDF.to_parquet(fileBaseName + '.parquet.gz', compression='gzip')
+        #resultDF.to_csv(fileBaseName + '.csv.gz',compression= 'gzip')
+        #resultDF.to_csv(fileBaseName + '.csv.zip',compression= 'zip')
+        #resultDF.to_pickle(fileBaseName + '.pickle')
+        #resultDF.to_pickle(fileBaseName + '.pickle.gz', compression='gzip')
+        #resultDF.to_pickle(fileBaseName + '.pickle.bz2', compression='bz2')
+        #resultDF.to_pickle(fileBaseName + '.pickle.zip', compression='zip')
+        #resultDF.to_pickle(fileBaseName + '.pickle.xz', compression='xz')
+        #resultDF.to_feather(fileBaseName + '.feather')
+        #resultDF.to_parquet(fileBaseName + '.parquet.gz', compression='gzip')
  
 
 
