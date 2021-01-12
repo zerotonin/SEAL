@@ -60,7 +60,7 @@ class runTimeData:
         self.oceanDepth             = -70 # [m] linkable
         self.oceanLimit             = (-70,70) # [m] linkable
         self.waterCurrent           = np.array([0.0,0.1,0.0]) # just a simple example will be changed later 
-        self.amountOfObstacles      = 100
+        self.amountOfObstacles      = 20
         self.durSec                 = 240 # duration of,
         self.traLen                 = self.durSec*self.sps # number of samples
         self.velTra                 = list() # list of sealTrajectory per sample with (thrust,slip,lift,yaw,pitch,roll)        
@@ -70,7 +70,7 @@ class runTimeData:
         self.sealTrajectory         = list() # public??
         self.diveType               = 'vShape' # descri
         self.currentType            = 'static'
-        self.max_particles          = 270
+        self.max_particles          = 3660
         self.particleSizeRange      = (0.00002,0.00016)
         self.cloudRadius            = 0.0018
 
