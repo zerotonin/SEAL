@@ -207,8 +207,8 @@ class Cloud:
     b for the best optical performance in R1 with the maximum size particle of R2 1850 µm = ----------------
                                                                                             tan(0.086666667)
 
-    The lowest count of particles in the baltic sea is 1500 particles pro cm³ R3). For a cube of 0.18 cm³ in which 
-    the seal can sea particles this renders 270 particles.
+    The lowest count of particles in the baltic sea is 1500 particles pro cm³ R3). For a cube of 2.44 cm³ in which 
+    the seal can sea particles this renders 3660 particles.
 
 
     R1) Michael Weiffen, Bettina Möller, Björn Mauck, Guido Dehnhardt, Effect of water turbidity 
