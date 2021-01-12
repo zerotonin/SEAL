@@ -157,7 +157,7 @@ class environment:
                   and innerRadius[m]  
         """  
         radius = np.random.uniform(0.1,10.0, size=(1)) # set size to 10cm to 10m radius
-        initialCoord = np.random.uniform(-5000,5000,size = (2)) # random vector (x,y,) from -5km to 5km 
+        initialCoord = np.random.uniform(self.oceanLimit[0],self.oceanLimit[1],size = (2)) # random vector (x,y,) from -5km to 5km 
         return (initialCoord,radius,radius-0.1)
 
     def checkObstacleDistance(self):
