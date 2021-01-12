@@ -131,7 +131,7 @@ ax1.set_ylabel('xProfile')
 ax2.plot(simObj.protoMove.yProfile))
 ax2.set_ylabel('yProfile')
 ax3.plot(simObj.protoMove.zProfile))
-ax3.set_ylabel('zProfile')
+# ax3.set_ylabel('zProfile')
 ax4.plot(simObj.protoMove.posTrajectory[:,0]))
 ax4.set_ylabel('x from posTrajectory')
 ax5.plot(simObj.protoMove.posTrajectory[:,1]))
@@ -141,6 +141,39 @@ ax6.set_ylabel('z from posTrajectory')
 
 
 plt.show()
+
+#########################################
+fig, ((ax1, ax2, ax3),  (ax4, ax5, ax6),(ax7, ax8, ax9), (ax10, ax11, ax12)) = plt.subplots(4, 3) 
+ax1.plot(np.rad2deg(simObj.protoMove.posTrajectory[:,3])) 
+ax1.set_ylabel('yaw angle') 
+ax2.plot(np.rad2deg(simObj.protoMove.posTrajectory[:,4])) 
+ax2.set_ylabel('pitch angle') 
+ax3.plot(np.rad2deg(simObj.protoMove.posTrajectory[:,5])) 
+ax3.set_ylabel('roll angle') 
+
+ax4.plot(simObj.protoMove.posTrajectory[:,0])
+ax4.set_ylabel('x from posTrajectory') 
+ax5.plot(simObj.protoMove.posTrajectory[:,1]) 
+ax5.set_ylabel('y from posTrajectory') 
+ax6.plot(simObj.protoMove.posTrajectory[:,2]) 
+ax6.set_ylabel('z from posTrajectory') 
+
+ax7.plot(np.rad2deg(simObj.runTimeData.velTra[:,3])) 
+ax7.set_ylabel('yaw') 
+ax8.plot(np.rad2deg(simObj.runTimeData.velTra[:,4])) 
+ax8.set_ylabel('pitch') 
+ax9.plot(np.rad2deg(simObj.runTimeData.velTra[:,5])) 
+ax9.set_ylabel('roll') 
+
+ax10.plot((simObj.runTimeData.velTra[:,0])) 
+ax10.set_ylabel('x from posTrajectory') 
+ax11.plot(simObj.runTimeData.velTra[:,1]) 
+ax11.set_ylabel('y from posTrajectory') 
+ax12.plot(simObj.runTimeData.velTra[:,2]) 
+ax12.set_ylabel('z from posTrajectory') 
+#plt.savefig('vShape.svg', format = 'svg') 
+plt.show()   
+
 
 ###########################################
 #test data translation between posTrajectory and velTra YAW & PITCHs   
