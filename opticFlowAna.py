@@ -6,6 +6,7 @@ import copy, matplotlib
 import matplotlib.pyplot as plt 
 from ai import cs
 from tqdm import tqdm
+import math as m
 
 class opticFlowAnalysis:
     ''' 
@@ -304,6 +305,37 @@ class opticFlowAnalysis:
         |ofVec(2)| > pi/2 -> mod(ofVec(2),pi/2)*-1 
         """
         OFvector = np.subtract(sphereParticles[1],sphereParticles[0]) # magnitude of 2D vector p1(phi,z) to p2(phi,z)
+        
+        #if np.linalg.norm(OFvector[1]) > np.pi/2:
+        #    #OFvector[2]= OFvector[2]*-1
+        #    if OFvector[1] < 0:
+        #        turns = m.floor(OFvector[1]/(np.pi/2))
+        #        if (turns % 2)== 0:
+        #            OFvector[1]= -(OFvector[1]%(np.pi/2))
+        #        else:
+        #            OFvector[1]= -(OFvector[1]%(np.pi/2))*-1
+        #else:
+        #    turns = m.floor(OFvector[1]/(np.pi/2))
+        #    if (turns % 2) == 0:
+        #        OFvector[1]= (OFvector[1]%(np.pi/2))    
+        #    else:
+        #        OFvector[1]= (OFvector[1]%(np.pi/2))*-1
+#
+        #if np.linalg.norm(OFvector[2]) > np.pi:
+#
+        #    if OFvector[2] < 0:
+        #        turns = m.floor(OFvector[2]/np.pi)
+        #        if (turns % 2) == 0:
+        #            OFvector[2]= -(OFvector[2]%np.pi)
+        #        else:
+        #            OFvector[2]= -(OFvector[2]%np.pi)*-1
+        #else:
+        #    turns = m.floor(OFvector[2]/np.pi)
+        #    if (turns % 2) == 0:
+        #        OFvector[2]= (OFvector[2]%(np.pi))    
+        #    else:
+        #        OFvector[2]= (OFvector[2]%(np.pi))*-1
+
         if np.linalg.norm(OFvector[1]) > np.pi/2:
             #OFvector[2]= OFvector[2]*-1
             if OFvector[1] < 0:
