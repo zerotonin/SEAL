@@ -235,26 +235,26 @@ class ProtMov:
         self.velTra = np.array(self.velTra)
         self.simObj.runTimeData.setParameter('velTra', self.velTra)
     
-    def getPositionAndAngelTrajectoryFromVelTrajectory(self):
-        """
-        This function calculates the angle(deg) and postion(m) data from the angleVelocity(deg/s) and 
-        directionVelocity(m/s) data. For the angles the cumulative sum of the angleVelocities
-        over the time of the dive is calculates. As for the positions the directionVectors from 
-        seal point of view needed to be rotated around yaw and pitch in order to get the position 
-        values in the world coordinates system(x,y,z)
-        """
-        testAngle = np.array([np.deg2rad(self.yawAngle[0]),np.deg2rad(self.pitchAngle[0]),0])
-        testVelAngle = self.velTra[:,3:]/self.sps
-        angles = np.vstack((testAngle,testVelAngle))
-        angles = np.cumsum(angles,axis=0)
-        positions = np.zeros(shape=(self.velTra.shape[0]+1,3))
-
-        for frameI in range(self.velTra.shape[0]):
-            positions[frameI+1,:] = self.mathUtils.agentBasedVels2worldBasedCoords(
-                                np.array(self.velTra[frameI,0:3]/self.sps),angles[frameI,:],'3D')
-     
-        self.positions = positions 
-        self.angles    = angles 
+    #def getPositionAndAngelTrajectoryFromVelTrajectory(self):
+    #    """
+    #    This function calculates the angle(deg) and postion(m) data from the angleVelocity(deg/s) and 
+    #    directionVelocity(m/s) data. For the angles the cumulative sum of the angleVelocities
+    #    over the time of the dive is calculates. As for the positions the directionVectors from 
+    #    seal point of view needed to be rotated around yaw and pitch in order to get the position 
+    #    values in the world coordinates system(x,y,z)
+    #    """
+    #    testAngle = np.array([np.deg2rad(self.yawAngle[0]),np.deg2rad(self.pitchAngle[0]),0])
+    #    testVelAngle = self.velTra[:,3:]/self.sps
+    #    angles = np.vstack((testAngle,testVelAngle))
+    #    angles = np.cumsum(angles,axis=0)
+    #    positions = np.zeros(shape=(self.velTra.shape[0]+1,3))
+#
+    #    for frameI in range(self.velTra.shape[0]):
+    #        positions[frameI+1,:] = self.mathUtils.agentBasedVels2worldBasedCoords(
+    #                            np.array(self.velTra[frameI,0:3]/self.sps),angles[frameI,:],'3D')
+    # 
+    #    self.positions = positions 
+    #    self.angles    = angles 
 
     def createLiftPitch(self, currentDive):
         """
@@ -405,9 +405,9 @@ class ProtMov:
         This function creats a 3D heading vector by rotating the 
         heading vector by the thrust pitch and roll angles.
         """
-        for frameI in range(self.angles.shape[0]):
+        for frameI in range(self.posTrajectory.shape[0]):
 
-            self.sealHeading.append(self.mathUtils.agentBasedVels2worldBasedCoords(headingVector,self.angles[frameI,:],'3D')) 
+            self.sealHeading.append(self.mathUtils.agentBasedVels2worldBasedCoords(headingVector,self.posTrajectory[frameI][3:],'3D')) 
             
         self.sealHeading = np.array(self.sealHeading)
         #print(self.sealHeading[0:10])
