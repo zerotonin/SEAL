@@ -10,7 +10,7 @@ class SEAL_SIM:
     dive simulation and the simulation parameter dictionary saving all usere settings for the simulation
     """
     def __init__(self,mode,spsInt=20,diveTypeStr='vShape',durSecFloat=240.0,currentTypeStr='static',currentStaticVelTuple=(1.0,0.0,0.0),
-                      oceanDepthFloat=-70.0,amountOfObstaclesInt=0,maxParticlesInt=260,particleSizeRangeTuple=(0.00002,0.00016),
+                      oceanDepthFloat=-70.0,amountOfObstaclesInt=0,maxParticlesInt=3660,particleSizeRangeTuple=(0.00002,0.00016),
                       cloudRadiusFloat=0.0018):
         """
         This function initialises the sample per seconds,and connects the environment class, 
