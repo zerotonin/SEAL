@@ -3,6 +3,8 @@ import random, copy
 from utilities import mathUtils
 from scipy.ndimage import gaussian_filter1d
 from scipy import signal
+import matplotlib.pyplot as plt
+
 
 class ProtMov: 
     """
@@ -103,7 +105,8 @@ class ProtMov:
         self.traLen        = int(simObj.runTimeData.getParameter('traLen'))
         self.velTra        = simObj.runTimeData.getParameter('velTra')
         # private objects
-        self.origDiveFPS   = 0.2 # the orginal data was recorded every 5th second 
+        self.origDiveFPS   = 100 # the orginal data was recorded every 5th second 0.2, changed to 100sps
+                                # assuming a faster translation between the single phases 
         self.origVideoFPS  = 25 # video fps of the original footage
         self.traIDX        = []
         self.pmIDX         = []  
@@ -127,11 +130,15 @@ class ProtMov:
         # 1) mean pitch angle [deg]  2)  standard deviation of the mean [deg] 3)  mean z-profil [m/s]
         # 4) standard deviation of z-profile [m/s]. We inverted the sign of the pitch values from the 
         # original data, so that they now fit the international definition of the pitch angle
-        self.diveShapeU = {'surface'  :(10.0/77.0, 79.639515  ,12.78034071 ,0.003492857142857107  ,0.012394484328836674),
-                           'down'     :(14.0/77.0, -63.9146825  ,8.36629103  ,-0.99880133333333     ,0.05321871641526968),
-                           'straight' :(65.0/77.0, -8.36629103  ,5.5529812   ,0.0024724705882352887 ,0.029324291568831443),
-                           'up'       :(77.0/77.0,68.64291923 ,15.63982373 ,0.24612163636363638   ,0.40711433143914316),
-                           'surface2' :(77.0/77.0, 79.639515  ,12.78034071 ,0.003492857142857107  ,0.012394484328836674)} # surface 2 is a bonus duration if up wards swimming ends before its duration
+        self.diveShapeU = {'surface'  :(10.0/77.0, 79.639515   ,12.78034071 ,0.003492857142857107  ,0.003492857142857107),
+                           #'saccade1' :(10.0000001/77.0, -63.9146825 ,8.36629103  ,0.0034928571428571070 ,0.003492857142857107),
+                           'down'     :(14.0/77.0, -63.9146825 ,8.36629103  ,-0.99880133333333     ,0.05321871641526968),
+                           #'saccade2' :(14.0000001/77.0, -8.36629103 ,5.5529812   ,-0.99880133333333     ,0.05321871641526968),
+                           'straight' :(65.0/77.0, -8.36629103 ,5.5529812   ,0.0024724705882352887 ,0.029324291568831443),
+                           #'saccade3' :(65.0000001/77.0, 68.64291923 ,15.63982373 ,0.0024724705882352887 ,0.029324291568831443),
+                           'up'       :(77.0/77.0, 68.64291923 ,15.63982373 ,0.24612163636363638   ,0.40711433143914316),
+                           #'saccade4' :(77.0000001/77.0, 79.639515   ,12.78034071 ,0.24612163636363638   ,0.40711433143914316),
+                           'surface2' :(77.0/77.0, 79.639515   ,12.78034071 ,0.003492857142857107  ,0.012394484328836674)} # surface 2 is a bonus duration if up wards swimming ends before its duration
         
         self.diveShapeV = {'surface'  :(11.0/36.0, 74.53024727,7.65994214  ,-0.005039636363636366 ,0.0280961935023646),        
                            'down'     :(25.0/36.0, -17.04128714 ,25.74478444 ,-0.23516400000000004  ,0.17638583527291268),
@@ -271,7 +278,7 @@ class ProtMov:
         bonusDur     = 0
 
         diveLen = int(np.round(self.traLenSec * self.origDiveFPS))
-
+        
         for frameI in range(diveLen+1): 
 
             # This if clause regulates the change of diving phases. A diving phase ends when
@@ -284,17 +291,17 @@ class ProtMov:
             currentKey          = phaseKeys[currentPhase]
             currentPhaseTimeOut = int(np.ceil(currentDive[currentKey][0]*diveLen + bonusDur))
 
-            if frameI > currentPhaseTimeOut and currentPhase < 5:
+            if frameI > currentPhaseTimeOut and currentPhase < 5: #5 or 9 without or with extra saccade phases
                 currentPhase += 1
                 bonusDur      = 0
                 #print(currentPhase,frameI,currentPhaseTimeOut,'frame out')
             
-            elif currentPhase == 1 and zProfile[-1] <= self.oceanDepth+0.5:
+            elif currentPhase == 1 and zProfile[-1] <= self.oceanDepth+0.5: #1 or 2 without or with extra saccade phases
                 currentPhase += 1
                 bonusDur = currentDive[currentKey][0]*self.origDiveFPS -frameI
                 #print(currentPhase,frameI,currentPhaseTimeOut,'depth out')
 
-            elif currentPhase == 3 and zProfile[-1] >= 0:
+            elif currentPhase == 3 and zProfile[-1] >= 0: #3 or 6 without or with extra saccade phases
                 currentPhase += 1
                 bonusDur = currentDive[currentKey][0]*self.origDiveFPS -frameI
                 #print(currentPhase,frameI,currentPhaseTimeOut,'surface out')
@@ -313,9 +320,18 @@ class ProtMov:
             elif zProfile[-1] > 0:
                 zProfile[-1] = 0
         #print('pitchAngleList : ', pitchAngle)
+        fig = plt.figure()
+        ax=fig.add_subplot(211)
+        ax.plot(pitchAngle)
+        ax.set_ylabel('pitchAngle')
+        ax=fig.add_subplot(212)
+        ax.plot(zProfile)
+        ax.set_ylabel('zProfile')
+        plt.show()
 
+        
         return self.resample_by_interpolation(zProfile,self.origDiveFPS,self.sps),self.resample_by_interpolation(pitchAngle,self.origDiveFPS,self.sps)
-
+        #return self.resampleData2TraLen(zProfile),self.resampleData2TraLen(pitchAngle)
     def createThrustSlipYaw(self):
         """
         Taken Prototypical Movements from analyized video data by Frederike Hanke. 
@@ -398,6 +414,7 @@ class ProtMov:
             np.linspace(0.0, 1.0, len(signal), endpoint=False),  # known positions
             signal,  # known data points
         )
+        
         return self.resampleData2TraLen(resampled_signal) # to assure trajectory length
 
     def getSealHeading(self,headingVector=np.array([1,0,0])):
