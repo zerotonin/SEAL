@@ -287,41 +287,6 @@ class runTimeData:
         #resultDF.to_parquet(fileBaseName + '.parquet.gz', compression='gzip')
  
 
-
-
-        '''
-        This function saves the simulated sealTrajectories and particle Trajectories
-        as well as all public data for this simulation in a hdf5 file format.
-        
-        # sealTra, particleTra(for each particle list of duration ( including list of prePosition, postPosition and state)), Paramater aus init
-        hf = h5py.File('data.h5', 'w')
-
-        g1 = hf.create_group('publicData')
-
-        g1.create_dataset('sps',data=self.sps)
-        g1.create_dataset('oceanSurface',data=self.oceanSurface)
-        g1.create_dataset('oceanDepth',data=self.oceanDepth)
-        g1.create_dataset('oceanLimit',data=self.oceanLimit)
-        g1.create_dataset('waterCurrent',data=self.waterCurrent)
-        g1.create_dataset('amountOfObstacles',data=self.amountOfObstacles)
-        g1.create_dataset('durSec',data=self.durSec)
-        g1.create_dataset('traLen',data=self.traLen)
-        g1.create_dataset('velTra',data=self.velTra)
-        g1.create_dataset('sealPosition',data=self.sealPosition)
-        g1.create_dataset('sealOrientation',data=self.sealOrientation)
-        g1.create_dataset('sealStep',data=self.sealStep)
-        g1.create_dataset('diveType',data=self.diveType)
-        g1.create_dataset('currentType',data=self.currentType)
-        g1.create_dataset('currentStaticVel',data=self.currentStaticVel)
-        g1.create_dataset('max_particles',data=self.max_particles)
-        g1.create_dataset('particleSizeRange',data=self.particleSizeRange)
-        g1.create_dataset('cloudRadius',data=self.cloudRadius)
-#
-        hf.create_dataset('sealTrajectory',data=self.sealTrajectory)
-
-        g3 = hf.create_group('particleList')
-        for pObject in self.simObj.pCloud.partclObjList:
-            g3.create_dataset('particleTra_'+str(pObject),data=self.simObj.pCloud.partclObjList[pObject].trajectory)
-#       # data=self.simObj.pCloud.partclObjList[pObject].trajectory[i] --> prePosition ARRAY, postPosition ARRAY StateCheck BOOL
-        '''
-
+    def writeOutVelTra(self,fileBaseName):
+        sealVelDF = pd.DataFrame(self.velTra,columns= ['thrust m/s','slip m/s','lift m/s','yaw rad/s','pitch rad/s','roll rad/s'])
+        sealVelDF.to_csv(fileBaseName + '.csv')
