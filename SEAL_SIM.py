@@ -160,6 +160,43 @@ class SEAL_SIM:
         print(self.protoMove.posTrajectory[0,:])
         self.opticFlowAna = opticFlowAna.opticFlowAnalysis(self)
 
+    def runSimulationSingleStep(self,velStep,sealPos,sealOrient):
+        """
+        This function initiates the simulation to run. 
+        
+        It calls the setParameters function to set the environment and the particle cloud. 
+        Next it creates the obstacles in the environment class according to the user setting.
+        It generates seal trajectories to simulate a typical seal dive and saves 
+        them in the sealVelTra list. for each step of the seal agent the particles
+        in the particle Cloud are moving in the opposite direction and the particle positons 
+        are saved.
+        """
+        # build new onjects based on the parameters of the runTimeDataObject
+        self.initSimulationObjects()
+        #set environment and particle cloud
+        #self.setParameters()
+        self.environment.creatObstacles() #create obstacle if amountOfObstacles >0
+       
+        # set the seal class to the trajectories of the protoMove class
+        self.sealVelTra = self.runTimeData.getParameter('velTra') # steps needed for movement
+        self.runTimeData.setParameter('sealTrajectory',self.protoMove.posTrajectory)
+        #self.seal.sealTrajectory  = self.protoMove.posTrajectory # save trajectory to avoid trajectory recording by seal class
+        self.runTimeData.setParameter('sealPosition', sealPos)
+        self.runTimeData.setParameter('sealOrientation', sealOrient)        
+        self.seal.sealPosition    = copy.deepcopy(sealPos) # get initial value
+        self.seal.sealOrientation = copy.deepcopy(sealOrient)  # get initial value
+       
+        # get a step from the step trajectory
+        #self.seal.sealStep = step
+        self.runTimeData.setParameter('sealStep', velStep)
+        # at this time point the seal has its old position but a new step
+        # so let's move the particles accordingly
+            
+        self.pCloud.moveParticles()
+        # move the seal to new position
+        self.seal.MoveSeal()
+        self.opticFlowAna = opticFlowAna.opticFlowAnalysis(self)
+    
     def setParametersInRunTimeDataCLI(self):
         """
         This function sets the public parameters in the runTimeData class according to user settings
