@@ -179,7 +179,7 @@ class SEAL_SIM:
        
         # set the seal class to the trajectories of the protoMove class
         self.sealVelTra = self.runTimeData.getParameter('velTra') # steps needed for movement
-        self.runTimeData.setParameter('sealTrajectory',self.protoMove.posTrajectory)
+        self.runTimeData.setParameter('sealTrajectory',np.hstack((sealPos,sealOrient)))
         #self.seal.sealTrajectory  = self.protoMove.posTrajectory # save trajectory to avoid trajectory recording by seal class
         self.runTimeData.setParameter('sealPosition', sealPos)
         self.runTimeData.setParameter('sealOrientation', sealOrient)        
@@ -193,8 +193,6 @@ class SEAL_SIM:
         # so let's move the particles accordingly
             
         self.pCloud.moveParticles()
-        # move the seal to new position
-        self.seal.MoveSeal()
         self.opticFlowAna = opticFlowAna.opticFlowAnalysis(self)
     
     def setParametersInRunTimeDataCLI(self):

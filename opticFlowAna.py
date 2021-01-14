@@ -52,6 +52,8 @@ class opticFlowAnalysis:
         # private objects
         self.anaDataList    = list()
         self.distRankDiff   = list()
+        #initialize data
+        self.opticFlowAbility()
         
     
     def createOpticFlow(self,frame):
@@ -196,7 +198,7 @@ class opticFlowAnalysis:
         for this seal step the median error of all particles will be our quality value
         R = norm(theta1_-theta_0, phi_1-phi_0)
         """
-        for frameI in tqdm(range(self.traLen-1),desc='calculating OF'):
+        for frameI in tqdm(range(self.traLen),desc='calculating OF'):
             distTrueList  = list()
             distOFestList = list()
             partSphereList   = list()
