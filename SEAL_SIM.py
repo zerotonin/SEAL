@@ -101,6 +101,20 @@ class SEAL_SIM:
         self.runTimeData.setParameter('particleSizeRange',particleSizeRangeTuple)
         self.runTimeData.setParameter('cloudRadius',cloudRadiusFloat)
 
+    def runTrajectoryGenerationOnly(self):
+        """
+        This function simulates 6 dimensional seal trajectories. This is mainly used to
+        create clustering data in 6 dimensional combinations.
+        """
+        
+        # build new onjects based on the parameters of the runTimeDataObject
+        self.initSimulationObjects()
+        #get trajectory
+        self.protoMove.generator2()
+        # set the seal class to the trajectories of the protoMove class
+        self.sealVelTra = self.runTimeData.getParameter('velTra') # steps needed for movement
+
+
     def runSimulation(self):
         """
         This function initiates the simulation to run. 
