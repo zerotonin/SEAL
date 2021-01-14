@@ -244,6 +244,7 @@ class ProtMov:
             
         self.velTra = np.array(self.velTra)
         self.simObj.runTimeData.setParameter('velTra', self.velTra)
+        self.simObj.runTimeData.setParameter('sealTrajectory', self.posTrajectory)
     
     #def getPositionAndAngelTrajectoryFromVelTrajectory(self):
     #    """
@@ -367,15 +368,15 @@ class ProtMov:
 
         pitchAngle = self.addSaccadicPitchTransitions(pitchAngle,currentDive)
         #print('pitchAngleList : ', pitchAngle)
-        fig = plt.figure()
-        ax=fig.add_subplot(211)
-        ax.plot(pitchAngle)
-        ax.set_ylabel('pitchAngle')
-        ax=fig.add_subplot(212)
-        ax.plot(zProfile)
-        ax.set_ylabel('zProfile')
-        plt.show()
-        print(len(self.resampleData2TraLen(zProfile)))
+        #fig = plt.figure()
+        #ax=fig.add_subplot(211)
+        #ax.plot(pitchAngle)
+        #ax.set_ylabel('pitchAngle')
+        #ax=fig.add_subplot(212)
+        #ax.plot(zProfile)
+        #ax.set_ylabel('zProfile')
+        #plt.show()
+        #print(len(self.resampleData2TraLen(zProfile)))
         
         return self.resampleData2TraLen(zProfile), self.resampleData2TraLen(pitchAngle) #self.resample_by_interpolation(zProfile,self.origDiveFPS,self.sps),self.resample_by_interpolation(pitchAngle,self.origDiveFPS,self.sps)
         #return self.resampleData2TraLen(zProfile),self.resampleData2TraLen(pitchAngle)
