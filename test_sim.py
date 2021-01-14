@@ -33,7 +33,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D 
 reload(SEAL_SIM)
 reload(opticFlowAna)
-simObj = SEAL_SIM.SEAL_SIM('headless',spsInt=100, durSecFloat=30, currentStaticVelTuple=(0.0,0.0,0.0)) 
+simObj = SEAL_SIM.SEAL_SIM('headless',spsInt=100, maxParticlesInt=25, durSecFloat=90, currentStaticVelTuple=(0.0,0.0,0.0),diveTypeStr='uShape') 
 #simObj.userDefParametersCLI()
 simObj.runSimulation()
 
@@ -90,9 +90,29 @@ sealPos = np.vstack(simObj.runTimeData.sealTrajectory)
 # pitch values, depth, yaw
 #########
 fig2 = plt.figure()
-ax =fig2.add_subplot(311)
-ax.plot(np.rad2deg(simObj.protoMove.angles[:,0]))
-ax.set_ylabel('yaw, deg')
+labelList=['thrust','slip','lift','yaw','pitch','roll']
+dimLabelList = ['m/s','m/s','m/s','deg/s','deg/s','deg/s']
+for i in range(6):
+    ax =fig2.add_subplot(6,1,i+1)
+    if i > 2:
+        ax.plot(np.rad2deg(simObj.runTimeData.velTra[:,i]))
+    else:
+        ax.plot(simObj.runTimeData.velTra[:,i])
+    ax.set_ylabel(labelList[i]+', '+dimLabelList[i])
+
+fig3 = plt.figure()
+labelList=['x-coord','y-coord','z-coord','yaw','pitch','roll']
+dimLabelList = ['m','m','m','deg','deg','deg']
+for i in range(6):
+    ax =fig3.add_subplot(6,1,i+1)
+    if i > 2:
+        ax.plot(np.rad2deg(simObj.protoMove.posTrajectory[:,i]))
+    else:
+        ax.plot(simObj.protoMove.posTrajectory[:,i])
+    ax.set_ylabel(labelList[i]+', '+dimLabelList[i])
+
+plt.show()
+
 ax =fig2.add_subplot(312)
 ax.plot(np.rad2deg(simObj.protoMove.angles[:,1]))
 ax.set_ylabel('pitch, deg')
