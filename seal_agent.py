@@ -101,9 +101,11 @@ class Seal:
         self.SealStateCheck()
         
         if self.activeSealMovement == True:
-
-            # calculate m/s to m/sample
+            #update position, orientation, and step
+            self.sealPosition = self.simObj.runTimeData.getParameter('sealPosition')
+            self.sealOrientation = self.simObj.runTimeData.getParameter('sealOrientation')
             self.sealStep = self.simObj.runTimeData.getParameter('sealStep')
+            # calculate m/s to m/sample
             presentStep = self.simObj.meterPerSecond2meterPerSample(self.sealStep)
             
             self.sealPosition += self.mathUtils.agentBasedVels2worldBasedCoords(presentStep[0:3],self.sealOrientation,'3D') # new Seal Position after one sealStep/Movement
