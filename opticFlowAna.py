@@ -56,37 +56,18 @@ class opticFlowAnalysis:
         self.opticFlowAbility()
         
     
-    def createOpticFlow(self,frame):
+
+    def plotOpticFlow(self,frame, showStartEnd = True, viewField = False, projectionType = 'polar'):
         """
         This function plotts a 2D optic flow field for a single sealStep, by calculating the 
         magnitute ot the movement vector from the oldPosition of the particle to the newPosition 
         for theta and phi (ignoring the radius, since the retina only has 2 dimensions)
         """
         fig = plt.figure() 
-        ax = fig.add_subplot(111, projection ='hammer') 
-        #for specific frame it calcultates the magnitute between the old and new position of each visibile? particle
-        for i in range(len(self.particleList)): # po should be (oldPosition, newPosition, status) of particle per movement
-            direct = self.anaDataList[frame][3][i]
-            if  self.anaDataList[frame][2][i] != None: # richtungsvector between frames
-                X = self.anaDataList[frame][2][i][0][2] # phi
-                Y = self.anaDataList[frame][2][i][0][1] # theta
-                U = direct[2] # phi direction
-                V = direct[1] # theta direction
-                ax.quiver(X,Y,U,V,angles ='xy',scale_units='xy', scale =1,width=0.001)
-            else:
-                pass
-
-            
-        plt.show() 
-
-    def createOpticFlowViewField(self,frame):
-        """
-        This function plotts a 2D optic flow field for a single sealStep, by calculating the 
-        magnitute ot the movement vector from the oldPosition of the particle to the newPosition 
-        for theta and phi (ignoring the radius, since the retina only has 2 dimensions)
-        """
-        fig = plt.figure() 
-        ax = fig.add_subplot(111)
+        if projectionType == 'polar':
+            ax = fig.add_subplot(111, projection = 'hammer')
+        else:
+            ax = fig.add_subplot(111)
         #ax.axis('equal') 
         #for specific frame it calcultates the magnitute between the old and new position of each visibile? particle
         for i in range(len(self.particleList)): # po should be (oldPosition, newPosition, status) of particle per movement
@@ -96,18 +77,65 @@ class opticFlowAnalysis:
                 Y = self.anaDataList[frame][2][i][0][1] # theta
                 U = direct[2] # phi direction
                 V = direct[1] # theta direction
-                ax.quiver(X,Y,U,V,angles ='xy',scale_units='xy', scale =1,width=0.001)
+                ax.quiver(X,Y,U,V,angles ='xy',scale_units='xy', scale =1,width=0.001, color='gray', alpha=0.5, zorder=2)
             else:
                 pass
-        thetaList, phiList = self.create2DParticleDistributionList(0,frame)
-        ax.scatter(phiList, thetaList, color = 'red')
-        postThetaList, postPhiList = self.create2DParticleDistributionList(1,frame)
-        ax.scatter(postPhiList,postThetaList, color='green')
+        if showStartEnd == True:
+            thetaList, phiList = self.create2DParticleDistributionList(0,frame)
+            ax.scatter(phiList, thetaList, color = 'red')
+            postThetaList, postPhiList = self.create2DParticleDistributionList(1,frame)
+            ax.scatter(postPhiList,postThetaList, color='green')
 
-        ax.set_xlim(-1.815,1.815) # visual field from -104 to 104° horizontally
-        ax.set_ylim(-0.209,1.204) # vidual field from−12°to+69°vertically
-            
+        if viewField == True:
+            ax.set_xlim(-1.815,1.815) # visual field from -104 to 104° horizontally
+            ax.set_ylim(-0.209,1.204) # vidual field from−12°to+69°vertically
+        
+        if viewField == False:
+            x = ([-1.815,-1.815,1.815,1.815,-1.815])
+            y = ([-0.209,1.204,1.204,-0.209,-0.209])
+            ax.plot(x,y, zorder=1, color= 'forestgreen')    
+
+        ax.set_xlabel('azimuth [deg]')
+        ax.set_ylabel('elevation [deg]')
+        plt.grid(True)
         plt.show() 
+
+    def plotPolarOpticflow(self, frame,showStartEnd = True):
+        '''
+        This functions plot old and new position in a geographical projection.
+        https://matplotlib.org/3.1.0/gallery/subplots_axes_and_figures/geo_demo.html
+        '''
+        thetaList, phiList = self.create2DParticleDistributionList(0,frame)
+        fig = plt.figure()
+
+        ax = fig.add_subplot(111, projection='hammer')
+        #ax.set_xlim(-np.pi,np.pi)
+        #ax.set_ylim(0,np.pi/2)
+        for i in range(len(self.particleList)): # po should be (oldPosition, newPosition, status) of particle per movement
+            direct = self.anaDataList[frame][3][i]
+            if  self.anaDataList[frame][2][i] != None: # richtungsvector between frames
+                X = self.anaDataList[frame][2][i][0][2] # phi
+                Y = self.anaDataList[frame][2][i][0][1] # theta
+                U = direct[2] # phi direction
+                V = direct[1] # theta direction
+                ax.quiver(X,Y,U,V,angles ='xy',scale_units='xy', scale =1,width=0.001, color='gray', alpha=50)
+            else:
+                pass
+        if showStartEnd == True:
+            thetaList, phiList = self.create2DParticleDistributionList(0,frame)
+            ax.scatter(phiList, thetaList, color = 'red')
+            postThetaList, postPhiList = self.create2DParticleDistributionList(1,frame)
+            ax.scatter(postPhiList,postThetaList, color='green')
+        
+        x = ([-1.815,-1.815,1.815,1.815,-1.815])
+        y = ([-0.209,1.204,1.204,-0.209,-0.209])
+        ax.plot(x,y)   
+
+        ax.set_xlabel('azimuth [deg]')
+        ax.set_ylabel('elevation [deg]')
+
+        plt.grid(True)
+        plt.show()
 
     def create2DParticleDistributionList(self,prePost, frame):
         """
@@ -129,54 +157,9 @@ class opticFlowAnalysis:
                 phiList.append(None)
         return thetaList, phiList
 
-    def createPolarOpticflow(self, frame,showStartEnd = True):
-        '''
-        This functions plot old and new position in a geographical projection.
-        https://matplotlib.org/3.1.0/gallery/subplots_axes_and_figures/geo_demo.html
-        '''
-        thetaList, phiList = self.create2DParticleDistributionList(0,frame)
-        fig = plt.figure()
-
-        ax = fig.add_subplot(111, projection='hammer')
-        #ax.set_xlim(-np.pi,np.pi)
-        #ax.set_ylim(0,np.pi/2)
-        for i in range(len(self.particleList)): # po should be (oldPosition, newPosition, status) of particle per movement
-            direct = self.anaDataList[frame][3][i]
-            if  self.anaDataList[frame][2][i] != None: # richtungsvector between frames
-                X = self.anaDataList[frame][2][i][0][2] # phi
-                Y = self.anaDataList[frame][2][i][0][1] # theta
-                U = direct[2] # phi direction
-                V = direct[1] # theta direction
-                ax.quiver(X,Y,U,V,angles ='xy',scale_units='xy', scale =1,width=0.001)
-            else:
-                pass
-        if showStartEnd == True:
-            thetaList, phiList = self.create2DParticleDistributionList(0,frame)
-            ax.scatter(phiList, thetaList, color = 'red')
-            postThetaList, postPhiList = self.create2DParticleDistributionList(1,frame)
-            ax.scatter(postPhiList,postThetaList, color='green')
-        plt.grid(True)
-        plt.show()
 
 
-    def plot2DparticleDist(self, frame):
-        """
-        This function plots the old and new positions of particles for a given frame
-        it creates x and y list of the sphereindric coordinates of the particles 
-        with the create2DparticleDistributionList and plots the old positions
-        in red and the new positions in green
-        """
-        fig = plt.figure()
-        ax = fig.add_subplot(111)
-        ax.axis('equal')
-        thetaList, phiList = self.create2DParticleDistributionList(0,frame)
-        ax.scatter(phiList, thetaList, color = 'red')
-        postThetaList, postPhiList = self.create2DParticleDistributionList(1,frame)
-        ax.scatter(postPhiList,postThetaList, color='green')
-        ax.set_xlim(min(min(phiList),min(postPhiList)),max(max(phiList),max(postPhiList)))
-        ax.set_ylim(min(min(thetaList),min(postThetaList)),max(max(thetaList),max(postThetaList)))
-        
-        plt.show()
+
 
     def opticFlowAbility(self):
         """das
