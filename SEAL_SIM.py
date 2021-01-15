@@ -188,9 +188,13 @@ class SEAL_SIM:
         #self.setParameters()
         self.environment.creatObstacles() #create obstacle if amountOfObstacles >0
        
+        # activate seal trajectory recording
+        self.seal.trajectoryRecording = True
+
         # set the seal class to the trajectories of the protoMove class
         self.sealVelTra = self.runTimeData.getParameter('velTra') # steps needed for movement
         self.runTimeData.setParameter('sealTrajectory',np.hstack((sealPos,sealOrient)))
+        self.seal.sealTrajectory = self.runTimeData.getParameter('sealTrajectory')
         #self.seal.sealTrajectory  = self.protoMove.posTrajectory # save trajectory to avoid trajectory recording by seal class
         self.runTimeData.setParameter('sealPosition', sealPos)
         self.runTimeData.setParameter('sealOrientation', sealOrient)        
@@ -206,6 +210,11 @@ class SEAL_SIM:
         self.pCloud.moveParticles()
         # move the seal to new position
         self.seal.MoveSeal()
+
+        # deactivate seal trajectory recording
+        self.seal.trajectoryRecording = False
+        
+        # initialise optic flow analysis
         self.opticFlowAna = opticFlowAna.opticFlowAnalysis(self)
     
     def setParametersInRunTimeDataCLI(self):
