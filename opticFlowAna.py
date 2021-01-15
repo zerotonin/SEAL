@@ -68,34 +68,56 @@ class opticFlowAnalysis:
         fig = plt.figure() 
         if projectionType == 'polar':
             ax = fig.add_subplot(111, projection = 'hammer')
+                    #for specific frame it calcultates the magnitute between the old and new position of each visibile? particle
+            for i in range(len(self.particleList)): # po should be (oldPosition, newPosition, status) of particle per movement
+                direct = self.anaDataList[frame][3][i]
+                if  self.anaDataList[frame][2][i] != None: # richtungsvector between frames
+                    X = self.anaDataList[frame][2][i][0][2] # phi
+                    Y = self.anaDataList[frame][2][i][0][1] # theta
+                    U = direct[2] # phi direction
+                    V = direct[1] # theta direction
+                    ax.quiver(X,Y,U,V,angles ='xy',scale_units='xy', scale =1,width=0.001, color='midnightblue', alpha=0.7, zorder=2)
+                else:
+                    pass
+            if showStartEnd == True:
+                thetaList, phiList = self.create2DParticleDistributionList(0,frame)
+                ax.scatter(phiList, thetaList, color = 'red')
+                postThetaList, postPhiList = self.create2DParticleDistributionList(1,frame)
+                ax.scatter(postPhiList,postThetaList, color='green')
+
+            if viewField == False:
+                x = ([-1.815,-1.815,1.815,1.815,-1.815])
+                y = ([-0.209,1.204,1.204,-0.209,-0.209])
+                ax.plot(x,y, zorder=1, color= 'forestgreen', linewidth= 2.0) 
+
+
         else:
             ax = fig.add_subplot(111)
         #ax.axis('equal') 
-        #for specific frame it calcultates the magnitute between the old and new position of each visibile? particle
-        for i in range(len(self.particleList)): # po should be (oldPosition, newPosition, status) of particle per movement
-            direct = self.anaDataList[frame][3][i]
-            if  self.anaDataList[frame][2][i] != None: # richtungsvector between frames
-                X = self.anaDataList[frame][2][i][0][2] # phi
-                Y = self.anaDataList[frame][2][i][0][1] # theta
-                U = direct[2] # phi direction
-                V = direct[1] # theta direction
-                ax.quiver(X,Y,U,V,angles ='xy',scale_units='xy', scale =1,width=0.001, color='#262626', alpha=0.5, zorder=2)
-            else:
-                pass
-        if showStartEnd == True:
-            thetaList, phiList = self.create2DParticleDistributionList(0,frame)
-            ax.scatter(phiList, thetaList, color = 'red')
-            postThetaList, postPhiList = self.create2DParticleDistributionList(1,frame)
-            ax.scatter(postPhiList,postThetaList, color='green')
+            for i in range(len(self.particleList)): # po should be (oldPosition, newPosition, status) of particle per movement
+                direct = self.anaDataList[frame][3][i]
+                if  self.anaDataList[frame][2][i] != None: # richtungsvector between frames
+                    X = self.anaDataList[frame][2][i][0][2] # phi
+                    Y = self.anaDataList[frame][2][i][0][1] # theta
+                    U = direct[2] # phi direction
+                    V = direct[1] # theta direction
+                    ax.quiver(np.rad2deg(X),np.rad2deg(Y),np.rad2deg(U),np.rad2deg(V),angles ='xy',scale_units='xy', scale =1,width=0.001, color='midnightblue', alpha=0.7, zorder=2)
+                else:
+                    pass
+            if showStartEnd == True:
+                thetaList, phiList = self.create2DParticleDistributionList(0,frame)
+                ax.scatter(np.rad2deg(phiList), np.rad2deg(thetaList), color = 'red')
+                postThetaList, postPhiList = self.create2DParticleDistributionList(1,frame)
+                ax.scatter(np.rad2deg(postPhiList),np.rad2deg(postThetaList), color='green')
 
-        if viewField == True:
-            ax.set_xlim(-1.815,1.815) # visual field from -104 to 104° horizontally
-            ax.set_ylim(-0.209,1.204) # vidual field from−12°to+69°vertically
+            if viewField == True:
+                ax.set_xlim(np.rad2deg(-1.815),np.rad2deg(1.815)) # visual field from -104 to 104° horizontally
+                ax.set_ylim(np.rad2deg(-0.209),np.rad2deg(1.204)) # vidual field from−12°to+69°vertically
         
-        if viewField == False:
-            x = ([-1.815,-1.815,1.815,1.815,-1.815])
-            y = ([-0.209,1.204,1.204,-0.209,-0.209])
-            ax.plot(x,y, zorder=1, color= 'forestgreen', linewidth= 2.0)    
+            if viewField == False:
+                x = ([np.rad2deg(-1.815),np.rad2deg(-1.815),np.rad2deg(1.815),np.rad2deg(1.815),np.rad2deg(-1.815)])
+                y = ([np.rad2deg(-0.209),np.rad2deg(1.204),np.rad2deg(1.204),np.rad2deg(-0.209),np.rad2deg(-0.209)])
+                ax.plot(x,y, zorder=1, color= 'forestgreen', linewidth= 2.0)    
 
         ax.set_xlabel('azimuth [deg]')
         ax.set_ylabel('elevation [deg]')
