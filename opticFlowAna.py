@@ -79,7 +79,7 @@ class opticFlowAnalysis:
                 Y = self.anaDataList[frame][2][i][0][1] # theta
                 U = direct[2] # phi direction
                 V = direct[1] # theta direction
-                ax.quiver(X,Y,U,V,angles ='xy',scale_units='xy', scale =1,width=0.001, color='gray', alpha=0.5, zorder=2)
+                ax.quiver(X,Y,U,V,angles ='xy',scale_units='xy', scale =1,width=0.001, color='#262626', alpha=0.5, zorder=2)
             else:
                 pass
         if showStartEnd == True:
@@ -95,7 +95,7 @@ class opticFlowAnalysis:
         if viewField == False:
             x = ([-1.815,-1.815,1.815,1.815,-1.815])
             y = ([-0.209,1.204,1.204,-0.209,-0.209])
-            ax.plot(x,y, zorder=1, color= 'forestgreen')    
+            ax.plot(x,y, zorder=1, color= 'forestgreen', linewidth= 2.0)    
 
         ax.set_xlabel('azimuth [deg]')
         ax.set_ylabel('elevation [deg]')
