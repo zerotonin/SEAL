@@ -255,8 +255,10 @@ class Cloud:
         self.sealPosition      = self.simObj.runTimeData.getParameter('sealPosition') # change of position and orientation
         
         self.partclObjList     = [] # list of particle objects
-        self.waterCurrent      = self.simObj.runTimeData.getParameter('waterCurrent') # water current 
-    
+        self.waterCurrent      = self.simObj.runTimeData.getParameter('waterCurrent') # water current
+
+        # this part of the cloud is not used because the particles would drive right through the seal
+        self.centralFreeSpace  = 0.2 # normalised to sphere radius
     def add_particles(self):
         """
         The 'add_particle' function initializes and adds random sized particles in random position from
@@ -291,7 +293,7 @@ class Cloud:
         @return a positional vector of the particle within the particle Cloud
         """
         normCoord = np.empty(3)
-        normCoord = coordinate*(np.random.rand(1)*self.maxVectorMagnitude/np.linalg.norm(coordinate))
+        normCoord = coordinate*(np.random.uniform(low=self.centralFreeSpace, high= 1.0,size=(1,))*self.maxVectorMagnitude/np.linalg.norm(coordinate))
         return normCoord
         
     def resetParticles(self,lastInitialPosition):

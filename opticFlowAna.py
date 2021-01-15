@@ -174,8 +174,8 @@ class opticFlowAnalysis:
         @return rankDiff between estimated and true distance
         """
         # clear list of None and build np.arry
-        distEstOF_clean = np.array([dist for dist in distEstOF if dist])
-        distTrue_clean = np.array([dist for dist in distTrue if dist])
+        distEstOF_clean = np.array([dist for dist in distEstOF if dist >= 0.0])
+        distTrue_clean = np.array([dist for dist in distTrue if dist >= 0.0])
         # These functions return the indices of a sorted list Therefore it is the relative distance rank. 
         # Note that the closest particle is ranked on 1st place in the true distance, but it will elicit 
         # the largest optic flow vector, therefore we have to flip the ranks of one list. We decided to do
@@ -233,7 +233,7 @@ class opticFlowAnalysis:
 
             return sphereParticle, OFvector, distance, OFdistanceEst 
         else:
-            return None, None, None, None
+            return -1.0, -1.0, -1.0, -1.0
         
     def rotateParticleStep2SealHeading(self,particleTrajStep,sealOrientationStep):
         """
@@ -294,35 +294,7 @@ class opticFlowAnalysis:
         """
         OFvector = np.subtract(sphereParticles[1],sphereParticles[0]) # magnitude of 2D vector p1(phi,z) to p2(phi,z)
         
-        #if np.linalg.norm(OFvector[1]) > np.pi/2:
-        #    #OFvector[2]= OFvector[2]*-1
-        #    if OFvector[1] < 0:
-        #        turns = m.floor(OFvector[1]/(np.pi/2))
-        #        if (turns % 2)== 0:
-        #            OFvector[1]= -(OFvector[1]%(np.pi/2))
-        #        else:
-        #            OFvector[1]= -(OFvector[1]%(np.pi/2))*-1
-        #else:
-        #    turns = m.floor(OFvector[1]/(np.pi/2))
-        #    if (turns % 2) == 0:
-        #        OFvector[1]= (OFvector[1]%(np.pi/2))    
-        #    else:
-        #        OFvector[1]= (OFvector[1]%(np.pi/2))*-1
-#
-        #if np.linalg.norm(OFvector[2]) > np.pi:
-#
-        #    if OFvector[2] < 0:
-        #        turns = m.floor(OFvector[2]/np.pi)
-        #        if (turns % 2) == 0:
-        #            OFvector[2]= -(OFvector[2]%np.pi)
-        #        else:
-        #            OFvector[2]= -(OFvector[2]%np.pi)*-1
-        #else:
-        #    turns = m.floor(OFvector[2]/np.pi)
-        #    if (turns % 2) == 0:
-        #        OFvector[2]= (OFvector[2]%(np.pi))    
-        #    else:
-        #        OFvector[2]= (OFvector[2]%(np.pi))*-1
+
 
         if np.linalg.norm(OFvector[1]) > np.pi/2:
             #OFvector[2]= OFvector[2]*-1
@@ -366,7 +338,7 @@ class opticFlowAnalysis:
             tan(alpha)                 \ b/
         """
         for particle in self.particleList:
-            print
+
             vecNorm = np.linalg.norm(particle.position) 
             
             angleSize = np.rad2deg(np.arctan(particle.size/vecNorm)) 
