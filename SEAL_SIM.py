@@ -166,10 +166,21 @@ class SEAL_SIM:
         
         It calls the setParameters function to set the environment and the particle cloud. 
         Next it creates the obstacles in the environment class according to the user setting.
-        It generates seal trajectories to simulate a typical seal dive and saves 
-        them in the sealVelTra list. for each step of the seal agent the particles
-        in the particle Cloud are moving in the opposite direction and the particle positons 
-        are saved.
+        You have to set a velocity step, the seal position, and its orientation via input vars. 
+        The step of the seal agent is then simulated and the particle cloud is moving in the 
+        opposite direction. The particle positons are saved in the pCould.partclObjList.
+
+        @param velStep           default: none
+            this is the velocity step. It is a numpy array of 6 floats. In the succesion
+            thurst (m/s), slip (m/s), lift (m/s), yaw (rad/s), pitch (rad/s), and 
+            roll (rad/s).      
+        @param sealPos           default: none
+            this is the position of the seal. It is a numpy array of 3 floats. 
+            In the succesion x-coordinate (m), y-coordinate (m), and z-coordinate (m)
+        @param sealOrient        default: none
+            this is the orientation of the seal. It is a numpy array of 3 floats. 
+            In the succesion yaw (rad), pitch (rad), and roll (rad).
+
         """
         # build new onjects based on the parameters of the runTimeDataObject
         self.initSimulationObjects()
@@ -193,6 +204,8 @@ class SEAL_SIM:
         # so let's move the particles accordingly
             
         self.pCloud.moveParticles()
+        # move the seal to new position
+        self.seal.MoveSeal()
         self.opticFlowAna = opticFlowAna.opticFlowAnalysis(self)
     
     def setParametersInRunTimeDataCLI(self):
