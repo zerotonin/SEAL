@@ -51,9 +51,9 @@ pU.plot3D_positionSizeColorCoded(100,1,simObj.pCloud.partclObjList )
 
 O = opticFlowAna.opticFlowAnalysis(simObj)
 O.opticFlowAbility()
-O.plot2DparticleDist(100)
-O.createOpticFlow(100)
-O.createOpticFlowViewField(100)
+O.plot2DparticleDist(0)
+O.createOpticFlow(0)
+O.createOpticFlowViewField(0)
 
 #########################################################################################
 #plotSealTrajectory
@@ -221,3 +221,31 @@ O.anaDataList[0:10]
 len(O.anaDataList)
 O.distRankDiff[0:10]
 len(O.distRankDiff)
+
+
+simObj.environment.setCurrents(currentSys)
+##########################################################################################
+# run Simulation with user settings
+
+from importlib import reload 
+import utilities as util
+import SEAL_SIM
+import opticFlowAna
+import numpy as np 
+import matplotlib.pyplot as plt 
+from mpl_toolkits.mplot3d import Axes3D 
+reload(SEAL_SIM)
+reload(opticFlowAna)
+simObj = SEAL_SIM.SEAL_SIM('headless',spsInt=1000, maxParticlesInt=3660, durSecFloat=1/1000., 
+                            currentStaticVelTuple=(0.0,0.0,0.0),diveTypeStr='uShape') 
+ simObj.runSimulationSingleStep(np.array([0.50831,0.16146,-0.40015,-0.0069808,-1.9845,0.0]),np.array([0.,0.,-35.]),np.array([0.,0.,0.]))
+
+0.50831,0.16146,-0.40015,-0.0069808,-1.9845
+0.54088,-0.0058351,-0.41512,-2.4519e-05,-0.76015
+0.14588,-0.0143,0.046056,-0.023478,-2.5786e-05
+0.10182,-0.5523,0.0024168,-0.16104,0.00047178
+0.45197,0.72346,0.021853,0.081617,0.00084235
+0.58643,-0.29914,0.012678,0.11914,0.0008728
+1.4685,0.15058,0.038578,-0.066709,0.0014909
+0.43296,0.098639,-1.0179,0.0060124,0.003138
+0.48369,0.01351,-0.0080336,-0.013273,0.5358
