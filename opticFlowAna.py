@@ -57,7 +57,7 @@ class opticFlowAnalysis:
         
     
 
-    def plotOpticFlow(self,frame, showStartEnd = True, viewField = False, projectionType = 'polar'):
+    def plotOpticFlow(self,frame, showStartEnd = False, viewField = False, projectionType = 'polar'):
         """
         This function plotts a 2D optic flow field for a single sealStep, by calculating the 
         magnitute ot the movement vector from the oldPosition of the particle to the newPosition 
@@ -223,6 +223,7 @@ class opticFlowAnalysis:
             else:
                 sealOrientationStep=(self.sealTrajectory[frameNo-1][3:],self.sealTrajectory[frameNo][3:])
 
+
             # in this function the particle position are rotated so that they align with the animals 
             # orientation. Furthermore they transfer from a 3-D cartesian coordinate sytem into a 3-D
             # sphereindirical coordinate systemeal
@@ -250,11 +251,11 @@ class opticFlowAnalysis:
         
         # This rotation matrix rotates the particle from world coordinates
         # into a position relative to the seals orientation
-        rotMatOld = self.mathUtils.getRotMatrix3D(sealOrientationOld[0],sealOrientationOld[1],0) # because we have no roll
+        rotMatOld = self.mathUtils.getRotMatrix3D(sealOrientationOld[0],sealOrientationOld[1],sealOrientationOld[2],mode='passive') 
         # This rotation matrix does the same but after performing the seal step
         # Warning maybe use negative angles unsure ...
-        rotMatNew = self.mathUtils.getRotMatrix3D(sealOrientationNew[0],sealOrientationNew[1],0) # because we have no roll
-        print(rotMatOld,rotMatNew)
+        rotMatNew = self.mathUtils.getRotMatrix3D(sealOrientationNew[0],sealOrientationNew[1],sealOrientationOld[2],mode='passive') 
+       
         # getting correctly position particle pre seal step
         partclPosOld = np.dot(rotMatOld,particleTrajStep[0])
         # getting correctly position particle pre seal step
