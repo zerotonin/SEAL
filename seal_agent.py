@@ -117,7 +117,7 @@ class Seal:
             SealPosition = copy.deepcopy(self.sealPosition)
             
             if self.trajectoryRecording == True:            
-                self.sealTrajectory.append(np.hstack((SealPosition,SealOrientation)))
+                self.sealTrajectory =np.vstack((self.sealTrajectory,np.hstack((SealPosition,SealOrientation))))
                 self.simObj.runTimeData.setParameter('sealTrajectory',self.sealTrajectory)
         else :
             self.activeSealMovement = False
