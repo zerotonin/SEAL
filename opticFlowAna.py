@@ -306,7 +306,7 @@ class opticFlowAnalysis:
         # This rotation matrix does the same but after performing the seal step
         # Warning maybe use negative angles unsure ...
         rotMatNew = self.mathUtils.getRotMatrix3D(sealOrientationNew[0],sealOrientationNew[1],0) # because we have no roll
-
+        print(rotMatOld,rotMatNew)
         # getting correctly position particle pre seal step
         partclPosOld = np.dot(rotMatOld,particleTrajStep[0])
         # getting correctly position particle pre seal step
