@@ -62,6 +62,8 @@ class opticFlowAnalysis:
         This function plotts a 2D optic flow field for a single sealStep, by calculating the 
         magnitute ot the movement vector from the oldPosition of the particle to the newPosition 
         for theta and phi (ignoring the radius, since the retina only has 2 dimensions)
+        This functions plot old and new position in a geographical projection.
+        https://matplotlib.org/3.1.0/gallery/subplots_axes_and_figures/geo_demo.html
         """
         fig = plt.figure() 
         if projectionType == 'polar':
@@ -99,43 +101,6 @@ class opticFlowAnalysis:
         ax.set_ylabel('elevation [deg]')
         plt.grid(True)
         plt.show() 
-
-    def plotPolarOpticflow(self, frame,showStartEnd = True):
-        '''
-        This functions plot old and new position in a geographical projection.
-        https://matplotlib.org/3.1.0/gallery/subplots_axes_and_figures/geo_demo.html
-        '''
-        thetaList, phiList = self.create2DParticleDistributionList(0,frame)
-        fig = plt.figure()
-
-        ax = fig.add_subplot(111, projection='hammer')
-        #ax.set_xlim(-np.pi,np.pi)
-        #ax.set_ylim(0,np.pi/2)
-        for i in range(len(self.particleList)): # po should be (oldPosition, newPosition, status) of particle per movement
-            direct = self.anaDataList[frame][3][i]
-            if  self.anaDataList[frame][2][i] != None: # richtungsvector between frames
-                X = self.anaDataList[frame][2][i][0][2] # phi
-                Y = self.anaDataList[frame][2][i][0][1] # theta
-                U = direct[2] # phi direction
-                V = direct[1] # theta direction
-                ax.quiver(X,Y,U,V,angles ='xy',scale_units='xy', scale =1,width=0.001, color='gray', alpha=50)
-            else:
-                pass
-        if showStartEnd == True:
-            thetaList, phiList = self.create2DParticleDistributionList(0,frame)
-            ax.scatter(phiList, thetaList, color = 'red')
-            postThetaList, postPhiList = self.create2DParticleDistributionList(1,frame)
-            ax.scatter(postPhiList,postThetaList, color='green')
-        
-        x = ([-1.815,-1.815,1.815,1.815,-1.815])
-        y = ([-0.209,1.204,1.204,-0.209,-0.209])
-        ax.plot(x,y)   
-
-        ax.set_xlabel('azimuth [deg]')
-        ax.set_ylabel('elevation [deg]')
-
-        plt.grid(True)
-        plt.show()
 
     def create2DParticleDistributionList(self,prePost, frame):
         """
