@@ -129,7 +129,7 @@ class opticFlowAnalysis:
                 phiList.append(None)
         return thetaList, phiList
 
-    def createPolarOpticflow(self, frame):
+    def createPolarOpticflow(self, frame,showStartEnd = True):
         '''
         This functions plot old and new position in a geographical projection.
         https://matplotlib.org/3.1.0/gallery/subplots_axes_and_figures/geo_demo.html
@@ -150,10 +150,12 @@ class opticFlowAnalysis:
                 ax.quiver(X,Y,U,V,angles ='xy',scale_units='xy', scale =1,width=0.001)
             else:
                 pass
-        thetaList, phiList = self.create2DParticleDistributionList(0,frame)
-        ax.scatter(phiList, thetaList, color = 'red')
-        postThetaList, postPhiList = self.create2DParticleDistributionList(1,frame)
-        ax.scatter(postPhiList,postThetaList, color='green')
+        if showStartEnd == True:
+            thetaList, phiList = self.create2DParticleDistributionList(0,frame)
+            ax.scatter(phiList, thetaList, color = 'red')
+            postThetaList, postPhiList = self.create2DParticleDistributionList(1,frame)
+            ax.scatter(postPhiList,postThetaList, color='green')
+        plt.grid(True)
         plt.show()
 
 
