@@ -219,7 +219,7 @@ class opticFlowAnalysis:
         if particleTrajEntry[2] == True:
             #get seal step orientations
             if frameNo == 0:
-                sealOrientationStep=(self.sealTrajectory[frameNo][3:],self.sealTrajectory[frameNo][3:])
+                sealOrientationStep=(self.sealTrajectory[frameNo][3:],self.sealTrajectory[frameNo+1][3:])
             else:
                 sealOrientationStep=(self.sealTrajectory[frameNo-1][3:],self.sealTrajectory[frameNo][3:])
 
