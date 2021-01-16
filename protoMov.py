@@ -414,6 +414,38 @@ class ProtMov:
         """
         return signal.resample(data,self.traLen) 
 
+    def resample_by_interpolation(self,signal, input_fs, output_fs):
+        """
+        The diving (depth sensor) and cruising data (Videos) were recorded at
+        0.2 Hz and respectively 25 Hz. Especially in the case of the prototypical
+        movements (PM), this renders each PM to be 40ms long. Therefore we have 
+        to create the PM sequence in 25 Hz and than resample the resulting trajectory
+        to a frequency of our simulation. Note the PM sequence cannot be resampled as
+        it is a quantized (classes) and not continues data format.
+
+        @return interpolated Data with a length of traLen
+        """
+        scale = output_fs / input_fs
+        # calculate new length of sample
+        n = round(len(signal) * scale)
+
+        # use linear interpolation
+        # endpoint keyword means than linspace doesn't go all the way to 1.0
+        # If it did, there are some off-by-one errors
+        # e.g. scale=2.0, [1,2,3] should go to [1,1.5,2,2.5,3,3]
+        # but with endpoint=True, we get [1,1.4,1.8,2.2,2.6,3]
+        # Both are OK, but since resampling will often involve
+        # exact ratios (i.e. for 44100 to 22050 or vice versa)
+        # using endpoint=False gets less noise in the resampled sound
+        resampled_signal = np.interp(
+            np.linspace(0.0, 1.0, n, endpoint=False),  # where to interpret
+            np.linspace(0.0, 1.0, len(signal), endpoint=False),  # known positions
+            signal,  # known data points
+        )
+        
+        return self.resampleData2TraLen(resampled_signal) # to assure trajectory length
+
+
     def getSealHeading(self,headingVector=np.array([1,0,0])):
         """
         This function creats a 3D heading vector by rotating the 
