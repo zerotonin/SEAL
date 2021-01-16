@@ -67,26 +67,6 @@ class plotUtils:
         fig.colorbar(h)
         fig.show()
 
-    def plot3D_positionsMovement(self, frame, partclObjList):
-        '''
-        This function plots the prePositions of all particle for a specifc frame in red
-        and all postPositions in green.
-        '''
-
-        preCoordinates = self.particleObjList2CoordList(
-            frame, 0, partclObjList)
-        postCoordinates = self.particleObjList2CoordList(
-            frame, 1, partclObjList)
-        fig, ax = self.makeSquare3DAxis()
-        h = ax.scatter3D(
-            preCoordinates[0], preCoordinates[1], preCoordinates[2], color='red')
-        h = ax.scatter3D(
-            postCoordinates[0], postCoordinates[1], postCoordinates[2], color='green')
-        ax.set_xlabel('X')
-        ax.set_ylabel('Y')
-        ax.set_zlabel('Depth (m)')
-        fig.show()
-
     def plot3D_OF(self, frame, partclObjList, sealTrajectory):
         '''
         This function plot both, the particle movement (red to green)for a specific frame
@@ -99,8 +79,7 @@ class plotUtils:
             frame, 1, partclObjList)
         direct = np.subtract(postCoordinates, preCoordinates)
         fig, ax = self.makeSquare3DAxis()
-        ax.scatter3D(preCoordinates[0], preCoordinates[1],
-                     preCoordinates[2], color='red')
+        ax.scatter3D(preCoordinates[0], preCoordinates[1],preCoordinates[2], color='red')
         ax.scatter3D(
             postCoordinates[0], postCoordinates[1], postCoordinates[2], color='green')
         X = preCoordinates[0]
