@@ -123,7 +123,8 @@ class plotUtils:
 
     def plotSealDive(self):
         '''
-        This function 
+        This function plots a 3D simulated dive, and the the 
+        seal heading throughout the dive.
         '''
         fig = plt.figure() 
         ax = fig.add_subplot(111, projection='3d') 
@@ -144,6 +145,13 @@ class plotUtils:
         plt.show()  
 
     def plotDiveParameters(self):
+        '''
+        This function plots the dive paramters. It is
+        split up into one figure showing the tranlational 
+        and rotational velocities and the other figure 
+        hiolding information about the seals position 
+        and the rotional angles.
+        '''
         fig1 = plt.figure()
         labelList=['thrust','slip','lift','yaw','pitch','roll']
         dimLabelList = ['m/s','m/s','m/s','deg/s','deg/s','deg/s']
