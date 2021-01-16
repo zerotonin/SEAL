@@ -245,27 +245,7 @@ class ProtMov:
         self.velTra = np.array(self.velTra)
         self.simObj.runTimeData.setParameter('velTra', self.velTra)
         self.simObj.runTimeData.setParameter('sealTrajectory', self.posTrajectory)
-    
-    #def getPositionAndAngelTrajectoryFromVelTrajectory(self):
-    #    """
-    #    This function calculates the angle(deg) and postion(m) data from the angleVelocity(deg/s) and 
-    #    directionVelocity(m/s) data. For the angles the cumulative sum of the angleVelocities
-    #    over the time of the dive is calculates. As for the positions the directionVectors from 
-    #    seal point of view needed to be rotated around yaw and pitch in order to get the position 
-    #    values in the world coordinates system(x,y,z)
-    #    """
-    #    testAngle = np.array([np.deg2rad(self.yawAngle[0]),np.deg2rad(self.pitchAngle[0]),0])
-    #    testVelAngle = self.velTra[:,3:]/self.sps
-    #    angles = np.vstack((testAngle,testVelAngle))
-    #    angles = np.cumsum(angles,axis=0)
-    #    positions = np.zeros(shape=(self.velTra.shape[0]+1,3))
-#
-    #    for frameI in range(self.velTra.shape[0]):
-    #        positions[frameI+1,:] = self.mathUtils.agentBasedVels2worldBasedCoords(
-    #                            np.array(self.velTra[frameI,0:3]/self.sps),angles[frameI,:],'3D')
-    # 
-    #    self.positions = positions 
-    #    self.angles    = angles 
+
     def calculateSaccadeDur(self, mu=5.,sigma=2.5):
         duration = np.random.normal(mu,sigma)
         durNorm  = duration / self.traLenSec
@@ -433,37 +413,6 @@ class ProtMov:
         @returns resampled data with a length of traLen 
         """
         return signal.resample(data,self.traLen) 
-
-    def resample_by_interpolation(self,signal, input_fs, output_fs):
-        """
-        The diving (depth sensor) and cruising data (Videos) were recorded at
-        0.2 Hz and respectively 25 Hz. Especially in the case of the prototypical
-        movements (PM), this renders each PM to be 40ms long. Therefore we have 
-        to create the PM sequence in 25 Hz and than resample the resulting trajectory
-        to a frequency of our simulation. Note the PM sequence cannot be resampled as
-        it is a quantized (classes) and not continues data format.
-
-        @return interpolated Data with a length of traLen
-        """
-        scale = output_fs / input_fs
-        # calculate new length of sample
-        n = round(len(signal) * scale)
-
-        # use linear interpolation
-        # endpoint keyword means than linspace doesn't go all the way to 1.0
-        # If it did, there are some off-by-one errors
-        # e.g. scale=2.0, [1,2,3] should go to [1,1.5,2,2.5,3,3]
-        # but with endpoint=True, we get [1,1.4,1.8,2.2,2.6,3]
-        # Both are OK, but since resampling will often involve
-        # exact ratios (i.e. for 44100 to 22050 or vice versa)
-        # using endpoint=False gets less noise in the resampled sound
-        resampled_signal = np.interp(
-            np.linspace(0.0, 1.0, n, endpoint=False),  # where to interpret
-            np.linspace(0.0, 1.0, len(signal), endpoint=False),  # known positions
-            signal,  # known data points
-        )
-        
-        return self.resampleData2TraLen(resampled_signal) # to assure trajectory length
 
     def getSealHeading(self,headingVector=np.array([1,0,0])):
         """
