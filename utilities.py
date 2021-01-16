@@ -110,11 +110,7 @@ class plotUtils:
         V = direct[1]
         W = direct[2]
         ax.quiver(X, Y, Z, U, V, W, arrow_length_ratio=0.03, color='black')
-        # plot sealStep direction from simObj.runTimeData.sealTrajectory(x,y,z)
-        # sealStep = np.subtract(sealTrajectory[frame+1],sealTrajectory[frame]) # sealTrajectory --> simObj.runTimeData.sealTrajectory[0:3]
-        # ax.scatter3D(sealStep[0],sealStep[1],sealStep[2])
-        #ax.quiver(0,0,0,sealStep[0],sealStep[1],sealStep[2], color ='red')
-        # or:
+        
         R = self.simObj.math.getRotMatrix3D(
             sealTrajectory[frame][3:][0], sealTrajectory[frame][3:][1], sealTrajectory[frame][3:][2], 'passive')
         sealStep3 = np.dot(
@@ -122,22 +118,14 @@ class plotUtils:
         ax.scatter3D(sealStep3[0], sealStep3[1], sealStep3[2])
         ax.quiver(0, 0, 0, sealStep3[0],
                   sealStep3[1], sealStep3[2], color='red')
-        # or:
-        # sealStep1 = self.simObj.runTimeData.velTra[frame][0:3]/self.simObj.runTimeData.sps # sealTrajectors --> simObj.runTimeData.velTra
-        # ax.scatter3D(sealStep1[0],sealStep1[1],sealStep1[2])
-        #ax.quiver(0,0,0,sealStep1[0],sealStep1[1],sealStep1[2], color ='magenta')
-
-        # plot the heading vector during the sealStep taken from the sealTrajectory from the plotted seal
-        # yawAngle, pitchAngle, rollAngle
-        # headingVector=np.array([0.01,0,0])
-        self.sealHeading = self.simObj.protoMove.sealHeading[frame]
+        
         self.sealHeading1 = sealTrajectory[frame][3:]
-        #ax.quiver(0,0,0,self.sealHeading[0]*0.01,self.sealHeading[1]*0.01,self.sealHeading[2]*0.01, color ='green')
         ax.quiver(0, 0, 0, self.sealHeading1[0]*0.01, self.sealHeading1[1]*0.01, self.sealHeading1[2]*0.01, color='magenta')
         ax.set_xlabel('X')
         ax.set_ylabel('Y')
         ax.set_zlabel('Depth (m)')
         fig.show()
+
     def plot3D_positionRelSize(self, partclObjList):
         '''
         Function that builds 3d graph with zoomed * 10^3 particles sizes for better visualization 
@@ -154,33 +142,51 @@ class plotUtils:
                     alpha=0.85)
         fig.show()
 
-    def VectorMagnitude(self, partclObjList):
+    def plotSealDive(self):
         '''
-        This function might take coordinates for x,y,z of particle.
-
-        @return the list of values of vector magnitude VctMgn for 
-                each particle in the cloud.
+        This function 
         '''
-        VctMgn = list()
-        for particle in partclObjList:
-            VctMgn.append(np.linalg.norm(particle.position))
+        fig = plt.figure() 
+        ax = fig.add_subplot(111, projection='3d') 
+        for data in [self.simObj.protoMove.posTrajectory, np.array(self.simObj.runTimeData.sealTrajectory)]:
+            ax.plot(list(data[:,0]),list(data[:,1]),list(data[:,2]))
+            ax.scatter3D(data[0,0],data[0,1],data[0,2], color = 'green')
+            ax.scatter3D(data[-1,0],data[-1,1],data[-1,2], color = 'red')     
 
-        return VctMgn
+        frames4Quiver = range(self.simObj.runTimeData.traLen)
+        for i in  frames4Quiver[0::5]:
+            X = self.simObj.protoMove.xProfile[i]
+            Y = self.simObj.protoMove.yProfile[i]
+            Z = self.simObj.protoMove.zProfile[i]
+            U = self.simObj.protoMove.sealHeading[i,0] 
+            V = self.simObj.protoMove.sealHeading[i,1] 
+            W = self.simObj.protoMove.sealHeading[i,2] 
+            ax.quiver(X,Y,Z,U*.1,V*.1,W*.1)
+        plt.show()  
 
-    def plot_vectorHistogram(self, partclObjList):
-        '''
-        This function plots the distribution of the particles's vectors magnitude in the 
-        visual field of a seal
-        '''
-        VctMgn = self.VectorMagnitude(partclObjList)
+    def plotDiveParameters(self):
+        fig1 = plt.figure()
+        labelList=['thrust','slip','lift','yaw','pitch','roll']
+        dimLabelList = ['m/s','m/s','m/s','deg/s','deg/s','deg/s']
+        for i in range(6):
+            ax =fig1.add_subplot(6,1,i+1)
+            if i > 2:
+                ax.plot(np.rad2deg(self.simObj.runTimeData.velTra[:,i]))
+            else:
+                ax.plot(self.simObj.runTimeData.velTra[:,i])
+            ax.set_ylabel(labelList[i]+', '+dimLabelList[i])
 
-        fig = plt.figure()  # open fig space
-        n, bins, patches = plt.hist(x=VctMgn, bins='auto', color='#0504aa',
-                                    alpha=0.7, rwidth=0.85)
-        plt.grid(axis='y', alpha=0.75)
-        plt.xlabel('Vectors magnitude')
-        plt.ylabel('# of Vectors')
-        plt.title('Distribution of vectors magnitude')
+        fig2 = plt.figure()
+        labelList=['x-coord','y-coord','z-coord','yaw','pitch','roll']
+        dimLabelList = ['m','m','m','deg','deg','deg']
+        for i in range(6):
+            ax =fig2.add_subplot(6,1,i+1)
+            if i > 2:
+                ax.plot(np.rad2deg(self.simObj.protoMove.posTrajectory[:,i]))
+            else:
+                ax.plot(self.simObj.protoMove.posTrajectory[:,i])
+            ax.set_ylabel(labelList[i]+', '+dimLabelList[i])
+
         plt.show()
 
 
