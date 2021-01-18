@@ -272,15 +272,13 @@ class mathUtils:
         cosRoll = np.cos(roll)
         sinRoll = np.sin(roll)
         if mode == 'active':
-            return np.array(((cosYaw*cosPitch, -sinYaw*cosPitch, sinPitch),
-                             (cosYaw*sinPitch*sinRoll+sinYaw*cosRoll, -sinYaw *
-                              sinPitch*sinRoll+cosYaw*cosRoll, -cosPitch*sinRoll),
+            return np.array((( cosYaw*cosPitch                       , -sinYaw*cosPitch                       , sinPitch),
+                             ( cosYaw*sinPitch*sinRoll+sinYaw*cosRoll, -sinYaw*sinPitch*sinRoll+cosYaw*cosRoll, -cosPitch*sinRoll),
                              (-cosYaw*sinPitch*cosRoll+sinYaw*sinRoll,  sinYaw*sinPitch*cosRoll+cosYaw*sinRoll, cosPitch*cosRoll)))
         elif mode == 'passive':
-            return np.array(((cosYaw*cosPitch,  cosYaw*sinPitch*sinRoll-sinYaw*cosRoll,  cosYaw*sinPitch*cosRoll+sinYaw*sinRoll),
-                             (sinYaw*cosPitch,  sinYaw*sinPitch*sinRoll+cosYaw *
-                              cosRoll, sinYaw*sinPitch*cosRoll-cosYaw*sinRoll),
-                             (-sinPitch,          cosPitch*sinRoll,          cosPitch*cosRoll)))
+            return np.array(((cosYaw*cosPitch,  cosYaw*sinPitch*sinRoll-sinYaw*cosRoll, cosYaw*sinPitch*cosRoll+sinYaw*sinRoll),
+                             (sinYaw*cosPitch,  sinYaw*sinPitch*sinRoll+cosYaw*cosRoll, sinYaw*sinPitch*cosRoll-cosYaw*sinRoll),
+                             (-sinPitch      ,          cosPitch*sinRoll              ,          cosPitch*cosRoll)))
 
         else:
             print('Unknown mode for generating Fick Rotational Matrix:' + str(mode))
