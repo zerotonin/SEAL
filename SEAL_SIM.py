@@ -191,7 +191,7 @@ class SEAL_SIM:
         # activate seal trajectory recording
         self.seal.trajectoryRecording = True
 
-        # set the seal class to the trajectories of the protoMove class
+        # set the step
         self.sealVelTra = self.runTimeData.getParameter('velTra') # steps needed for movement
         self.runTimeData.setParameter('sealTrajectory',np.hstack((sealPos,sealOrient)))
         self.seal.sealTrajectory = self.runTimeData.getParameter('sealTrajectory')
