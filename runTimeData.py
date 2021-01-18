@@ -72,7 +72,7 @@ class runTimeData:
         self.currentType            = 'static'
         self.max_particles          = 3660
         self.particleSizeRange      = (0.00002,0.00016)
-        self.cloudRadius            = 0.0018
+        self.cloudRadius            = 0.00174
 
     def setParameter(self, parameterName, parameterValue):
         ''' 
