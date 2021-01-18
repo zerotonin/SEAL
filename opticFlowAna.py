@@ -245,7 +245,6 @@ class opticFlowAnalysis:
             else:
                 sealOrientationStep=(self.sealTrajectory[frameNo-1][3:],self.sealTrajectory[frameNo][3:])
 
-
             # in this function the particle position are rotated so that they align with the animals 
             # orientation. Furthermore they transfer from a 3-D cartesian coordinate sytem into a 3-D
             # sphereindirical coordinate systemeal
@@ -276,7 +275,7 @@ class opticFlowAnalysis:
         rotMatOld = self.mathUtils.getRotMatrix3D(sealOrientationOld[0],sealOrientationOld[1],sealOrientationOld[2],mode='passive') 
         # This rotation matrix does the same but after performing the seal step
         # Warning maybe use negative angles unsure ...
-        rotMatNew = self.mathUtils.getRotMatrix3D(sealOrientationNew[0],sealOrientationNew[1],sealOrientationOld[2],mode='passive') 
+        rotMatNew = self.mathUtils.getRotMatrix3D(sealOrientationNew[0],sealOrientationNew[1],sealOrientationNew[2],mode='passive') 
        
         # getting correctly position particle pre seal step
         partclPosOld = np.dot(rotMatOld,particleTrajStep[0])
