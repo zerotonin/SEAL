@@ -201,14 +201,14 @@ class Cloud:
     b = ----------
         tan(alpha)
 
-    alpha  = best visual resolution of a seal 0.08666667° R1)
+    alpha  = best visual resolution of a seal 5,5' = 0.09166666° R1) 
     a =  20 -160µm R2)
                                                                                                   160
-    b for the best optical performance in R1 with the maximum size particle of R2 1850 µm = ----------------
-                                                                                            tan(0.086666667)
+    b for the best optical performance in R1 with the maximum size particle of R2 1740 µm = ----------------
+                                                                                            tan(0.091666)
 
-    The lowest count of particles in the baltic sea is 1500 particles pro cm³ R3). For a cube of 2.44 cm³ in which 
-    the seal can sea particles this renders 3660 particles.
+    The lowest count of particles in the baltic sea is 1500 particles pro cm³ R3), the highets 35000. For a sphere of 0.022 cm³ in which 
+    the seal can sea particles this renders  22-770 particles.
 
 
     R1) Michael Weiffen, Bettina Möller, Björn Mauck, Guido Dehnhardt, Effect of water turbidity 
