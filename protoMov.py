@@ -246,7 +246,7 @@ class ProtMov:
         self.simObj.runTimeData.setParameter('velTra', self.velTra)
         self.simObj.runTimeData.setParameter('sealTrajectory', self.posTrajectory)
 
-    def calculateSaccadeDur(self, mu=5.,sigma=2.5):
+    def calculateSaccadeDur(self, mu=1,sigma=0.3):
         duration = np.random.normal(mu,sigma)
         durNorm  = duration / self.traLenSec
         return durNorm
