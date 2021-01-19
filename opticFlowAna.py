@@ -93,7 +93,7 @@ class opticFlowAnalysis:
 
         else:
             ax = fig.add_subplot(111)
-        #ax.axis('equal') 
+            #ax.axis('equal') 
             for i in range(len(self.particleList)): # po should be (oldPosition, newPosition, status) of particle per movement
                 direct = self.anaDataList[frame][3][i]
                 if  self.anaDataList[frame][2][i] != None: # richtungsvector between frames
@@ -144,12 +144,8 @@ class opticFlowAnalysis:
                 phiList.append(None)
         return thetaList, phiList
 
-
-
-
-
     def opticFlowAbility(self):
-        """das
+        """
         The particle position is denoted in a spherical coordinate system.
         The spherical coordinate system is defiend as:
             r     = the distance to the coordinate origin (aka seal) [m]
