@@ -253,3 +253,102 @@ simObj.opticFlowAna.plotOpticFlow(0,showStartEnd = False)
 1.4685,0.15058,0.038578,-0.066709,0.0014909
 0.43296,0.098639,-1.0179,0.0060124,0.003138
 0.48369,0.01351,-0.0080336,-0.013273,0.5358
+
+
+##########################################################################################
+#test current influence in polar plot
+############################################################################################
+from importlib import reload  
+import utilities as util 
+import SEAL_SIM 
+import opticFlowAna 
+import numpy as np  
+import matplotlib.pyplot as plt  
+from mpl_toolkits.mplot3d import Axes3D  
+reload(SEAL_SIM) 
+reload(opticFlowAna) 
+simObjCurrent = SEAL_SIM.SEAL_SIM('headless',spsInt=10000, maxParticlesInt=770, durSecFloat=2/10000.,currentStaticVelTuple=(0.0,0.15,0.0),diveTypeStr='uShape')  
+simObjCurrent.runSimulationSingleStep(np.array([1.3511,0.30699,0.0,np.deg2rad(1.5778),0.0,0.0]),np.array([0.,0.,-33]),np.array([0.,0.,0.])) 
+
+simObj = SEAL_SIM.SEAL_SIM('headless',spsInt=10000, maxParticlesInt=770, durSecFloat=2/10000.,currentStaticVelTuple=(0.0,0.0,0.0),diveTypeStr='uShape')  
+simObj.runSimulationSingleStep(np.array([1.3511,0.30699,0.0,np.deg2rad(1.5778),0.0,0.0]),np.array([0.,0.,-33]),np.array([0.,0.,0.]))
+
+
+########################
+
+frame = 0
+fig = plt.figure() 
+ax = fig.add_subplot(111, projection = 'hammer')
+        #for specific frame it calcultates the magnitute between the old and new position of each visibile? particle
+for i in range(len(simObj.opticFlowAna.particleList)): # po should be (oldPosition, newPosition, status) of particle per movement
+    direct = simObj.opticFlowAna.anaDataList[frame][3][i]
+    if  simObj.opticFlowAna.anaDataList[frame][2][i] != None: # richtungsvector between frames
+        X = simObj.opticFlowAna.anaDataList[frame][2][i][0][2] # phi
+        Y = simObj.opticFlowAna.anaDataList[frame][2][i][0][1] # theta
+        U = direct[2] # phi direction
+        V = direct[1] # theta direction
+        ax.quiver(X,Y,U,V,angles ='xy',scale_units='xy', scale =1,width=0.001, color='midnightblue', alpha=0.7, zorder=2)
+    else:
+        pass
+
+for i in range(len(simObjCurrent.opticFlowAna.particleList)): # po should be (oldPosition, newPosition, status) of particle per movement
+    direct = simObjCurrent.opticFlowAna.anaDataList[frame][3][i]
+    if  simObjCurrent.opticFlowAna.anaDataList[frame][2][i] != None: # richtungsvector between frames
+        X = simObjCurrent.opticFlowAna.anaDataList[frame][2][i][0][2] # phi
+        Y = simObjCurrent.opticFlowAna.anaDataList[frame][2][i][0][1] # theta
+        U = direct[2] # phi direction
+        V = direct[1] # theta direction
+        ax.quiver(X,Y,U,V,angles ='xy',scale_units='xy', scale =1,width=0.001, color='darkorange', alpha=0.7, zorder=2)
+    else:
+        pass
+
+x = ([-1.815,-1.815,1.815,1.815,-1.815])
+y = ([-0.209,1.204,1.204,-0.209,-0.209])
+ax.plot(x,y, zorder=1, color= 'forestgreen', linewidth= 2.0)
+
+ax.set_xlabel('azimuth [deg]')
+ax.set_ylabel('elevation [deg]')
+plt.grid(True)
+plt.show() 
+
+##############################################################################################
+# test current influence in normal 
+##############################################################################################
+viewField = True
+frame =0
+fig = plt.figure()
+ax = fig.add_subplot(111)
+#ax.axis('equal') 
+for i in range(len(simObj.opticFlowAna.particleList)): # po should be (oldPosition, newPosition, status) of particle per movement
+    direct = simObj.opticFlowAna.anaDataList[frame][3][i]
+    if  simObj.opticFlowAna.anaDataList[frame][2][i] != None: # richtungsvector between frames
+        X = simObj.opticFlowAna.anaDataList[frame][2][i][0][2] # phi
+        Y = simObj.opticFlowAna.anaDataList[frame][2][i][0][1] # theta
+        U = direct[2] # phi direction
+        V = direct[1] # theta direction
+        ax.quiver(np.rad2deg(X),np.rad2deg(Y),np.rad2deg(U),np.rad2deg(V),angles ='xy',scale_units='xy', scale =1,width=0.001, color='midnightblue', alpha=0.7, zorder=2)
+    else:
+        pass
+for i in range(len(simObjCurrent.opticFlowAna.particleList)): # po should be (oldPosition, newPosition, status) of particle per movement
+    direct = simObjCurrent.opticFlowAna.anaDataList[frame][3][i]
+    if  simObjCurrent.opticFlowAna.anaDataList[frame][2][i] != None: # richtungsvector between frames
+        X = simObjCurrent.opticFlowAna.anaDataList[frame][2][i][0][2] # phi
+        Y = simObjCurrent.opticFlowAna.anaDataList[frame][2][i][0][1] # theta
+        U = direct[2] # phi direction
+        V = direct[1] # theta direction
+        ax.quiver(np.rad2deg(X),np.rad2deg(Y),np.rad2deg(U),np.rad2deg(V),angles ='xy',scale_units='xy', scale =1,width=0.001, color='darkorange', alpha=0.7, zorder=2)
+    else:
+        pass
+
+if viewField == True:
+    ax.set_xlim(np.rad2deg(-1.815),np.rad2deg(1.815)) # visual field from -104 to 104° horizontally
+    ax.set_ylim(np.rad2deg(-0.209),np.rad2deg(1.204)) # vidual field from−12°to+69°vertically
+if viewField == False:
+    x = ([np.rad2deg(-1.815),np.rad2deg(-1.815),np.rad2deg(1.815),np.rad2deg(1.815),np.rad2deg(-1.815)])
+    y = ([np.rad2deg(-0.209),np.rad2deg(1.204),np.rad2deg(1.204),np.rad2deg(-0.209),np.rad2deg(-0.209)])
+    ax.plot(x,y, zorder=1, color= 'forestgreen', linewidth= 2.0)    
+
+ax.set_xlabel('azimuth [deg]')
+ax.set_ylabel('elevation [deg]')
+plt.grid(True)
+plt.show() 
