@@ -57,7 +57,7 @@ class opticFlowAnalysis:
         
     
 
-    def plotOpticFlow(self,frame, showStartEnd = False, viewField = False, projectionType = 'polar'):
+    def plotOpticFlow(self,frame,subPlot, figure, showStartEnd = False, viewField = False, projectionType = 'polar', plotFigure = True):
         """
         This function plotts a 2D optic flow field for a single sealStep, by calculating the 
         magnitute ot the movement vector from the oldPosition of the particle to the newPosition 
@@ -65,9 +65,17 @@ class opticFlowAnalysis:
         This functions plot old and new position in a geographical projection.
         https://matplotlib.org/3.1.0/gallery/subplots_axes_and_figures/geo_demo.html
         """
-        fig = plt.figure() 
+        if plotFigure == True:
+            fig = plt.figure() 
+        else:
+            fig = figure
+
         if projectionType == 'polar':
-            ax = fig.add_subplot(111, projection = 'hammer')
+            if plotFigure == True:
+                ax = fig.add_subplot(111, projection = 'hammer')
+            else:
+                ax = subPlot
+
                     #for specific frame it calcultates the magnitute between the old and new position of each visibile? particle
             for i in range(len(self.particleList)): # po should be (oldPosition, newPosition, status) of particle per movement
                 direct = self.anaDataList[frame][3][i]
@@ -92,7 +100,10 @@ class opticFlowAnalysis:
 
 
         else:
-            ax = fig.add_subplot(111)
+            if plotFigure == True:
+                ax = fig.add_subplot(111)
+            else:
+                ax = subPlot
             #ax.axis('equal') 
             for i in range(len(self.particleList)): # po should be (oldPosition, newPosition, status) of particle per movement
                 direct = self.anaDataList[frame][3][i]
@@ -122,7 +133,10 @@ class opticFlowAnalysis:
         ax.set_xlabel('azimuth [deg]')
         ax.set_ylabel('elevation [deg]')
         plt.grid(True)
-        plt.show() 
+        if plotFigure == True:
+            plt.show()
+        else:
+            pass 
 
     def create2DParticleDistributionList(self,prePost, frame):
         """
