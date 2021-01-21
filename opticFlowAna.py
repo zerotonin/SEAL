@@ -57,7 +57,7 @@ class opticFlowAnalysis:
         
     
 
-    def plotOpticFlow(self,frame,subPlot, figure, showStartEnd = False, viewField = False, projectionType = 'polar', plotFigure = True):
+    def plotOpticFlow(self,frame,subPlot=None, figure=None, showStartEnd = False, viewField = False, projectionType = 'polar', plotFigure = True, color='midnightblue'):
         """
         This function plotts a 2D optic flow field for a single sealStep, by calculating the 
         magnitute ot the movement vector from the oldPosition of the particle to the newPosition 
@@ -84,7 +84,7 @@ class opticFlowAnalysis:
                     Y = self.anaDataList[frame][2][i][0][1] # theta
                     U = direct[2] # phi direction
                     V = direct[1] # theta direction
-                    ax.quiver(X,Y,U,V,angles ='xy',scale_units='xy', scale =1,width=0.001, color='midnightblue', alpha=0.7, zorder=2)
+                    ax.quiver(X,Y,U,V,angles ='xy',scale_units='xy', scale =1,width=0.001, color= color, alpha=0.7, zorder=2)
                 else:
                     pass
             if showStartEnd == True:
@@ -112,7 +112,7 @@ class opticFlowAnalysis:
                     Y = self.anaDataList[frame][2][i][0][1] # theta
                     U = direct[2] # phi direction
                     V = direct[1] # theta direction
-                    ax.quiver(np.rad2deg(X),np.rad2deg(Y),np.rad2deg(U),np.rad2deg(V),angles ='xy',scale_units='xy', scale =1,width=0.001, color='midnightblue', alpha=0.7, zorder=2)
+                    ax.quiver(np.rad2deg(X),np.rad2deg(Y),np.rad2deg(U),np.rad2deg(V),angles ='xy',scale_units='xy', scale =1,width=0.001, color=color, alpha=0.7, zorder=2)
                 else:
                     pass
             if showStartEnd == True:
