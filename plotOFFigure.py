@@ -90,25 +90,24 @@ for dt in diveType:
 
 # optional current ranging from 40 to 0 cm/s in the y plane,
 # plus one complex current shifting 40 cm/s in all 3 dimensions 
-Currents = ([[0.0,0.4,0.0],
+Currents = ([[0.0,0.0,0.0],
              [0.0,0.2,0.0],
+             [0.0,0.4,0.0],
              [0.4,0.4,0.4]])
 
 for dt in diveType:
-    
+    0
     fig = plt.figure(figsize=(8.27, 11.69), dpi=100)
     
     fig.suptitle('Currents: '+str(dt), fontsize=16)
-    positionValue = 0
+    
     for pm in range(len(ThreePMs)):
         for c in range(len(Currents)):
+            colorChoice = ('#000000','#e69f00','#56b4e9','#009e73')
             simObj = SEAL_SIM.SEAL_SIM('headless', spsInt=10000, maxParticlesInt=770, durSecFloat=2/10000,currentStaticVelTuple=Currents[c], diveTypeStr= dt )
             simObj.runSimulationSingleStep(np.array(ThreePMs[pm]),np.array([0.,0.,-33.0]),np.array([0.,0.,0.]))
-            simObj.opticFlowAna.plotOpticFlow(0,subPlot=fig.add_subplot(9,2,c*2+1+positionValue, projection = 'hammer'), figure= fig,showStartEnd = False, plotFigure=False)
-            simObj.opticFlowAna.plotOpticFlow(0,subPlot=fig.add_subplot(9,2,c*2+2+positionValue), figure= fig, showStartEnd = False, projectionType ='', viewField = True, plotFigure=False) 
-            
-            print(positionValue)
-        positionValue = positionValue+6
+            simObj.opticFlowAna.plotOpticFlow(0,subPlot=fig.add_subplot(3,2,pm*2+1, projection = 'hammer'), figure= fig,showStartEnd = False, plotFigure=False, color=colorChoice[c])
+            simObj.opticFlowAna.plotOpticFlow(0,subPlot=fig.add_subplot(3,2,pm*2+2), figure= fig, showStartEnd = False, projectionType ='', viewField = True, plotFigure=False, color=colorChoice[c]) 
     plt.show()
 
 ##################################################################################################
@@ -129,7 +128,7 @@ for dt in diveType:
     for pm in range(len(ThreePMs)):
         for c in range(len(depth)):
             simObj = SEAL_SIM.SEAL_SIM('headless', spsInt=10000, maxParticlesInt=770, durSecFloat=2/10000,currentStaticVelTuple=(0.0,0.0,0.0), diveTypeStr= dt )
-            simObj.runSimulationSingleStep(np.array(ThreePMs[pm]),np.array([0.,0.,-0.001]),np.array([0.,0.,0.]))
+            simObj.runSimulationSingleStep(np.array(ThreePMs[pm]),np.array(depth[c]),np.array([0.,0.,0.]))
             simObj.opticFlowAna.plotOpticFlow(0,subPlot=fig.add_subplot(9,2,c*2+1+positionValue, projection = 'hammer'), figure= fig,showStartEnd = False, plotFigure=False)
             simObj.opticFlowAna.plotOpticFlow(0,subPlot=fig.add_subplot(9,2,c*2+2+positionValue), figure= fig, showStartEnd = False, projectionType ='', viewField = True, plotFigure=False) 
             
