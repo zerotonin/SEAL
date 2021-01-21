@@ -116,7 +116,7 @@ for dt in diveType:
 
 # simulate 3 depth, close to surface, middle of the ocean
 # and close to the sea floor
-depth = ([[0.0,0.0,-0.0001],
+depth = ([[0.0,0.0,-0.01],
           [0.0,0.0,-35.0],
           [0.0,0.0,-69.9999]])
 
