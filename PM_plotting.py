@@ -152,7 +152,7 @@ class plotProtoMov:
         self.drawStraightArrow(center,orientation='vertical',strength=self.PMvelocities[0],facecolor=pPM.keiItoPalette(0))
         self.drawStraightArrow(center,orientation='horizontal',strength=self.PMvelocities[1],facecolor=pPM.keiItoPalette(1))
         if self.PMvelocities[1]>0:
-            thetaAngle = np.pi/2- (np.pi/2*self.PMvelocities[2])
+            thetaAngle = np.pi/2+ (np.pi/2*self.PMvelocities[2])
         elif self.PMvelocities[1]<0:
             thetaAngle = np.pi/2+ (np.pi/2*self.PMvelocities[2])
         else:
