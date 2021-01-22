@@ -5,25 +5,27 @@ from matplotlib.collections import PatchCollection
 import matplotlib.pyplot as plt
 
 
-class plot2DProtoMov:
+class plotProtoMov:
     def __init__(self):
 
         self.PMtype           =  '3D' # string defining which type of prototypical movement is plotted available types will be 3D thrust,slip yaw and 5D thrust slip lift yaw pitch
         self.PMvelocities     =  [0.75, 0.5 ,-1]   # list with either 3 or 5 entires normalised between -1 and 1 for the velocities
         self.plotOrigin       =  (0.0, 0.0)        # tupel of floats with the center of the coordinates for the PM
         self.velColorList     =  []                # list with colors for the different velocities
-        self.edgeColor        = self.keiItoPalette(0)
+        self.arrowWidth       =  0.1
+        self.offset           =  0.15
+        self.radius           =  1.25
 
-    def keiItoPalette(self,indice,typeStr='hex'):
+    def keiItoPalette(self,indice,returnFormat='hex'):
 
         if returnFormat == 'rgb':
             returnFormatIndice = 1
         elif returnFormat == 'cmyk':
             returnFormatIndice = 0
         elif returnFormat == 'hex':
-            returnFormatIndice = 3
+            returnFormatIndice = 2
         elif returnFormat == 'name':
-            returnFormatIndice = 4
+            returnFormatIndice = 3
         else:
             raise ValueError('keiItoPlatte: The return returnFormat is unkown: '+ str(returnFormat))
 
@@ -38,12 +40,12 @@ class plot2DProtoMov:
                 [[0.10,0.70,0.00,0.00],[0.80,0.60,0.70],'#cc79a7','reddishPurple'])
         
         if type(indice)==int:
-            indice = mod(indice,8)
+            indice = np.mod(indice,8)
             return data[indice][returnFormatIndice]
         elif type(indice)==list:
             colorList = list()
             for i in indice:
-                i = mod(i,8)
+                i = np.mod(i,8)
                 colorList.append(data[i][returnFormatIndice])
             return colorList
         else:
@@ -51,31 +53,122 @@ class plot2DProtoMov:
 
 
 
-    def drawYawArrows(self,center, radius, facecolor='#2693de', edgecolor='#000000', theta1=90, theta2=180):
+    def drawCircleArrows(self,center, facecolor='#c8c8c8', edgecolor='#c8c8c8', theta1=90, theta2=180):
         
         # Add the ring
-        rwidth = 0.02
-        ring = mpatches.Wedge(center, radius, theta1, theta2, width=rwidth)
+        if theta2 < theta1:
+            arrowHeadTheta = theta2
+            theta2,theta1 = theta1,theta2
+            arrowTippOffset = np.pi/-2.0
+        else:
+            arrowHeadTheta = theta2
+            arrowTippOffset = np.pi/2
+
+        
+        ring = mpatches.Wedge(center, self.radius, theta1, theta2, width=self.arrowWidth)
 
         # Triangle edges
-        xcent  = center[0] +(radius-rwidth/2)*np.cos(np.deg2rad(theta2))
-        ycent  = center[1] +(radius-rwidth/2)*np.sin(np.deg2rad(theta2))
-        offset = 0.02
-        left   = [xcent  + offset*np.cos(np.deg2rad(theta2)), ycent +offset*np.sin(np.deg2rad(theta2))]
-        right  = [xcent  + offset*np.cos(np.deg2rad(theta2)+np.pi), ycent +offset*np.sin(np.deg2rad(theta2)+np.pi)]
-        bottom = [xcent  + offset*1.5*np.cos(np.deg2rad(theta2)+np.pi/2), ycent +offset*1.5*np.sin(np.deg2rad(theta2)+np.pi/2)]
+        
+        xcent  = center[0] +(self.radius-self.arrowWidth/2)*np.cos(np.deg2rad(arrowHeadTheta))
+        ycent  = center[1] +(self.radius-self.arrowWidth/2)*np.sin(np.deg2rad(arrowHeadTheta))
+        
+        left   = [xcent  + self.offset*np.cos(np.deg2rad(arrowHeadTheta))            , ycent +self.offset*np.sin(np.deg2rad(arrowHeadTheta))]
+        right  = [xcent  + self.offset*np.cos(np.deg2rad(arrowHeadTheta)+np.pi)      , ycent +self.offset*np.sin(np.deg2rad(arrowHeadTheta)+np.pi)]
+        bottom = [xcent  + self.offset*1.5*np.cos(np.deg2rad(arrowHeadTheta)+arrowTippOffset), ycent +self.offset*1.5*np.sin(np.deg2rad(arrowHeadTheta)+arrowTippOffset)]
         arrow  = plt.Polygon([left, right, bottom, left])
-        p = PatchCollection(
-            [ring, arrow], 
-            edgecolor = edgecolor, 
-            facecolor = facecolor
-        )
+        if theta2-theta1 < 10:
+            p = PatchCollection(
+                [ring], 
+                edgecolor = edgecolor, 
+                facecolor = facecolor
+            )
+        else:
+            p = PatchCollection(
+                [ring, arrow], 
+                edgecolor = edgecolor, 
+                facecolor = facecolor
+            )
         ax.add_collection(p)
+    
+    def drawStraightArrow(self, center,facecolor='#c8c8c8',edgecolor='#c8c8c8',orientation='vertical',strength = -1.0):
+
+        
+        if orientation == 'vertical':
+            xtip = center[0] + 0
+            ytip = center[1] + strength
+        elif  orientation == 'horizontal':
+            xtip = center[0] + strength
+            ytip = center[1] + 0
+        else:
+            raise ValueError('drawStraightArrow: The orientation  is unkown: '+ str(orientation)+' . Only vertical and horizontal are allowed!')
+        
+        # arrow angle
+        if strength < 0:
+            a_angle = np.arctan2(center[1]-ytip,center[0]-xtip)
+            headOffset = strength+self.offset*1.5
+        else:
+            a_angle = np.arctan2(center[1]-ytip,center[0]-xtip) - np.pi
+            headOffset= strength-self.offset*1.5
+
+        a_angleOrthogonal = a_angle -np.pi/2
+        wingOffset = self.offset-self.arrowWidth/2
+
+        #arrow base left
+        abl = [center[0]  + self.arrowWidth/2*np.cos(a_angleOrthogonal)      , center[1] +self.arrowWidth/2*np.sin(a_angleOrthogonal)]
+        #arrow base right
+        abr = [center[0]  + self.arrowWidth/2*np.cos(a_angleOrthogonal+np.pi), center[1] +self.arrowWidth/2*np.sin(a_angleOrthogonal+np.pi)]
+        #arrowTipp
+        atp = [xtip,ytip]
+        if np.abs(strength) < self.offset*1.5:
+            #arrow head left
+            ahl = [atp[0]  + self.arrowWidth/2*np.cos(a_angleOrthogonal)      , atp[1] +self.arrowWidth/2*np.sin(a_angleOrthogonal)]
+            #arrow head right
+            ahr = [atp[0]  + self.arrowWidth/2*np.cos(a_angleOrthogonal+np.pi), atp[1] +self.arrowWidth/2*np.sin(a_angleOrthogonal+np.pi)]
+            #compose patch
+            arrow  = plt.Polygon([abl, abr, ahr,ahl, abl],edgecolor = edgecolor, facecolor = facecolor)
+        else:
+            #arrow neck left    
+            anl = [abl[0]  + headOffset*np.cos(a_angle)                          , abl[1] +headOffset*np.sin(a_angle)]
+            #arrow wing left
+            awl = [anl[0]  + wingOffset*np.cos(a_angleOrthogonal)                , anl[1] +wingOffset*np.sin(a_angleOrthogonal)]
+            #arrow neck right
+            anr = [abr[0]  + headOffset*np.cos(a_angle)                          , abr[1] +headOffset*np.sin(a_angle)]
+            #arrow wing right
+            awr = [anr[0]  + wingOffset*np.cos(a_angleOrthogonal+np.pi)          , anr[1] +wingOffset*np.sin(a_angleOrthogonal+np.pi)]
+            #compose patch
+            arrow  = plt.Polygon([abl, abr, anr,awr, atp, awl, anl, abl],edgecolor = edgecolor, facecolor = facecolor)
+        ax.add_patch(arrow)
+
+    def drawAxisBackGround3F(self,center):
+        self.drawStraightArrow(center,orientation='vertical',strength=1.0)
+        self.drawStraightArrow(center,orientation='vertical',strength=-1.0)
+        self.drawStraightArrow(center,orientation='horizontal',strength=1.0)
+        self.drawStraightArrow(center,orientation='horizontal',strength=-1.0)
+        self.drawCircleArrows(center, theta2=180)
+        self.drawCircleArrows(center, theta2=0)
+
+    def draw3DPrototype(self,center):
+        self.drawAxisBackGround3F(center)
+        self.drawStraightArrow(center,orientation='vertical',strength=self.PMvelocities[0],facecolor=pPM.keiItoPalette(0))
+        self.drawStraightArrow(center,orientation='horizontal',strength=self.PMvelocities[1],facecolor=pPM.keiItoPalette(1))
+        if self.PMvelocities[1]>0:
+            thetaAngle = np.pi/2- (np.pi/2*self.PMvelocities[2])
+        elif self.PMvelocities[1]<0:
+            thetaAngle = np.pi/2+ (np.pi/2*self.PMvelocities[2])
+        else:
+            thetaAngle = np.pi/2
+
+        self.drawCircleArrows(center, theta2=thetaAngle,facecolor=pPM.keiItoPalette(2))
+
 #---------------------------------------------
 # Drawing time
 #---------------------------------------------
+
+pPM = plotProtoMov()
 fig, ax = plt.subplots(figsize=(6,6))
-drawYawArrows(center=(.5, .7), radius=.1,theta2=120)
-drawYawArrows(center=(.2, .2), radius=.15, facecolor='#ffb83c', edgecolor='gray')
-drawYawArrows(center=(.8, .3), radius=.15, facecolor='#39c1c8', edgecolor=None)
+pPM.draw3DPrototype(center=(2,3))
+pPM.drawAxisBackGround3F((5,3))
+plt.xlim(0,8)
+plt.ylim(0,5)
+ax.set_aspect('equal','box')
 plt.show()
