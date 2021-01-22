@@ -9,7 +9,7 @@ class plotProtoMov:
     def __init__(self):
 
         self.PMtype           =  '3D' # string defining which type of prototypical movement is plotted available types will be 3D thrust,slip yaw and 5D thrust slip lift yaw pitch
-        self.PMvelocities     =  [0.75, 0.5 ,-1]   # list with either 3 or 5 entires normalised between -1 and 1 for the velocities
+        self.PMvelocities     =  [0.75,-0.15 ,-1]   # list with either 3 or 5 entires normalised between -1 and 1 for the velocities
         self.plotOrigin       =  (0.0, 0.0)        # tupel of floats with the center of the coordinates for the PM
         self.velColorList     =  []                # list with colors for the different velocities
         self.arrowWidth       =  0.1
@@ -63,7 +63,6 @@ class plotProtoMov:
         else:
             arrowHeadTheta = theta2
             arrowTippOffset = np.pi/2
-
         
         ring = mpatches.Wedge(center, self.radius, theta1, theta2, width=self.arrowWidth)
 
@@ -151,14 +150,8 @@ class plotProtoMov:
         self.drawAxisBackGround3F(center)
         self.drawStraightArrow(center,orientation='vertical',strength=self.PMvelocities[0],facecolor=pPM.keiItoPalette(0))
         self.drawStraightArrow(center,orientation='horizontal',strength=self.PMvelocities[1],facecolor=pPM.keiItoPalette(1))
-        if self.PMvelocities[1]>0:
-            thetaAngle = np.pi/2+ (np.pi/2*self.PMvelocities[2])
-        elif self.PMvelocities[1]<0:
-            thetaAngle = np.pi/2+ (np.pi/2*self.PMvelocities[2])
-        else:
-            thetaAngle = np.pi/2
-
-        self.drawCircleArrows(center, theta2=thetaAngle,facecolor=pPM.keiItoPalette(2))
+        thetaAngle = np.pi/2 - (np.pi/2*self.PMvelocities[2])
+        self.drawCircleArrows(center, theta2=np.rad2deg(thetaAngle),facecolor=pPM.keiItoPalette(2))
 
 #---------------------------------------------
 # Drawing time
