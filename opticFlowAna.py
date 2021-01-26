@@ -117,7 +117,7 @@ class opticFlowAnalysis:
                     Y = self.anaDataList[frame][2][i][0][1] # theta
                     U = direct[2] # phi direction
                     V = direct[1] # theta direction
-                    ax.quiver(np.rad2deg(X),np.rad2deg(Y),np.rad2deg(U),np.rad2deg(V),angles ='xy',scale_units='xy', scale =1,width=0.01, color=color, zorder=2)
+                    ax.quiver(np.rad2deg(X),np.rad2deg(Y),np.rad2deg(U),np.rad2deg(V),angles ='xy',scale_units='xy', scale =1,width=0.01,alpha=0.7, color=color, zorder=2)
                 else:
                     pass
             if showStartEnd == True:
