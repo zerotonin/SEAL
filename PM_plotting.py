@@ -8,13 +8,14 @@ import matplotlib.pyplot as plt
 class plotProtoMov:
     def __init__(self):
 
-        self.PMtype           =  '3D' # string defining which type of prototypical movement is plotted available types will be 3D thrust,slip yaw and 5D thrust slip lift yaw pitch
-        self.PMvelocities     =  [0.75,-0.15 ,-1]   # list with either 3 or 5 entires normalised between -1 and 1 for the velocities
-        self.plotOrigin       =  (0.0, 0.0)        # tupel of floats with the center of the coordinates for the PM
-        self.velColorList     =  []                # list with colors for the different velocities
-        self.arrowWidth       =  0.1
-        self.offset           =  0.15
-        self.radius           =  1.25
+        self.PMtype              =  '3D' # string defining which type of prototypical movement is plotted available types will be 3D thrust,slip yaw and 5D thrust slip lift yaw pitch
+        self.PMvelocities        =  [[0.75,-0.15 ,-1],[.3 ,.2,0.01],[-1,.0,.0]]   # list with either 3 or 5 entires normalised between -1 and 1 for the velocities
+        self.plotOrigin          =  (0.0, 0.0)        # tupel of floats with the center of the coordinates for the PM
+        self.velColorList        =  []                # list with colors for the different velocities
+        self.arrowWidth          =  0.1
+        self.offset              =  0.15
+        self.radius              =  1.25
+        self.interPlotStepSize2D = 3.0
 
     def keiItoPalette(self,indice,returnFormat='hex'):
 
@@ -146,12 +147,13 @@ class plotProtoMov:
         self.drawCircleArrows(center, theta2=180)
         self.drawCircleArrows(center, theta2=0)
 
-    def draw3DPrototype(self,center):
+    def draw2DPrototype(self,center,PMVel,PMID=''):
         self.drawAxisBackGround3F(center)
-        self.drawStraightArrow(center,orientation='vertical',strength=self.PMvelocities[0],facecolor=pPM.keiItoPalette(0))
-        self.drawStraightArrow(center,orientation='horizontal',strength=self.PMvelocities[1],facecolor=pPM.keiItoPalette(1))
-        thetaAngle = np.pi/2 - (np.pi/2*self.PMvelocities[2])
+        self.drawStraightArrow(center,orientation='vertical'  ,strength=PMVel[0],facecolor=pPM.keiItoPalette(0))
+        self.drawStraightArrow(center,orientation='horizontal',strength=PMVel[1],facecolor=pPM.keiItoPalette(1))
+        thetaAngle = np.pi/2 - (np.pi/2*PMVel[2])
         self.drawCircleArrows(center, theta2=np.rad2deg(thetaAngle),facecolor=pPM.keiItoPalette(2))
+        ax.annotate(PMID,(center[0]-self.interPlotStepSize2D/2.+0.2,center[1]+self.interPlotStepSize2D/2.-0.2))
 
     def squareSubplotArrangement(self,PMnum):
         rows = int(np.ceil(np.sqrt(PMnum)))
@@ -162,17 +164,27 @@ class plotProtoMov:
 
         xOffset    = 0.0
         yOffset    = 0.0
-        stepSize   = 3.0
+        self.interPlotStepSize2D   = 3.0
         centerList = list()
         rows,cols  = self.squareSubplotArrangement(PMnum)
         
         for j in range(rows):
             for i in range(cols):
                 centerList.append([firstCenter[0]+xOffset,firstCenter[0]+yOffset])
-                xOffset += stepSize
+                xOffset += self.interPlotStepSize2D
             xOffset    = 0.0
-            yOffset += -1*stepSize
+            yOffset += -1*self.interPlotStepSize2D
         return np.array(centerList)
+    
+    def plot2DPMset(self):
+        self.PMvelocities     = np.array(self.PMvelocities)
+        PMnum = self.PMvelocities.shape[0]
+        centerList = self.getCentersforPMs(PMnum)
+        for pmI in range(PMnum):
+            self.draw2DPrototype(centerList[pmI],self.PMvelocities[pmI,0:3],PMID=str(pmI+1))
+        
+        plt.xlim([centerList[0,0]-self.interPlotStepSize2D/2.,centerList[-1,0]+self.interPlotStepSize2D/2.])
+        plt.ylim([centerList[-1,1]-self.interPlotStepSize2D/2.,centerList[0,1]+self.interPlotStepSize2D/2.])
         
 #---------------------------------------------
 # Drawing time
@@ -180,9 +192,6 @@ class plotProtoMov:
 
 pPM = plotProtoMov()
 fig, ax = plt.subplots(figsize=(6,6))
-pPM.draw3DPrototype(center=(2,3))
-pPM.drawAxisBackGround3F((5,3))
-plt.xlim(0,8)
-plt.ylim(0,5)
+pPM.plot2DPMset()
 ax.set_aspect('equal','box')
 plt.show()
