@@ -267,11 +267,9 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D  
 reload(SEAL_SIM) 
 reload(opticFlowAna) 
-simObjCurrent = SEAL_SIM.SEAL_SIM('headless',spsInt=10000, maxParticlesInt=770, durSecFloat=2/10000.,currentStaticVelTuple=(0.0,0.15,0.0),diveTypeStr='uShape')  
-simObjCurrent.runSimulationSingleStep(np.array([1.3511,0.30699,0.0,np.deg2rad(1.5778),0.0,0.0]),np.array([0.,0.,-33]),np.array([0.,0.,0.])) 
 
 simObj = SEAL_SIM.SEAL_SIM('headless',spsInt=10000, maxParticlesInt=770, durSecFloat=2/10000.,currentStaticVelTuple=(0.0,0.0,0.0),diveTypeStr='uShape')  
-simObj.runSimulationSingleStep(np.array([1.3511,0.30699,0.0,np.deg2rad(1.5778),0.0,0.0]),np.array([0.,0.,-33]),np.array([0.,0.,0.]))
+simObj.runSimulationSingleStep(np.array([3.7257,1.4087,   0.058942,  0.041954, -0.0015622, 0.0]),np.array([0.,0.,-33]),np.array([0.,0.,0.]))
 
 
 ########################
@@ -352,3 +350,28 @@ ax.set_xlabel('azimuth [deg]')
 ax.set_ylabel('elevation [deg]')
 plt.grid(True)
 plt.show() 
+
+
+
+###################################
+
+from importlib import reload   
+import utilities as util  
+import SEAL_SIM  
+import opticFlowAna  
+import numpy as np   
+import matplotlib.pyplot as plt   
+from mpl_toolkits.mplot3d import Axes3D   
+reload(SEAL_SIM)  
+reload(opticFlowAna)  
+ 
+simObj = SEAL_SIM.SEAL_SIM('headless',spsInt=10000, maxParticlesInt=770, durSecFloat=2/10000.,currentStaticVelTuple=(0.0,0.0,0.0),diveTypeStr='uShape')   
+simObj.runSimulationSingleStep(np.array([3.7257,1.4087,   0.058942,  0.041954, -0.0015622, 0.0]),np.array([0.,0.,-33]),np.array([0.,0.,0.])) 
+simObjSacc = SEAL_SIM.SEAL_SIM('headless',spsInt=10000, maxParticlesInt=770, durSecFloat=2/10000.,currentStaticVelTuple=(0.0,0.0,0.0),diveTypeStr='uShape') 
+simObjSacc.runSimulationSingleStep(np.array([1.1163,0.33908, -2.5045,    0.033083,  0.00027863,0.0]),np.array([0.,0.,-33]),np.array([0.,0.,0.])) 
+plt.hist(simObjSacc.opticFlowAna.distRankDiff,density=True, bins = 770, color= 'magenta') 
+plt.hist(simObj.opticFlowAna.distRankDiff,density=True, bins = 770, color = 'blue')  # density=False would make counts  
+ 
+plt.ylabel('Probability')  
+plt.xlabel('Distance Rank Difference')   
+plt.show()

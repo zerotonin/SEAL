@@ -57,7 +57,7 @@ class opticFlowAnalysis:
         
     
 
-    def plotOpticFlow(self,frame,subPlot=None, figure=None, showStartEnd = False, viewField = False, projectionType = 'polar', plotFigure = True, color='midnightblue'):
+    def plotOpticFlow(self,frame,subPlot=None, figure=None, showStartEnd = False, viewField = False, projectionType = 'polar', plotFigure = True, color='midnightblue', sealHeading=True):
         """
         This function plotts a 2D optic flow field for a single sealStep, by calculating the 
         magnitute ot the movement vector from the oldPosition of the particle to the newPosition 
@@ -75,7 +75,6 @@ class opticFlowAnalysis:
                 ax = fig.add_subplot(111, projection = 'hammer')
             else:
                 ax = subPlot
-
                     #for specific frame it calcultates the magnitute between the old and new position of each visibile? particle
             for i in range(len(self.particleList)): # po should be (oldPosition, newPosition, status) of particle per movement
                 direct = self.anaDataList[frame][3][i]
@@ -84,7 +83,7 @@ class opticFlowAnalysis:
                     Y = self.anaDataList[frame][2][i][0][1] # theta
                     U = direct[2] # phi direction
                     V = direct[1] # theta direction
-                    ax.quiver(X,Y,U,V,angles ='xy',scale_units='xy', scale =1,width=0.001, color= color, alpha=0.7, zorder=2)
+                    ax.quiver(X,Y,U,V,angles ='xy',scale_units='xy', scale =1,width=0.005, color= color, alpha=0.7, zorder=2)
                 else:
                     pass
             if showStartEnd == True:
@@ -97,6 +96,12 @@ class opticFlowAnalysis:
                 x = ([-1.815,-1.815,1.815,1.815,-1.815])
                 y = ([-0.209,1.204,1.204,-0.209,-0.209])
                 ax.plot(x,y, zorder=1, color= 'forestgreen', linewidth= 2.0) 
+            
+            if sealHeading == True:
+                sealPositions = self.sealTrajectory[:,0:3]
+                OFvector = np.subtract(sealPositions[1],sealPositions[0]) # magnitude of 2D vector p1(phi,z) to p2(phi,z)
+                OFvector = self.cart2spheric(OFvector)
+                ax.scatter(OFvector[2],OFvector[1],s = 80, marker ='+', color = '#e69f00')
 
 
         else:
@@ -112,7 +117,7 @@ class opticFlowAnalysis:
                     Y = self.anaDataList[frame][2][i][0][1] # theta
                     U = direct[2] # phi direction
                     V = direct[1] # theta direction
-                    ax.quiver(np.rad2deg(X),np.rad2deg(Y),np.rad2deg(U),np.rad2deg(V),angles ='xy',scale_units='xy', scale =1,width=0.001, color=color, alpha=0.7, zorder=2)
+                    ax.quiver(np.rad2deg(X),np.rad2deg(Y),np.rad2deg(U),np.rad2deg(V),angles ='xy',scale_units='xy', scale =1,width=0.01,alpha=0.7, color=color, zorder=2)
                 else:
                     pass
             if showStartEnd == True:
@@ -122,13 +127,21 @@ class opticFlowAnalysis:
                 ax.scatter(np.rad2deg(postPhiList),np.rad2deg(postThetaList), color='green')
 
             if viewField == True:
+                ax.axis('equal')
                 ax.set_xlim(np.rad2deg(-1.815),np.rad2deg(1.815)) # visual field from -104 to 104° horizontally
                 ax.set_ylim(np.rad2deg(-0.209),np.rad2deg(1.204)) # vidual field from−12°to+69°vertically
+                
         
             if viewField == False:
                 x = ([np.rad2deg(-1.815),np.rad2deg(-1.815),np.rad2deg(1.815),np.rad2deg(1.815),np.rad2deg(-1.815)])
                 y = ([np.rad2deg(-0.209),np.rad2deg(1.204),np.rad2deg(1.204),np.rad2deg(-0.209),np.rad2deg(-0.209)])
                 ax.plot(x,y, zorder=1, color= 'forestgreen', linewidth= 2.0)    
+
+            if sealHeading == True:               
+                sealPositions = self.sealTrajectory[:,0:3]
+                OFvector = np.subtract(sealPositions[1],sealPositions[0]) # magnitude of 2D vector p1(phi,z) to p2(phi,z)
+                OFvector = self.cart2spheric(OFvector)
+                ax.scatter(np.rad2deg(OFvector[2]),np.rad2deg(OFvector[1]),s = 80, marker ='+', color = '#e69f00') 
 
         ax.set_xlabel('azimuth [deg]')
         ax.set_ylabel('elevation [deg]')
@@ -325,9 +338,6 @@ class opticFlowAnalysis:
         |ofVec(2)| > pi/2 -> mod(ofVec(2),pi/2)*-1 
         """
         OFvector = np.subtract(sphereParticles[1],sphereParticles[0]) # magnitude of 2D vector p1(phi,z) to p2(phi,z)
-        
-
-
         if np.linalg.norm(OFvector[1]) > np.pi/2:
             #OFvector[2]= OFvector[2]*-1
             if OFvector[1] < 0:
