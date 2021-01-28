@@ -56,8 +56,7 @@ class plotProtoMov:
 
 
 
-    def drawCircleArrows(self,center, facecolor='#c8c8c8', edgecolor='#c8c8c8', theta1=90, theta2=180):
-        
+    def arrowStrength2ThetaAngle(self,theta1,theta2):
         # Add the ring
         if theta2 < theta1:
             arrowHeadTheta = theta2
@@ -67,6 +66,12 @@ class plotProtoMov:
             arrowHeadTheta = theta2
             arrowTippOffset = np.pi/2
         
+        return theta1,theta2,arrowHeadTheta,arrowTippOffset
+
+    def drawCircleArrows(self,center, facecolor='#c8c8c8', edgecolor='#c8c8c8', theta1=90, theta2=180):
+        
+        theta1,theta2,arrowHeadTheta,arrowTippOffset = self.arrowStrength2ThetaAngle(self,theta1,theta2)
+
         ring = mpatches.Wedge(center, self.radius, theta1, theta2, width=self.arrowWidth)
 
         # Triangle edges
@@ -147,9 +152,14 @@ class plotProtoMov:
         ax.add_patch(arrow)
     
     def drawStraightArrow3D(self, center,facecolor='#c8c8c8',edgecolor='#c8c8c8',orientation='vertical',strength = 1.0):
-        nodeList = self.constructStraightArrow(center,orientation,strength)
-        #add a zero to all entries, but because the first and last pointer point to the same node, we ignore the first.
-        [a.append(0.) for a in nodeList[1::]]
+        if orientation == 'orthogonal':
+            nodeList = self.constructStraightArrow(center,'vertical',strength)
+            #add a zero to all entries, but because the first and last pointer point to the same node, we ignore the first.
+            [a.insert(0,0.) for a in nodeList[1::]]
+        else:
+            nodeList = self.constructStraightArrow(center,orientation,strength)
+            #add a zero to all entries, but because the first and last pointer point to the same node, we ignore the first.
+            [a.append(0.) for a in nodeList[1::]]
 
         tri = Poly3DCollection(np.array([nodeList]))
         tri.set_color(facecolor)
@@ -169,6 +179,8 @@ class plotProtoMov:
         self.drawStraightArrow3D(center,orientation='vertical',strength=-1.0)
         self.drawStraightArrow3D(center,orientation='horizontal',strength=1.0)
         self.drawStraightArrow3D(center,orientation='horizontal',strength=-1.0)
+        self.drawStraightArrow3D(center,orientation='orthogonal',strength=1.0)
+        self.drawStraightArrow3D(center,orientation='orthogonal',strength=-1.0)
 
     def draw2DPrototype(self,center,PMVel,PMID=''):
         self.drawAxisBackGround3F(center)
@@ -223,6 +235,8 @@ pPM.drawAxisBackGround6F((0,0))
 ax.set_xlim([-1, 1])
 ax.set_ylim([-1, 1])
 ax.set_zlim([-1, 1])
+ax.set_xlabel('x')
+ax.view_init(elev=30, azim=0)
 plt.show()
 
 # PMs  = np.genfromtxt('/home/bgeurten/ownCloud/personalSwaps/SealSim/clustering/data/protoMov.csv',delimiter=',')
