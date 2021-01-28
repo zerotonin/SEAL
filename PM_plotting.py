@@ -1,8 +1,10 @@
 
 import numpy as np
 import matplotlib.patches as mpatches 
-from matplotlib.collections import PatchCollection
 import matplotlib.pyplot as plt
+from matplotlib.collections import PatchCollection
+from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+from mpl_toolkits.mplot3d import Axes3D
 
 
 class plotProtoMov:
@@ -143,6 +145,18 @@ class plotProtoMov:
         nodeList = self.constructStraightArrow(center,orientation,strength)
         arrow  = plt.Polygon(nodeList,edgecolor = edgecolor, facecolor = facecolor)
         ax.add_patch(arrow)
+    
+    def drawStraightArrow3D(self, center,facecolor='#c8c8c8',edgecolor='#c8c8c8',orientation='vertical',strength = 1.0):
+        nodeList = self.constructStraightArrow(center,orientation,strength)
+        #add a zero to all entries
+        [a.append(0.) for a in nodeList]
+        # because the first and last pointer point to the same node. This node gets 2 zeros and we have to get rid off one.
+        nodeList[0] = nodeList[0][0:-1]
+
+        tri = Poly3DCollection(np.array([nodeList]))
+        tri.set_color(facecolor)
+        tri.set_edgecolor(edgecolor)
+        ax.add_collection3d(tri)
 
     def drawAxisBackGround3F(self,center):
         self.drawStraightArrow2D(center,orientation='vertical',strength=1.0)
@@ -198,9 +212,13 @@ class plotProtoMov:
 #---------------------------------------------
 
 pPM = plotProtoMov()
-fig, ax = plt.subplots(figsize=(6,6))
-pPM.plot2DPMset()
-ax.set_aspect('equal','box')
+
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+pPM.drawStraightArrow3D([0,0],strength= 1.0)
+ax.set_xlim([-5, 5])
+ax.set_ylim([-5, 5])
+ax.set_zlim([-5, 5])
 plt.show()
 
 # PMs  = np.genfromtxt('/home/bgeurten/ownCloud/personalSwaps/SealSim/clustering/data/protoMov.csv',delimiter=',')
