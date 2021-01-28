@@ -300,6 +300,18 @@ class plotProtoMov:
         self.drawCircleArrow3D(  center,orientation='roll'      ,strength=-1.0, alpha = alpha)
         self.drawCircleArrow3D(  center,orientation='roll'      ,strength= 1.0, alpha = alpha)
 
+    def drawAxisBackGround5F(self,center,alpha = 0.75):
+        self.drawStraightArrow3D(center,orientation='vertical'  ,strength= 1.0, alpha = alpha)
+        self.drawStraightArrow3D(center,orientation='vertical'  ,strength=-1.0, alpha = alpha)
+        self.drawStraightArrow3D(center,orientation='horizontal',strength= 1.0, alpha = alpha)
+        self.drawStraightArrow3D(center,orientation='horizontal',strength=-1.0, alpha = alpha)
+        self.drawStraightArrow3D(center,orientation='orthogonal',strength= 1.0, alpha = alpha)
+        self.drawStraightArrow3D(center,orientation='orthogonal',strength=-1.0, alpha = alpha)
+        self.drawCircleArrow3D(  center,orientation='pitch'     ,strength=-1.0, alpha = alpha)
+        self.drawCircleArrow3D(  center,orientation='pitch'     ,strength= 1.0, alpha = alpha)
+        self.drawCircleArrow3D(  center,orientation='yaw'       ,strength=-1.0, alpha = alpha)
+        self.drawCircleArrow3D(  center,orientation='yaw'       ,strength= 1.0, alpha = alpha)
+
     def draw2DPrototype(self,center,PMVel,PMID=''):
         self.drawAxisBackGround3F(center)
         self.drawStraightArrow2D(center,orientation='vertical'  ,strength=PMVel[0],facecolor=pPM.keiItoPalette(0))
@@ -316,6 +328,18 @@ class plotProtoMov:
         self.drawCircleArrow3D(center,orientation='yaw',strength=PMVel[3] ,facecolor=pPM.keiItoPalette(2))
         self.drawCircleArrow3D(center,orientation='pitch',strength=PMVel[4] ,facecolor=pPM.keiItoPalette(4))
         self.drawCircleArrow3D(center,orientation='roll',strength=PMVel[5] ,facecolor=pPM.keiItoPalette(5))
+    
+    def draw3DPrototype5F(self,center,PMVel,PMID=''):
+        self.drawAxisBackGround5F(center)
+        self.drawStraightArrow3D(center,orientation='horizontal'  ,strength=PMVel[0],facecolor=pPM.keiItoPalette(0))
+        self.drawStraightArrow3D(center,orientation='vertical',strength=PMVel[1],facecolor=pPM.keiItoPalette(1))
+        self.drawStraightArrow3D(center,orientation='orthogonal'  ,strength=PMVel[2],facecolor=pPM.keiItoPalette(3))
+        self.drawCircleArrow3D(center,orientation='yaw',strength=PMVel[3] ,facecolor=pPM.keiItoPalette(2))
+        self.drawCircleArrow3D(center,orientation='pitch',strength=PMVel[4] ,facecolor=pPM.keiItoPalette(4))
+    
+
+    
+
 
     def squareSubplotArrangement(self,PMnum):
         rows = int(np.ceil(np.sqrt(PMnum)))
@@ -353,19 +377,26 @@ class plotProtoMov:
 #---------------------------------------------
 # Drawing time
 #---------------------------------------------
-
+PMs  = np.genfromtxt('/home/bgeurten/PyProjects/seal-sensory-aquatic-odometry-simulator/exampleC.csv',delimiter=',')
+norm = np.max(np.abs(PMs),0)
+PMs[:,0:3] =PMs[:,0:3]/np.max(norm[0:2])
+PMs[:,3] =PMs[:,3]/np.max(norm[3])
+PMs[:,4] =PMs[:,4]/np.max(norm[4])
 pPM = plotProtoMov()
-
 fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
-pPM.draw3DPrototype6F((0,0),[0.5,.25,-.25 ,.75 ,.15 ,.05])
-ax.set_xlim([-1, 1])
-ax.set_ylim([-1, 1])
-ax.set_zlim([-1, 1])
-ax.set_xlabel('x')
 
-ax.view_init(elev=40, azim=25)
-plt.axis('off')
+
+PMnum = PMs.shape[0]
+rows,cols  = pPM.squareSubplotArrangement(PMnum)
+
+for i in range(PMnum):
+    ax = fig.add_subplot(rows,cols,i+1, projection='3d')
+    pPM.draw3DPrototype5F((0,0),PMs[i,:])
+    ax.set_xlim([-1, 1])
+    ax.set_ylim([-1, 1])
+    ax.set_zlim([-1, 1])
+    ax.view_init(elev=40, azim=25)
+    plt.axis('off')
 plt.show()
 
 # PMs  = np.genfromtxt('/home/bgeurten/ownCloud/personalSwaps/SealSim/clustering/data/protoMov.csv',delimiter=',')
