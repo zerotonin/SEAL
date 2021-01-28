@@ -148,10 +148,8 @@ class plotProtoMov:
     
     def drawStraightArrow3D(self, center,facecolor='#c8c8c8',edgecolor='#c8c8c8',orientation='vertical',strength = 1.0):
         nodeList = self.constructStraightArrow(center,orientation,strength)
-        #add a zero to all entries
-        [a.append(0.) for a in nodeList]
-        # because the first and last pointer point to the same node. This node gets 2 zeros and we have to get rid off one.
-        nodeList[0] = nodeList[0][0:-1]
+        #add a zero to all entries, but because the first and last pointer point to the same node, we ignore the first.
+        [a.append(0.) for a in nodeList[1::]]
 
         tri = Poly3DCollection(np.array([nodeList]))
         tri.set_color(facecolor)
@@ -165,6 +163,12 @@ class plotProtoMov:
         self.drawStraightArrow2D(center,orientation='horizontal',strength=-1.0)
         self.drawCircleArrows(center, theta2=180)
         self.drawCircleArrows(center, theta2=0)
+
+    def drawAxisBackGround6F(self,center):
+        self.drawStraightArrow3D(center,orientation='vertical',strength=1.0)
+        self.drawStraightArrow3D(center,orientation='vertical',strength=-1.0)
+        self.drawStraightArrow3D(center,orientation='horizontal',strength=1.0)
+        self.drawStraightArrow3D(center,orientation='horizontal',strength=-1.0)
 
     def draw2DPrototype(self,center,PMVel,PMID=''):
         self.drawAxisBackGround3F(center)
@@ -215,10 +219,10 @@ pPM = plotProtoMov()
 
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
-pPM.drawStraightArrow3D([0,0],strength= 1.0)
-ax.set_xlim([-5, 5])
-ax.set_ylim([-5, 5])
-ax.set_zlim([-5, 5])
+pPM.drawAxisBackGround6F((0,0))
+ax.set_xlim([-1, 1])
+ax.set_ylim([-1, 1])
+ax.set_zlim([-1, 1])
 plt.show()
 
 # PMs  = np.genfromtxt('/home/bgeurten/ownCloud/personalSwaps/SealSim/clustering/data/protoMov.csv',delimiter=',')
