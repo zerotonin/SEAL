@@ -90,7 +90,7 @@ class plotProtoMov:
             )
         ax.add_collection(p)
     
-    def drawStraightArrow(self, center,facecolor='#c8c8c8',edgecolor='#c8c8c8',orientation='vertical',strength = -1.0):
+    def constructStraightArrow(self,center,orientation,strength):
 
         
         if orientation == 'vertical':
@@ -125,7 +125,7 @@ class plotProtoMov:
             #arrow head right
             ahr = [atp[0]  + self.arrowWidth/2*np.cos(a_angleOrthogonal+np.pi), atp[1] +self.arrowWidth/2*np.sin(a_angleOrthogonal+np.pi)]
             #compose patch
-            arrow  = plt.Polygon([abl, abr, ahr,ahl, abl],edgecolor = edgecolor, facecolor = facecolor)
+            nodeList  = [abl, abr, ahr,ahl, abl]
         else:
             #arrow neck left    
             anl = [abl[0]  + headOffset*np.cos(a_angle)                          , abl[1] +headOffset*np.sin(a_angle)]
@@ -136,7 +136,12 @@ class plotProtoMov:
             #arrow wing right
             awr = [anr[0]  + wingOffset*np.cos(a_angleOrthogonal+np.pi)          , anr[1] +wingOffset*np.sin(a_angleOrthogonal+np.pi)]
             #compose patch
-            arrow  = plt.Polygon([abl, abr, anr,awr, atp, awl, anl, abl],edgecolor = edgecolor, facecolor = facecolor)
+            nodeList = [abl, abr, anr,awr, atp, awl, anl, abl]
+        return nodeList
+     
+    def drawStraightArrow(self, center,facecolor='#c8c8c8',edgecolor='#c8c8c8',orientation='vertical',strength = -1.0):
+        nodeList = self.constructStraightArrow(center,orientation,strength)
+        arrow  = plt.Polygon(nodeList,edgecolor = edgecolor, facecolor = facecolor)
         ax.add_patch(arrow)
 
     def drawAxisBackGround3F(self,center):
@@ -185,13 +190,25 @@ class plotProtoMov:
         
         plt.xlim([centerList[0,0]-self.interPlotStepSize2D/2.,centerList[-1,0]+self.interPlotStepSize2D/2.])
         plt.ylim([centerList[-1,1]-self.interPlotStepSize2D/2.,centerList[0,1]+self.interPlotStepSize2D/2.])
+        ax.set_aspect('equal','box')
+        plt.axis('off')
         
 #---------------------------------------------
 # Drawing time
 #---------------------------------------------
 
+# pPM = plotProtoMov()
+# fig, ax = plt.subplots(figsize=(6,6))
+# pPM.plot2DPMset()
+# ax.set_aspect('equal','box')
+# plt.show()
+
+PMs  = np.genfromtxt('/home/bgeurten/ownCloud/personalSwaps/SealSim/clustering/data/protoMov.csv',delimiter=',')
+norm = np.max(np.abs(PMs),0)
+PMs[:,0:2] =PMs[:,0:2]/np.max(norm[0:2])
+PMs[:,2] =PMs[:,2]/norm[2]
 pPM = plotProtoMov()
 fig, ax = plt.subplots(figsize=(6,6))
+pPM.PMvelocities = PMs
 pPM.plot2DPMset()
-ax.set_aspect('equal','box')
 plt.show()
