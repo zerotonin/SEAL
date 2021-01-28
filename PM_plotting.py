@@ -153,11 +153,27 @@ class plotProtoMov:
         thetaAngle = np.pi/2 - (np.pi/2*self.PMvelocities[2])
         self.drawCircleArrows(center, theta2=np.rad2deg(thetaAngle),facecolor=pPM.keiItoPalette(2))
 
-    def squareSubplotArrangement(PMnum):
+    def squareSubplotArrangement(self,PMnum):
         rows = int(np.ceil(np.sqrt(PMnum)))
         cols = int(np.ceil(PMnum/rows))
         return rows,cols
+    
+    def getCentersforPMs(self,PMnum,firstCenter = (0,0)):
 
+        xOffset    = 0.0
+        yOffset    = 0.0
+        stepSize   = 3.0
+        centerList = list()
+        rows,cols  = self.squareSubplotArrangement(PMnum)
+        
+        for j in range(rows):
+            for i in range(cols):
+                centerList.append([firstCenter[0]+xOffset,firstCenter[0]+yOffset])
+                xOffset += stepSize
+            xOffset    = 0.0
+            yOffset += -1*stepSize
+        return np.array(centerList)
+        
 #---------------------------------------------
 # Drawing time
 #---------------------------------------------
