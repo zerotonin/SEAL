@@ -68,7 +68,7 @@ class plotProtoMov:
         
         return theta1,theta2,arrowHeadTheta,arrowTippOffset
 
-    def drawCircleArrows(self,center, facecolor='#c8c8c8', edgecolor='#c8c8c8', theta1=90, theta2=180):
+    def drawCircleArrows2D(self,center, facecolor='#c8c8c8', edgecolor='#c8c8c8', theta1=90, theta2=180):
         
         theta1,theta2,arrowHeadTheta,arrowTippOffset = self.arrowStrength2ThetaAngle(self,theta1,theta2)
 
@@ -171,8 +171,8 @@ class plotProtoMov:
         self.drawStraightArrow2D(center,orientation='vertical',strength=-1.0)
         self.drawStraightArrow2D(center,orientation='horizontal',strength=1.0)
         self.drawStraightArrow2D(center,orientation='horizontal',strength=-1.0)
-        self.drawCircleArrows(center, theta2=180)
-        self.drawCircleArrows(center, theta2=0)
+        self.drawCircleArrows2D(center, theta2=180)
+        self.drawCircleArrows2D(center, theta2=0)
 
     def drawAxisBackGround6F(self,center):
         self.drawStraightArrow3D(center,orientation='vertical',strength=1.0)
@@ -187,7 +187,7 @@ class plotProtoMov:
         self.drawStraightArrow2D(center,orientation='vertical'  ,strength=PMVel[0],facecolor=pPM.keiItoPalette(0))
         self.drawStraightArrow2D(center,orientation='horizontal',strength=PMVel[1],facecolor=pPM.keiItoPalette(1))
         thetaAngle = np.pi/2 - (np.pi/2*PMVel[2])
-        self.drawCircleArrows(center, theta2=np.rad2deg(thetaAngle),facecolor=pPM.keiItoPalette(2))
+        self.drawCircleArrows2D(center, theta2=np.rad2deg(thetaAngle),facecolor=pPM.keiItoPalette(2))
         ax.annotate(PMID,(center[0]-self.interPlotStepSize2D/2.+0.2,center[1]+self.interPlotStepSize2D/2.-0.2))
 
     def squareSubplotArrangement(self,PMnum):
