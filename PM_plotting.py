@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from matplotlib.collections import PatchCollection
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 from mpl_toolkits.mplot3d import Axes3D
-
+from scipy import signal
 
 class plotProtoMov:
     def __init__(self):
@@ -19,6 +19,47 @@ class plotProtoMov:
         self.radius              =  1.25
         self.interPlotStepSize2D = 3.0
 
+    def cart2sph(self,x, y, z):
+        hxy = np.hypot(x, y)
+        r = np.hypot(hxy, z)
+        el = np.arctan2(z, hxy)
+        az = np.arctan2(y, x)
+        return r, el, az
+
+    def sph2cart(self,r, el, az):
+        rcos_theta = r * np.cos(el)
+        x = rcos_theta * np.cos(az)
+        y = rcos_theta * np.sin(az)
+        z = r * np.sin(el)
+        return x, y, z
+
+    def getRotMatrix3D(self, yaw, pitch, roll, mode='active'):
+        """
+        This function creates a 3D rotation matrix in order
+        to rotate activly or passivly around the three given 
+        angles (yaw, pitch, roll)
+
+        @return 3x3 rotation matrix based on sinus and cosinus from yaw pitch and roll
+        """
+        # theta is in radians
+        cosYaw = np.cos(yaw)
+        sinYaw = np.sin(yaw)
+        cosPitch = np.cos(pitch)
+        sinPitch = np.sin(pitch)
+        cosRoll = np.cos(roll)
+        sinRoll = np.sin(roll)
+        if mode == 'active':
+            return np.array((( cosYaw*cosPitch                       , -sinYaw*cosPitch                       , sinPitch),
+                             ( cosYaw*sinPitch*sinRoll+sinYaw*cosRoll, -sinYaw*sinPitch*sinRoll+cosYaw*cosRoll, -cosPitch*sinRoll),
+                             (-cosYaw*sinPitch*cosRoll+sinYaw*sinRoll,  sinYaw*sinPitch*cosRoll+cosYaw*sinRoll, cosPitch*cosRoll)))
+        elif mode == 'passive':
+            return np.array(((cosYaw*cosPitch,  cosYaw*sinPitch*sinRoll-sinYaw*cosRoll, cosYaw*sinPitch*cosRoll+sinYaw*sinRoll),
+                             (sinYaw*cosPitch,  sinYaw*sinPitch*sinRoll+cosYaw*cosRoll, sinYaw*sinPitch*cosRoll-cosYaw*sinRoll),
+                             (-sinPitch      ,          cosPitch*sinRoll              ,          cosPitch*cosRoll)))
+
+        else:
+            print('Unknown mode for generating Fick Rotational Matrix:' + str(mode))
+            raise ValueError
     def keiItoPalette(self,indice,returnFormat='hex'):
 
         if returnFormat == 'rgb':
@@ -70,7 +111,7 @@ class plotProtoMov:
 
     def drawCircleArrows2D(self,center, facecolor='#c8c8c8', edgecolor='#c8c8c8', theta1=90, theta2=180):
         
-        theta1,theta2,arrowHeadTheta,arrowTippOffset = self.arrowStrength2ThetaAngle(self,theta1,theta2)
+        theta1,theta2,arrowHeadTheta,arrowTippOffset = self.arrowStrength2ThetaAngle(theta1,theta2)
 
         ring = mpatches.Wedge(center, self.radius, theta1, theta2, width=self.arrowWidth)
 
@@ -151,7 +192,7 @@ class plotProtoMov:
         arrow  = plt.Polygon(nodeList,edgecolor = edgecolor, facecolor = facecolor)
         ax.add_patch(arrow)
     
-    def drawStraightArrow3D(self, center,facecolor='#c8c8c8',edgecolor='#c8c8c8',orientation='vertical',strength = 1.0):
+    def drawStraightArrow3D(self, center,facecolor='#c8c8c8',edgecolor='#c8c8c8',orientation='vertical',strength = 1.0, alpha = 1.0):
         if orientation == 'orthogonal':
             nodeList = self.constructStraightArrow(center,'vertical',strength)
             #add a zero to all entries, but because the first and last pointer point to the same node, we ignore the first.
@@ -161,10 +202,81 @@ class plotProtoMov:
             #add a zero to all entries, but because the first and last pointer point to the same node, we ignore the first.
             [a.append(0.) for a in nodeList[1::]]
 
-        tri = Poly3DCollection(np.array([nodeList]))
+        tri = Poly3DCollection(np.array([nodeList]), alpha = alpha)
         tri.set_color(facecolor)
         tri.set_edgecolor(edgecolor)
         ax.add_collection3d(tri)
+
+    def projectArrowOnUnitSphere(self,nodeList):
+
+        for node in nodeList:
+            r,el,az = self.cart2sph(node[0],node[1],node[2])
+            node[0],node[1],node[2] = self.sph2cart(1.0,el,az)
+        
+        return nodeList
+    
+    def interpolateArrow(self,nodeList):
+        interSteps = 500
+        nodeListI = list()
+
+        for nodeI in range(1,len(nodeList)):
+            point_1 = nodeList[nodeI-1]
+            point_2 = nodeList[nodeI]
+            temp = list()
+            for axisI in range(3):
+                coords = np.linspace(point_1[axisI],point_2[axisI],interSteps, endpoint=True)
+                temp.append(coords)
+            temp = list(zip(temp[0],temp[1],temp[2]))
+            temp = [list(a) for a in temp]
+            nodeListI = nodeListI+temp
+
+        return nodeListI
+
+    def constructCircleArrow3D(self,center,strength):
+        # arrow has to be as long as the hypotenuse of the straigth arrows
+        nodeList = self.constructStraightArrow(center,'vertical',strength*np.sqrt(2)) 
+
+        #add a zero to all entries, but because the first and last pointer point to the same node, we ignore the first.
+        [a.insert(0,0.) for a in nodeList[1::]]
+        # rotate to 45
+        if strength < 0.0:
+            rotationAngle = np.pi/4
+        else:
+            rotationAngle = -np.pi/4
+        R = self.getRotMatrix3D(0, rotationAngle, 0)
+        nodeList =  [ np.dot(R, s) for s in nodeList]
+
+        #position at x-axis arrowTip
+        nodeList = [[a[0]+1.0, a[1], a[2]] for a in nodeList[1::]]
+        #print(nodeList)
+        #interpolate nodeList
+        nodeList = self.interpolateArrow(nodeList)
+        
+        # project on unitsphere
+        nodeList = self.projectArrowOnUnitSphere(nodeList)
+
+        return nodeList
+    
+    def drawCircleArrow3D(self, center,facecolor='#c8c8c8',edgecolor='#c8c8c8',orientation='pitch',strength = 1.0,alpha=1.0):
+        if orientation == 'pitch':
+            nodeList = self.constructCircleArrow3D(center,strength)
+
+        elif orientation == 'yaw':
+            nodeList = self.constructCircleArrow3D(center,strength)
+            R = self.getRotMatrix3D(0, 0, np.pi/2)
+            nodeList =  [ np.dot(R, s) for s in nodeList]
+        elif orientation == 'roll':
+            nodeList = self.constructCircleArrow3D(center,strength)
+            R = self.getRotMatrix3D(np.pi/2,0, 0)
+            nodeList =  [ np.dot(R, s) for s in nodeList]
+
+
+
+        tri = Poly3DCollection(np.array([nodeList]), alpha = alpha) 
+        tri.set_color(facecolor)
+        tri.set_edgecolor(edgecolor)
+        ax.add_collection3d(tri)
+
 
     def drawAxisBackGround3F(self,center):
         self.drawStraightArrow2D(center,orientation='vertical',strength=1.0)
@@ -174,13 +286,19 @@ class plotProtoMov:
         self.drawCircleArrows2D(center, theta2=180)
         self.drawCircleArrows2D(center, theta2=0)
 
-    def drawAxisBackGround6F(self,center):
-        self.drawStraightArrow3D(center,orientation='vertical',strength=1.0)
-        self.drawStraightArrow3D(center,orientation='vertical',strength=-1.0)
-        self.drawStraightArrow3D(center,orientation='horizontal',strength=1.0)
-        self.drawStraightArrow3D(center,orientation='horizontal',strength=-1.0)
-        self.drawStraightArrow3D(center,orientation='orthogonal',strength=1.0)
-        self.drawStraightArrow3D(center,orientation='orthogonal',strength=-1.0)
+    def drawAxisBackGround6F(self,center,alpha = 0.75):
+        self.drawStraightArrow3D(center,orientation='vertical'  ,strength= 1.0, alpha = alpha)
+        self.drawStraightArrow3D(center,orientation='vertical'  ,strength=-1.0, alpha = alpha)
+        self.drawStraightArrow3D(center,orientation='horizontal',strength= 1.0, alpha = alpha)
+        self.drawStraightArrow3D(center,orientation='horizontal',strength=-1.0, alpha = alpha)
+        self.drawStraightArrow3D(center,orientation='orthogonal',strength= 1.0, alpha = alpha)
+        self.drawStraightArrow3D(center,orientation='orthogonal',strength=-1.0, alpha = alpha)
+        self.drawCircleArrow3D(  center,orientation='pitch'     ,strength=-1.0, alpha = alpha)
+        self.drawCircleArrow3D(  center,orientation='pitch'     ,strength= 1.0, alpha = alpha)
+        self.drawCircleArrow3D(  center,orientation='yaw'       ,strength=-1.0, alpha = alpha)
+        self.drawCircleArrow3D(  center,orientation='yaw'       ,strength= 1.0, alpha = alpha)
+        self.drawCircleArrow3D(  center,orientation='roll'      ,strength=-1.0, alpha = alpha)
+        self.drawCircleArrow3D(  center,orientation='roll'      ,strength= 1.0, alpha = alpha)
 
     def draw2DPrototype(self,center,PMVel,PMID=''):
         self.drawAxisBackGround3F(center)
@@ -189,6 +307,15 @@ class plotProtoMov:
         thetaAngle = np.pi/2 - (np.pi/2*PMVel[2])
         self.drawCircleArrows2D(center, theta2=np.rad2deg(thetaAngle),facecolor=pPM.keiItoPalette(2))
         ax.annotate(PMID,(center[0]-self.interPlotStepSize2D/2.+0.2,center[1]+self.interPlotStepSize2D/2.-0.2))
+
+    def draw3DPrototype6F(self,center,PMVel,PMID=''):
+        self.drawAxisBackGround6F(center)
+        self.drawStraightArrow3D(center,orientation='horizontal'  ,strength=PMVel[0],facecolor=pPM.keiItoPalette(0))
+        self.drawStraightArrow3D(center,orientation='vertical',strength=PMVel[1],facecolor=pPM.keiItoPalette(1))
+        self.drawStraightArrow3D(center,orientation='orthogonal'  ,strength=PMVel[2],facecolor=pPM.keiItoPalette(3))
+        self.drawCircleArrow3D(center,orientation='yaw',strength=PMVel[3] ,facecolor=pPM.keiItoPalette(2))
+        self.drawCircleArrow3D(center,orientation='pitch',strength=PMVel[4] ,facecolor=pPM.keiItoPalette(4))
+        self.drawCircleArrow3D(center,orientation='roll',strength=PMVel[5] ,facecolor=pPM.keiItoPalette(5))
 
     def squareSubplotArrangement(self,PMnum):
         rows = int(np.ceil(np.sqrt(PMnum)))
@@ -231,12 +358,14 @@ pPM = plotProtoMov()
 
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
-pPM.drawAxisBackGround6F((0,0))
+pPM.draw3DPrototype6F((0,0),[0.5,.25,-.25 ,.75 ,.15 ,.05])
 ax.set_xlim([-1, 1])
 ax.set_ylim([-1, 1])
 ax.set_zlim([-1, 1])
 ax.set_xlabel('x')
-ax.view_init(elev=30, azim=0)
+
+ax.view_init(elev=40, azim=25)
+plt.axis('off')
 plt.show()
 
 # PMs  = np.genfromtxt('/home/bgeurten/ownCloud/personalSwaps/SealSim/clustering/data/protoMov.csv',delimiter=',')
