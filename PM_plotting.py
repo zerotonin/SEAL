@@ -100,7 +100,7 @@ class plotProtoMov:
             xtip = center[0] + strength
             ytip = center[1] + 0
         else:
-            raise ValueError('drawStraightArrow: The orientation  is unkown: '+ str(orientation)+' . Only vertical and horizontal are allowed!')
+            raise ValueError('constructStraightArrow: The orientation  is unkown: '+ str(orientation)+' . Only vertical and horizontal are allowed!')
         
         # arrow angle
         if strength < 0:
@@ -139,23 +139,23 @@ class plotProtoMov:
             nodeList = [abl, abr, anr,awr, atp, awl, anl, abl]
         return nodeList
      
-    def drawStraightArrow(self, center,facecolor='#c8c8c8',edgecolor='#c8c8c8',orientation='vertical',strength = -1.0):
+    def drawStraightArrow2D(self, center,facecolor='#c8c8c8',edgecolor='#c8c8c8',orientation='vertical',strength = -1.0):
         nodeList = self.constructStraightArrow(center,orientation,strength)
         arrow  = plt.Polygon(nodeList,edgecolor = edgecolor, facecolor = facecolor)
         ax.add_patch(arrow)
 
     def drawAxisBackGround3F(self,center):
-        self.drawStraightArrow(center,orientation='vertical',strength=1.0)
-        self.drawStraightArrow(center,orientation='vertical',strength=-1.0)
-        self.drawStraightArrow(center,orientation='horizontal',strength=1.0)
-        self.drawStraightArrow(center,orientation='horizontal',strength=-1.0)
+        self.drawStraightArrow2D(center,orientation='vertical',strength=1.0)
+        self.drawStraightArrow2D(center,orientation='vertical',strength=-1.0)
+        self.drawStraightArrow2D(center,orientation='horizontal',strength=1.0)
+        self.drawStraightArrow2D(center,orientation='horizontal',strength=-1.0)
         self.drawCircleArrows(center, theta2=180)
         self.drawCircleArrows(center, theta2=0)
 
     def draw2DPrototype(self,center,PMVel,PMID=''):
         self.drawAxisBackGround3F(center)
-        self.drawStraightArrow(center,orientation='vertical'  ,strength=PMVel[0],facecolor=pPM.keiItoPalette(0))
-        self.drawStraightArrow(center,orientation='horizontal',strength=PMVel[1],facecolor=pPM.keiItoPalette(1))
+        self.drawStraightArrow2D(center,orientation='vertical'  ,strength=PMVel[0],facecolor=pPM.keiItoPalette(0))
+        self.drawStraightArrow2D(center,orientation='horizontal',strength=PMVel[1],facecolor=pPM.keiItoPalette(1))
         thetaAngle = np.pi/2 - (np.pi/2*PMVel[2])
         self.drawCircleArrows(center, theta2=np.rad2deg(thetaAngle),facecolor=pPM.keiItoPalette(2))
         ax.annotate(PMID,(center[0]-self.interPlotStepSize2D/2.+0.2,center[1]+self.interPlotStepSize2D/2.-0.2))
@@ -197,18 +197,18 @@ class plotProtoMov:
 # Drawing time
 #---------------------------------------------
 
-# pPM = plotProtoMov()
-# fig, ax = plt.subplots(figsize=(6,6))
-# pPM.plot2DPMset()
-# ax.set_aspect('equal','box')
-# plt.show()
-
-PMs  = np.genfromtxt('/home/bgeurten/ownCloud/personalSwaps/SealSim/clustering/data/protoMov.csv',delimiter=',')
-norm = np.max(np.abs(PMs),0)
-PMs[:,0:2] =PMs[:,0:2]/np.max(norm[0:2])
-PMs[:,2] =PMs[:,2]/norm[2]
 pPM = plotProtoMov()
 fig, ax = plt.subplots(figsize=(6,6))
-pPM.PMvelocities = PMs
 pPM.plot2DPMset()
+ax.set_aspect('equal','box')
 plt.show()
+
+# PMs  = np.genfromtxt('/home/bgeurten/ownCloud/personalSwaps/SealSim/clustering/data/protoMov.csv',delimiter=',')
+# norm = np.max(np.abs(PMs),0)
+# PMs[:,0:2] =PMs[:,0:2]/np.max(norm[0:2])
+# PMs[:,2] =PMs[:,2]/norm[2]
+# pPM = plotProtoMov()
+# fig, ax = plt.subplots(figsize=(6,6))
+# pPM.PMvelocities = PMs
+# pPM.plot2DPMset()
+# plt.show()
