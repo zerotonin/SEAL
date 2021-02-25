@@ -258,7 +258,7 @@ class Cloud:
         self.waterCurrent      = self.simObj.runTimeData.getParameter('waterCurrent') # water current
 
         # this part of the cloud is not used because the particles would drive right through the seal
-        self.centralFreeSpace  = 0.2 # normalised to sphere radius
+        self.centralFreeSpace  = 1-(0.02/self.maxVectorMagnitude) # normalised to sphere radius
     def add_particles(self):
         """
         The 'add_particle' function initializes and adds random sized particles in random position from
