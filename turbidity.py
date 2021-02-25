@@ -1,6 +1,7 @@
 import numpy as np
 import math as m 
 import copy 
+from ai import cs
 #from sympy import *
 
 class Particle:
@@ -259,17 +260,23 @@ class Cloud:
 
         # this part of the cloud is not used because the particles would drive right through the seal
         self.centralFreeSpace  = 1-(0.02/self.maxVectorMagnitude) # normalised to sphere radius
+        self.gridParticles = True
+    
     def add_particles(self):
         """
         The 'add_particle' function initializes and adds random sized particles in random position from
         'randomInit' function within the Cloud. this forms the partclObjList.
         These positions are described with x,y,z coordinates with the seal being the center of the system.
         """
-        while len(self.partclObjList)<self.max_particles:
+        if self.gridParticles == False:
+            while len(self.partclObjList)<self.max_particles:
+                posSize = self.randomInit() # get random size and position
+                self.partclObjList.append(Particle(self,posSize[0],posSize[1])) # initialise particle and add to list
+        else:
+            self.spornMeshGridParticles()
+            for i in range(len(self.particlePositions)):
+                self.partclObjList.append(Particle(self,self.particlePositions[i],0.001))
 
-            posSize = self.randomInit() # get random size and position
-            self.partclObjList.append(Particle(self,posSize[0],posSize[1])) # initialise particle and add to list
-          
     def randomInit(self):
         """
         The 'randomInit' function returns a list of random sized particles[µm] within a size range 
@@ -277,24 +284,33 @@ class Cloud:
         And it returns 'initialCoord' as a random vector (x,y,z) with a range from -1 to 1.
         This is limited by a set maxVectorMagnitute within the getRandomVectorMagnitute
         function.
-
         @return particle coordinates (x,y,z) and its size [µm]
         """  
         size = np.random.uniform(self.sizeRange[0], self.sizeRange[1], size=(1))
         initialCoord = np.random.uniform(-1,1,size = (3)) # random vector (x,y,z) from -1 to 1
         initialCoord = self.getRandomVectorMagnitude(initialCoord)
         return (initialCoord,size)
-
     def getRandomVectorMagnitude(self,coordinate):
         """
         The function 'getRandomVectorMagnitude' calculates the magnitude of the random vector,
         limited by the size of 'maxVectorMagnitude', which is the radius of particles' cloud.
-
         @return a positional vector of the particle within the particle Cloud
         """
         normCoord = np.empty(3)
         normCoord = coordinate*(np.random.uniform(low=self.centralFreeSpace, high= 1.0,size=(1,))*self.maxVectorMagnitude/np.linalg.norm(coordinate))
         return normCoord
+     
+    def spornMeshGridParticles(self):
+        
+        radius, theta, phi = np.meshgrid(np.linspace(self.centralFreeSpace,1,         num=1), #outer 2cm of the sphere radius
+                                         np.linspace(-0.5*np.pi,           0.5*np.pi, num= 20),    #theta ranging from -0.5pi to 0.5 pi
+                                         np.linspace(-np.pi,               np.pi,     num = 40))            #phi ranging from -pi to pi 
+
+        x,y,z = cs.sp2cart(r=radius, theta=theta, phi=phi)
+        self.particlePositions = np.stack((x.ravel(), y.ravel(),z.ravel()),axis=1)
+
+        return self.particlePositions
+
         
     def resetParticles(self,lastInitialPosition):
         """
