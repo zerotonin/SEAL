@@ -160,6 +160,12 @@ class SEAL_SIM:
         print(self.protoMove.posTrajectory[0,:])
         self.opticFlowAna = opticFlowAna.opticFlowAnalysis(self)
 
+    def runSimulationRadiusDependen(self):
+        self.radiusRange = np.arange(0.02,4.0,step=0.02)
+        for i in range(len(self.radiusRange)):
+            self.runTimeData.setParameter('cloudRadius',self.radiusRange[i])
+            self.runSimulationSingleStep(np.array([1.8,0.0,   0.0,  2.2, 0.0, 0.0]),np.array([0.,0.,-33]),np.array([0.,0.,0.]))
+
     def runSimulationSingleStep(self,velStep,sealPos,sealOrient):
         """
         This function initiates the simulation to run. 
