@@ -302,7 +302,7 @@ class Cloud:
      
     def spornMeshGridParticles(self):
         
-        radius, theta, phi = np.meshgrid(np.linspace(self.centralFreeSpace,1,         num=1), #outer 2cm of the sphere radius
+        radius, theta, phi = np.meshgrid(np.linspace(self.centralFreeSpace*self.maxVectorMagnitude,self.maxVectorMagnitude,         num=1), #outer 2cm of the sphere radius
                                          np.linspace(-0.5*np.pi,           0.5*np.pi, num= 20),    #theta ranging from -0.5pi to 0.5 pi
                                          np.linspace(-np.pi,               np.pi,     num = 40))            #phi ranging from -pi to pi 
 
