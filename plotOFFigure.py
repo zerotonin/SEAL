@@ -9,10 +9,12 @@ TranslaPM = ([[1.8609,0.44391, -0.072173, -0.52564,  -0.0011278, 0.0],
               [1.0312,-0.33755,-0.10574,  -0.023993, -0.0041735, 0.0],
               [1.6527,0.3865,  -0.052242,  0.0060586,-0.93312,   0.0],
               [1.6259,0.39059, -0.010533,  0.008956,  0.84291,   0.0],
-              [1.1163,0.33908, -2.5045,    0.033083,  0.00027863,0.0],
-              [3.7257,1.4087,   0.058942,  0.041954, -0.0015622, 0.0],
-              [3.6564,-0.48179, 0.1856,    0.095942,  0.0022598, 0.0],
               [1.5748,0.45007,  0.051904,  0.35187,  -0.0064602, 0.0]])
+
+TranslaPM = ([[1.1163,0.33908, -2.5045,    0.033083,  0.00027863,0.0],
+              [3.7257,1.4087,   0.058942,  0.041954, -0.0015622, 0.0],
+              [3.6564,-0.48179, 0.1856,    0.095942,  0.0022598, 0.0],])
+
 
 RotationalPM = ([[1.8268,  0.01529,  -0.15939, 2.1617,    0.0054881, 0.0],#yaw right
                  [1.7163,  0.79161,  -0.13845,-2.2299,    0.00061883,0.0],#yaw left
@@ -29,20 +31,20 @@ RotationalPM = ([[1.8268,  0.01529,  -0.15939, 2.1617,    0.0054881, 0.0],#yaw r
 dt = 'uShape'
 # translational PMs
 
-fig = plt.figure(figsize=(5.27, 18.69), dpi=100)
+fig = plt.figure(figsize=(8.27, 18.69), dpi=100)
 fig.suptitle('Translational PMs', fontsize=16)
 for pm in range(len(TranslaPM)):
     simObj = SEAL_SIM.SEAL_SIM('headless', spsInt=10000, maxParticlesInt=770, durSecFloat=2/10000,currentStaticVelTuple=(0.0,0.0,0.0), diveTypeStr= dt  )
     simObj.runSimulationSingleStep(np.array(TranslaPM[pm]),np.array([0.,0.,-33.0]),np.array([0.,0.,0.]))
-    simObj.opticFlowAna.plotOpticFlow(0,subPlot=fig.add_subplot(9,2,pm*2+1, projection = 'hammer'), figure= fig,showStartEnd = False, plotFigure=False)
+    simObj.opticFlowAna.plotOpticFlow(0,subPlot=fig.add_subplot(6,2,pm*2+1, projection = 'hammer'), figure= fig,showStartEnd = False, plotFigure=False)
     
-    simObj.opticFlowAna.plotOpticFlow(0,subPlot=fig.add_subplot(9,2,pm*2+2), figure= fig, showStartEnd = False, projectionType ='', viewField = True, plotFigure=False) 
+    simObj.opticFlowAna.plotOpticFlow(0,subPlot=fig.add_subplot(6,2,pm*2+2), figure= fig, showStartEnd = False, projectionType ='', viewField = True, plotFigure=False) 
 plt.show()
 
 # rotational PMs
 
-fig = plt.figure(figsize=(8.27, 11.69), dpi=100)
-
+fig = plt.figure()
+fig.subplots_adjust(wspace=0.25, hspace=0.5) 
 fig.suptitle('Rotational PMs', fontsize=16)
 for pm in range(len(RotationalPM)):
     simObj = SEAL_SIM.SEAL_SIM('headless', spsInt=10000, maxParticlesInt=770, durSecFloat=2/10000,currentStaticVelTuple=(0.0,0.0,0.0), diveTypeStr= dt )
@@ -67,7 +69,7 @@ turbidty = (22,220,770)
 
 for pm in range(len(ThreePMs)):
     fig = plt.figure()
-    fig.subplots_adjust(left=0.125, right=0.9, bottom=0.1, top=0.9,wspace=0.25, hspace=0.5)
+    fig.subplots_adjust(wspace=0.25, hspace=0.5)
     fig.suptitle('Turbidty: PM'+str(pm+1), fontsize=16)
     positionValue = 0
     for t in range(len(turbidty)):
@@ -85,21 +87,27 @@ plt.show()
 
 # optional current ranging from 40 to 0 cm/s in the y plane,
 # plus one complex current shifting 40 cm/s in all 3 dimensions 
-Currents = ([[0.0,0.0,0.0],
-             [0.0,0.2,0.0],
+Currents = ([[0.0,0.2,0.0],
              [0.0,0.4,0.0],
-             [0.4,0.4,0.4]])
+             [0.0,3.0,0.0]])
 
-fig = plt.figure(figsize=(8.27, 11.69), dpi=100)
-fig.suptitle('Currents', fontsize=16)
+
 
 for pm in range(len(ThreePMs)):
+    fig = plt.figure()
+    fig.subplots_adjust(wspace=0.25, hspace=0.5)
+    fig.suptitle('Current: PM'+str(pm+1), fontsize=16)
+    positionValue = 0
     for c in range(len(Currents)):
-        colorChoice = ('#000000','#e69f00','#56b4e9','#009e73')
-        simObj = SEAL_SIM.SEAL_SIM('headless', spsInt=10000, maxParticlesInt=770, durSecFloat=2/10000,currentStaticVelTuple=Currents[c], diveTypeStr= dt )
+        colorChoice = ('#56b4e9','#009e73','#e69f00')
+        simObj = SEAL_SIM.SEAL_SIM('headless', spsInt=10000, maxParticlesInt=770, durSecFloat=2/10000,currentStaticVelTuple=[0.0,0.0,0.0], diveTypeStr= dt )
+        simObjC = SEAL_SIM.SEAL_SIM('headless', spsInt=10000, maxParticlesInt=770, durSecFloat=2/10000,currentStaticVelTuple=Currents[c], diveTypeStr= dt )
         simObj.runSimulationSingleStep(np.array(ThreePMs[pm]),np.array([0.,0.,-33.0]),np.array([0.,0.,0.]))
-        simObj.opticFlowAna.plotOpticFlow(0,subPlot=fig.add_subplot(3,2,pm*2+1, projection = 'hammer'), figure= fig,showStartEnd = False, plotFigure=False, color=colorChoice[c])
-        simObj.opticFlowAna.plotOpticFlow(0,subPlot=fig.add_subplot(3,2,pm*2+2), figure= fig, showStartEnd = False, projectionType ='', viewField = True, plotFigure=False, color=colorChoice[c]) 
+        simObjC.runSimulationSingleStep(np.array(ThreePMs[pm]),np.array([0.,0.,-33.0]),np.array([0.,0.,0.]))
+        simObj.opticFlowAna.plotOpticFlow(0,subPlot=fig.add_subplot(3,2,c*2+1, projection = 'hammer'), figure= fig,showStartEnd = False, plotFigure=False, color='midnightblue')
+        simObj.opticFlowAna.plotOpticFlow(0,subPlot=fig.add_subplot(3,2,c*2+2), figure= fig, showStartEnd = False, projectionType ='', viewField = True, plotFigure=False, color='midnightblue') 
+        simObjC.opticFlowAna.plotOpticFlow(0,subPlot=fig.add_subplot(3,2,c*2+1, projection = 'hammer'), figure= fig,showStartEnd = False, plotFigure=False, color=colorChoice[c])
+        simObjC.opticFlowAna.plotOpticFlow(0,subPlot=fig.add_subplot(3,2,c*2+2), figure= fig, showStartEnd = False, projectionType ='', viewField = True, plotFigure=False, color=colorChoice[c])
 plt.show()
 
 ##################################################################################################
@@ -112,17 +120,37 @@ depth = ([[0.0,0.0,-0.01],
           [0.0,0.0,-69.9999]])
 
 
-fig = plt.figure(figsize=(5.27, 11.69), dpi=100)
-
-fig.suptitle('Depth', fontsize=16)
-positionValue = 0
 for pm in range(len(ThreePMs)):
+    fig = plt.figure()
+    fig.subplots_adjust(wspace=0.25, hspace=0.5)
+    fig.suptitle('Depth: PM'+str(pm+1), fontsize=16)
+    positionValue = 0
     for c in range(len(depth)):
-        simObj = SEAL_SIM.SEAL_SIM('headless', spsInt=10000, maxParticlesInt=770, durSecFloat=2/10000,currentStaticVelTuple=(0.0,0.0,0.0), diveTypeStr= dt )
+        simObj = SEAL_SIM.SEAL_SIM('headless', spsInt=10000, maxParticlesInt=770, durSecFloat=2/10000,currentStaticVelTuple=(0.0,4.0,0.0), diveTypeStr= dt )
         simObj.runSimulationSingleStep(np.array(ThreePMs[pm]),np.array(depth[c]),np.array([0.,0.,0.]))
-        simObj.opticFlowAna.plotOpticFlow(0,subPlot=fig.add_subplot(9,2,c*2+1+positionValue, projection = 'hammer'), figure= fig,showStartEnd = False, plotFigure=False)
-        simObj.opticFlowAna.plotOpticFlow(0,subPlot=fig.add_subplot(9,2,c*2+2+positionValue), figure= fig, showStartEnd = False, projectionType ='', viewField = True, plotFigure=False) 
+        simObj.opticFlowAna.plotOpticFlow(0,subPlot=fig.add_subplot(3,2,c*2+1+positionValue, projection = 'hammer'), figure= fig,showStartEnd = False, plotFigure=False)
+        simObj.opticFlowAna.plotOpticFlow(0,subPlot=fig.add_subplot(3,2,c*2+2+positionValue), figure= fig, showStartEnd = False, projectionType ='', viewField = True, plotFigure=False) 
         
         print(positionValue)
-    positionValue = positionValue+6
+    
 plt.show()
+
+
+radius = (0.02,0.2,1,2,4) # 0.00178m, 0.5m, 4m
+pm = ([1.8,  0.0,  0.0,2.2,0.0,0.0])
+
+fig = plt.figure()
+fig.subplots_adjust(wspace=0.25, hspace=0.5)
+positionValue = 0
+for c in range(len(radius)):
+    simObj = SEAL_SIM.SEAL_SIM('headless', spsInt=50, maxParticlesInt=770, durSecFloat=2/50,currentStaticVelTuple=(0.0,0.0,0.0), diveTypeStr= dt, cloudRadiusFloat=radius[c] )
+    simObj.runSimulationSingleStep(np.array(pm),np.array([0.,0.,-33.0]),np.array([0.,0.,0.]))
+    simObj.opticFlowAna.plotOpticFlow(0,subPlot=fig.add_subplot(5,2,c*2+1+positionValue, projection = 'hammer'), figure= fig,showStartEnd = False, plotFigure=False)
+    simObj.opticFlowAna.plotOpticFlow(0,subPlot=fig.add_subplot(5,2,c*2+2+positionValue), figure= fig, showStartEnd = False, projectionType ='', viewField = True, plotFigure=False) 
+    
+    print(positionValue)
+    
+plt.show()
+
+
+https://doi.org/10.1371/journal.pbio.1001177

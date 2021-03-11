@@ -52,6 +52,7 @@ class opticFlowAnalysis:
         # private objects
         self.anaDataList    = list()
         self.distRankDiff   = list()
+        self.divergence     = list()
         #initialize data
         self.opticFlowAbility()
         
@@ -170,6 +171,28 @@ class opticFlowAnalysis:
                 thetaList.append(None)
                 phiList.append(None)
         return thetaList, phiList
+
+    def calculateDivergence(self, frame):
+        
+        phiDirectionList = list()
+        thetaDirectionList = list()
+        for i in range(len(self.particleList)): # po should be (oldPosition, newPosition, status) of particle per movement
+            direct = self.anaDataList[frame][3][i]
+            if  self.anaDataList[frame][2][i] != None: # richtungsvector between frames
+
+                U = direct[2] # phi direction
+                phiDirectionList.append(U)
+
+                V = direct[1] #theta direction
+                thetaDirectionList.append(V)
+
+        phiDirection = np.array(phiDirectionList).reshape(20,40)
+        thetaDirection = np.array(thetaDirectionList).reshape(20,40)
+
+        F = [phiDirection,thetaDirection]
+        num_dims = len(F)
+        self.divergence = np.ufunc.reduce(np.add, [np.gradient(F[i], axis=i) for i in range(num_dims)])
+
 
     def opticFlowAbility(self):
         """

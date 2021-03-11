@@ -377,7 +377,7 @@ class plotProtoMov:
 #---------------------------------------------
 # Drawing time
 #---------------------------------------------
-PMs  = np.genfromtxt('/home/bgeurten/PyProjects/seal-sensory-aquatic-odometry-simulator/exampleC.csv',delimiter=',')
+PMs  = np.genfromtxt('/home/anne/pyprojects/seal-sensory-aquatic-odometry-simulator/combi_C.csv',delimiter=',')
 norm = np.max(np.abs(PMs),0)
 PMs[:,0:3] =PMs[:,0:3]/np.max(norm[0:2])
 PMs[:,3] =PMs[:,3]/np.max(norm[3])
