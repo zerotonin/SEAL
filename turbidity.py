@@ -259,7 +259,7 @@ class Cloud:
         self.waterCurrent      = self.simObj.runTimeData.getParameter('waterCurrent') # water current
 
         # this part of the cloud is not used because the particles would drive right through the seal
-        self.centralFreeSpace  = 1-(0.02/self.maxVectorMagnitude) # normalised to sphere radius
+        self.centralFreeSpace  = 1-(0.0199/self.maxVectorMagnitude) # normalised to sphere radius 0.0199 avoid devision by zero 
         self.gridParticles = True
     
     def add_particles(self):
@@ -273,7 +273,7 @@ class Cloud:
                 posSize = self.randomInit() # get random size and position
                 self.partclObjList.append(Particle(self,posSize[0],posSize[1])) # initialise particle and add to list
         else:
-            self.spornMeshGridParticles()
+            self.spawnMeshGridParticles()
             for i in range(len(self.particlePositions)):
                 self.partclObjList.append(Particle(self,self.particlePositions[i],0.001))
 
@@ -300,7 +300,7 @@ class Cloud:
         normCoord = coordinate*(np.random.uniform(low=self.centralFreeSpace, high= 1.0,size=(1,))*self.maxVectorMagnitude/np.linalg.norm(coordinate))
         return normCoord
      
-    def spornMeshGridParticles(self):
+    def spawnMeshGridParticles(self):
         
         radius, theta, phi = np.meshgrid(np.linspace(self.centralFreeSpace*self.maxVectorMagnitude,self.maxVectorMagnitude,         num=1), #outer 2cm of the sphere radius
                                          np.linspace(-0.5*np.pi,           0.5*np.pi, num= 20),    #theta ranging from -0.5pi to 0.5 pi
