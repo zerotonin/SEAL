@@ -57,6 +57,30 @@ class opticFlowAnalysis:
         self.opticFlowAbility()
         
     
+    def calculateQuiverData(self,frame,mode = 'all'):
+        # preallocation
+        phiDirectionList   = list()
+        thetaDirectionList = list()
+        phiList            = list()
+        thetaList          = list()
+        # iterate through all the optic flow data of the particles
+        for particleI in range(len(self.particleList)):
+            # shorthand for the OF vector
+            OFvector = self.anaDataList[frame][3][particleI]
+            # check if the OF vector is available
+            if  self.anaDataList[frame][2][particleI] != None: 
+
+                phiList.append(self.anaDataList[frame][2][particleI][0][2]) # phi
+                thetaList.append(self.anaDataList[frame][2][particleI][0][1]) # theta
+                # getting phi
+                phiDirectionList.append(OFvector[2])
+                # getting theta
+                thetaDirectionList.append(OFvector[1])
+                # OF vector 0 is the radius
+        if mode == 'directionOnly':
+            return (phiDirectionList, thetaDirectionList)
+        else:
+            return (phiList,thetaList,phiDirectionList,thetaDirectionList)
 
     def plotOpticFlow(self,frame,subPlot=None, figure=None, showStartEnd = False, viewField = False, projectionType = 'polar', plotFigure = True, color='midnightblue', sealHeading=True):
         """
@@ -76,17 +100,12 @@ class opticFlowAnalysis:
                 ax = fig.add_subplot(111, projection = 'hammer')
             else:
                 ax = subPlot
-                    #for specific frame it calcultates the magnitute between the old and new position of each visibile? particle
-            for i in range(len(self.particleList)): # po should be (oldPosition, newPosition, status) of particle per movement
-                direct = self.anaDataList[frame][3][i]
-                if  self.anaDataList[frame][2][i] != None: # richtungsvector between frames
-                    X = self.anaDataList[frame][2][i][0][2] # phi
-                    Y = self.anaDataList[frame][2][i][0][1] # theta
-                    U = direct[2] # phi direction
-                    V = direct[1] # theta direction
-                    ax.quiver(X,Y,U,V,angles ='xy',scale_units='xy', scale =1,width=0.005, color= color, alpha=0.7, zorder=2)
-                else:
-                    pass
+           #for specific frame it calcultates the magnitute between the old and new position of each visibile? particle
+            quiverData = self.calculateQuiverData(frame)
+            quiverData = np.rad2deg(quiverData)
+            for particleI in range(len(quiverData[0])): 
+                ax.quiver(quiverData[0][particleI],quiverData[1][particleI],quiverData[2][particleI],quiverData[3][particleI],angles ='xy',scale_units='xy', scale =1,width=0.005, color= color, alpha=0.7, zorder=2)
+
             if showStartEnd == True:
                 thetaList, phiList = self.create2DParticleDistributionList(0,frame)
                 ax.scatter(phiList, thetaList, color = 'red')
@@ -174,20 +193,10 @@ class opticFlowAnalysis:
 
     def calculateDivergence(self, frame):
         
-        phiDirectionList = list()
-        thetaDirectionList = list()
-        for i in range(len(self.particleList)): # po should be (oldPosition, newPosition, status) of particle per movement
-            direct = self.anaDataList[frame][3][i]
-            if  self.anaDataList[frame][2][i] != None: # richtungsvector between frames
+        quiverData = self.calculateQuiverData(0,'directionOnly')
 
-                U = direct[2] # phi direction
-                phiDirectionList.append(U)
-
-                V = direct[1] #theta direction
-                thetaDirectionList.append(V)
-
-        phiDirection = np.array(phiDirectionList).reshape(20,40)
-        thetaDirection = np.array(thetaDirectionList).reshape(20,40)
+        phiDirection = np.array(quiverData[0]).reshape(20,40)
+        thetaDirection = np.array(quiverData[1]).reshape(20,40)
 
         F = [phiDirection,thetaDirection]
         num_dims = len(F)
