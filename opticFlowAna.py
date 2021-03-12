@@ -192,16 +192,33 @@ class opticFlowAnalysis:
         return thetaList, phiList
 
     def calculateDivergence(self, frame):
-        
-        quiverData = self.calculateQuiverData(0,'directionOnly')
+        # get me the quiver data
+        quiverData = self.calculateQuiverData(0,'all')
+        # change from spherical base coordinates to matrix indices
+        dim2 = self.sphereCoordToMatrixCoords(quiverData[0],40)
+        dim1 = self.sphereCoordToMatrixCoords(quiverData[1],20)
+        # fill matrix
+        phiDirection = np.zeros(shape=(20,40))
+        phiDirection[dim1,dim2] = quiverData[2]
+        print(set(dim1),set(dim2),len(quiverData[0]),len(quiverData[1]))
+        thetaDirection = np.zeros(shape=(20,40))
+        thetaDirection[dim1,dim2] = quiverData[3]
 
-        phiDirection = np.array(quiverData[0]).reshape(20,40)
-        thetaDirection = np.array(quiverData[1]).reshape(20,40)
+        #phiDirection = np.array(quiverData[0]).reshape(40,20)
+        #thetaDirection = np.array(quiverData[1]).reshape(40,20)
 
         F = [phiDirection,thetaDirection]
         num_dims = len(F)
         self.divergence = np.ufunc.reduce(np.add, [np.gradient(F[i], axis=i) for i in range(num_dims)])
 
+    def sphereCoordToMatrixCoords(self,sphereCoord,matDimMax):
+        sphereCoordSet = np.array(list(set(sphereCoord)))
+        matIndicesSet  = np.linspace(0,matDimMax-1,matDimMax)
+        print(sphereCoordSet.shape,matIndicesSet.shape)
+        matIndices = np.where(sphereCoord == sphereCoordSet[0],matIndicesSet[0],sphereCoord)
+        for i in range(1,matDimMax):
+            matIndices = np.where(matIndices == sphereCoordSet[i],matIndicesSet[i],matIndices)    
+        return matIndices.astype(int)
 
     def opticFlowAbility(self):
         """
