@@ -303,7 +303,7 @@ class Cloud:
     def spawnMeshGridParticles(self):
         
         radius, theta, phi = np.meshgrid(np.linspace(self.centralFreeSpace*self.maxVectorMagnitude,self.maxVectorMagnitude,         num=1), #outer 2cm of the sphere radius
-                                         np.linspace(-0.5*np.pi,           0.5*np.pi, num= 20),    #theta ranging from -0.5pi to 0.5 pi
+                                         np.linspace(-0.4166666*np.pi,           0.4166666*np.pi, num= 20),    #theta ranging from -0.5pi to 0.5 pi
                                          np.linspace(-np.pi,               np.pi,     num = 40))            #phi ranging from -pi to pi 
 
         x,y,z = cs.sp2cart(r=radius, theta=theta, phi=phi)
