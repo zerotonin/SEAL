@@ -236,9 +236,13 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D 
 reload(SEAL_SIM)
 reload(opticFlowAna)
-simObj = SEAL_SIM.SEAL_SIM('headless',spsInt=10000, maxParticlesInt=3660, durSecFloat=2/10000., 
+sps  = 1000
+step = np.array([2.1,0.,0.,0.,0.,0.])
+pos  = np.array([0.,0.,-30.0])
+curr = np.array([0.,0.,0.])
+simObj = SEAL_SIM.SEAL_SIM('headless',spsInt=sps, maxParticlesInt=3660, durSecFloat=2/sps, 
                             currentStaticVelTuple=(0.0,0.0,0.0),diveTypeStr='uShape') 
-simObj.runSimulationSingleStep(np.array([0.1,0.,0.,000.0,2000.,2000.]),np.array([0.,0.,-69.999999]),np.array([0.,0.,0.]))
+simObj.runSimulationSingleStep(step,pos,curr)
 simObj.opticFlowAna.plotOpticFlow(0,showStartEnd = False)
 
 
