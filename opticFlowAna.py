@@ -82,7 +82,10 @@ class opticFlowAnalysis:
         else:
             return (phiList,thetaList,phiDirectionList,thetaDirectionList)
 
-    def plotOpticFlow(self,frame,subPlot=None, figure=None, showStartEnd = False, viewField = False, projectionType = 'polar', plotFigure = True, color='midnightblue', sealHeading=True):
+
+    def plotOpticFlow(self, frame, subPlot=None, figure=None, showStartEnd = False, viewField = False, 
+                      projectionType = 'polar', plotFigure = True, color='midnightblue', 
+                      sealHeading=True, Divergence = False):
         """
         This function plotts a 2D optic flow field for a single sealStep, by calculating the 
         magnitute ot the movement vector from the oldPosition of the particle to the newPosition 
@@ -129,17 +132,12 @@ class opticFlowAnalysis:
                 ax = fig.add_subplot(111)
             else:
                 ax = subPlot
-            #ax.axis('equal') 
-            for i in range(len(self.particleList)): # po should be (oldPosition, newPosition, status) of particle per movement
-                direct = self.anaDataList[frame][3][i]
-                if  self.anaDataList[frame][2][i] != None: # richtungsvector between frames
-                    X = self.anaDataList[frame][2][i][0][2] # phi
-                    Y = self.anaDataList[frame][2][i][0][1] # theta
-                    U = direct[2] # phi direction
-                    V = direct[1] # theta direction
-                    ax.quiver(np.rad2deg(X),np.rad2deg(Y),np.rad2deg(U),np.rad2deg(V),angles ='xy',scale_units='xy', scale =1,width=0.01,alpha=0.7, color=color, zorder=2)
-                else:
-                    pass
+           #for specific frame it calcultates the magnitute between the old and new position of each visibile? particle
+            quiverData = self.calculateQuiverData(frame)
+            #quiverData = np.rad2deg(quiverData)
+            for particleI in range(len(quiverData[0])): 
+                ax.quiver(quiverData[0][particleI],quiverData[1][particleI],quiverData[2][particleI],quiverData[3][particleI],angles ='xy',scale_units='xy', scale =1,width=0.005, color= color, alpha=0.7, zorder=2)
+
             if showStartEnd == True:
                 thetaList, phiList = self.create2DParticleDistributionList(0,frame)
                 ax.scatter(np.rad2deg(phiList), np.rad2deg(thetaList), color = 'red')
@@ -166,6 +164,12 @@ class opticFlowAnalysis:
         ax.set_xlabel('azimuth [deg]')
         ax.set_ylabel('elevation [deg]')
         plt.grid(True)
+        if Divergence == True:
+            self.calculateDivergence(frame)
+            plt.imshow(self.divergence)
+            plt.colorbar()
+        else:
+            pass
         if plotFigure == True:
             plt.show()
         else:
@@ -245,18 +249,20 @@ class opticFlowAnalysis:
         for frameI in tqdm(range(int(self.traLen-1)),desc='calculating OF'):
             distTrueList  = list()
             distOFestList = list()
-            partSphereList   = list()
+            self.partSphereList   = list()
             OFvectorList  = list()
+            self.partCartList =list()
             
             for pObjectI in range(len(self.particleList)):
                 # calculate OpticFlow data            
                 sphereParticle, OFvector, distance, OFdistanceEst = self.analyseSingleParticleOF(frameI,pObjectI)
                 distTrueList.append(distance)
                 distOFestList.append(OFdistanceEst)
-                partSphereList.append(sphereParticle)
+                self.partSphereList.append(sphereParticle)
                 OFvectorList.append(OFvector)
+                self.partCartList.append(self.relPartPosCart)
                 
-            self.anaDataList.append([distTrueList,distOFestList,partSphereList,OFvectorList])                
+            self.anaDataList.append([distTrueList,distOFestList,self.partSphereList,OFvectorList])                
             self.distRankDiff.append(self.calcDistanceRankDiff(distTrueList,distOFestList))
 
     def calcDistanceRankDiff(self,distTrue,distEstOF):
@@ -366,10 +372,10 @@ class opticFlowAnalysis:
                 spherical coordinates
         """
         # rotate 3D cartesian coordinates to seal orientation
-        relPartPosCart = self.rotateParticleStep2SealHeading(particleTrajEntry,sealTrajEntry)
+        self.relPartPosCart = self.rotateParticleStep2SealHeading(particleTrajEntry,sealTrajEntry)
 
         # transfrom from cartesian into spherical
-        return (self.cart2spheric(relPartPosCart[0]),self.cart2spheric(relPartPosCart[1]))
+        return (self.cart2spheric(self.relPartPosCart[0]),self.cart2spheric(self.relPartPosCart[1]))
 
     def getDistancesFromsphereParticles(self,sphereParticles): 
         """
