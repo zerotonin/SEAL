@@ -105,7 +105,7 @@ class opticFlowAnalysis:
                 ax = subPlot
            #for specific frame it calcultates the magnitute between the old and new position of each visibile? particle
             quiverData = self.calculateQuiverData(frame)
-            quiverData = np.rad2deg(quiverData)
+            
             for particleI in range(len(quiverData[0])): 
                 ax.quiver(quiverData[0][particleI],quiverData[1][particleI],quiverData[2][particleI],quiverData[3][particleI],angles ='xy',scale_units='xy', scale =1,width=0.005, color= color, alpha=0.7, zorder=2)
 
@@ -134,7 +134,7 @@ class opticFlowAnalysis:
                 ax = subPlot
            #for specific frame it calcultates the magnitute between the old and new position of each visibile? particle
             quiverData = self.calculateQuiverData(frame)
-            #quiverData = np.rad2deg(quiverData)
+            quiverData = np.rad2deg(quiverData)
             for particleI in range(len(quiverData[0])): 
                 ax.quiver(quiverData[0][particleI],quiverData[1][particleI],quiverData[2][particleI],quiverData[3][particleI],angles ='xy',scale_units='xy', scale =1,width=0.005, color= color, alpha=0.7, zorder=2)
 
