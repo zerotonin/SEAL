@@ -26,8 +26,11 @@ def getCurrent(vel):
 
 currents = [getCurrent(x) for x in np.logspace(0,3,20)]
 cloudRad = np.logspace(0,200,20)
-particleNoList    = np.logspace(0,200,20)[0,5,10,50,150,250,500,1000] #
- 
+# simulate differen turbidity 1000 p/cm3, 10000 p/cm3, 35000p/cm3
+# https://www.tandfonline.com/doi/abs/10.3402/tellusb.v35i5.14624
+#turbidty = (22,220,770) --> gilt für eine sphere von 0.0018m
+particleNoList    = np.logspace(0,770,20) # muss an weiter Hohlsphere angepasst werden ?
+
 
 currentPC = 'Kathi'
 #Kathis PC:
