@@ -43,8 +43,16 @@ cloudRad = np.logspace(0.001,1.0,10) # loud Radius from 1mm to 1m (this is not w
 #turbidty = (22,220,770) --> gilt für eine sphere von 0.0018m
 particleNoList    = np.linspace(2.0,770.0,10) # muss an weiter Hohlsphere angepasst werden ?
 
+Movement = 'TranslaFast'
 
-for PM in TranslaSlowPM:    
+if Movement == 'TranslaFast':
+    ProtoMoveList = TranslaFastPM
+elif Movement == 'TranslaSlow':
+    ProtoMoveList = TranslaSlowPM
+else:
+    ProtoMoveList = RotationalPM
+
+for PM in ProtoMoveList:    
     for pNo in particleNoList:
         for cRad in cloudRad:
             for curr in currents:
