@@ -44,12 +44,12 @@ cloudRad = np.logspace(0.001,1.0,10) # loud Radius from 1mm to 1m (this is not w
 particleNoList    = np.linspace(2.0,770.0,10) # muss an weiter Hohlsphere angepasst werden ?
 
 
-
-for pNo in particleNoList:
-    for cRad in cloudRad:
-        for curr in currents:
-                simObj = SEAL_SIM.SEAL_SIM('headless', spsInt=sps, cloudRadiusFloat=cRad, maxParticlesInt=pNo,                                    
-                                            durSecFloat=2/sps, diveTypeStr='uShape')    
-                simObj.runSimulationSingleStep(step,pos,curr)    
-                simObj.runTimeData.writeOutParticleTra('PM_'+str(step)+'_Current_'+str(curr)+'_CloudRad_'+str(cRad)+'_maxParticles_'+str(pNo))  
+for PM in TranslaSlowPM:    
+    for pNo in particleNoList:
+        for cRad in cloudRad:
+            for curr in currents:
+                    simObj = SEAL_SIM.SEAL_SIM('headless', spsInt=sps, cloudRadiusFloat=cRad, maxParticlesInt=pNo,                                    
+                                                durSecFloat=2/sps, diveTypeStr='uShape')    
+                    simObj.runSimulationSingleStep(step,pos,curr)    
+                    simObj.runTimeData.writeOutParticleTra('PM_'+str(step)+'_Current_'+str(curr)+'_CloudRad_'+str(cRad)+'_maxParticles_'+str(pNo))  
                    
