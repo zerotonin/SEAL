@@ -293,6 +293,6 @@ class runTimeData:
 
     def writeOutParticleTra(self, fileBaseName):
         particleVel  = pd.DataFrame(self.simObj.opticFlowAna.partCartList, columns=['startPosition', 'endPosition'])
-        particleVel2 = pd.DataFrame(self.simObj.opticFlowAna.partSphereList, columns=['startPosition', 'endPosition'])
+        #particleVel2 = pd.DataFrame(self.simObj.opticFlowAna.partSphereList, columns=['startPosition', 'endPosition'])
         particleVel.to_csv(fileBaseName + '.csv')
         #particleVel2.to_csv(f'{fileBaseName}2.csv')
