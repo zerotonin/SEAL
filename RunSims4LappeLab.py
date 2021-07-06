@@ -1,9 +1,21 @@
-import SEAL_SIM
+import SEAL_SIM,os
 import pandas as pd
 import numpy as np
 from utilities import mathUtils
 """
 """
+
+
+def float2str(num):
+    return str(np.around(num,3)).replace('.','-')
+
+
+def getCurrent(vel):
+    rotMat =np.array([[ 0.5       , -0.5       ,  0.70710678],
+                      [ 0.70710678,  0.70710678, -0.        ],
+                      [-0.5       ,  0.5       ,  0.70710678]])
+    frontalCurrent = np.array([vel,0.,0.])
+    return np.insert(np.dot(rotMat,frontalCurrent),0,vel,axis=0)
 
 simObj = SEAL_SIM.SEAL_SIM('headless')
 sps = 100 #100 samples per second
@@ -28,36 +40,45 @@ RotationalPM = ([[1.8268,  0.01529,  -0.15939, 2.1617,    0.0054881, 0.0],#yaw r
                  [0.27325, 0.10791,   0.26439,-0.0018402,-2.9212,    0.0],#pitch down
                  [-0.10417,0.0054149,-0.019695,0.0048984, 2.2828,    0.0]])#pitch up
 
-
-def getCurrent(vel):
-    rotMat =np.array([[ 0.5       , -0.5       ,  0.70710678],
-                      [ 0.70710678,  0.70710678, -0.        ],
-                      [-0.5       ,  0.5       ,  0.70710678]])
-    frontalCurrent = np.array([vel,0.,0.])
-    return np.dot(rotMat,frontalCurrent)
-
-currents = [getCurrent(x) for x in np.logspace(0,3,10)] # currenty between 0-3m/s waterspeed
-cloudRad = np.logspace(0.001,1.0,10) # loud Radius from 1mm to 1m (this is not working yet, giving to high values above 1)
+currents = [getCurrent(x) for x in np.insert(np.geomspace(0.01,3,9,endpoint=True),0,0.0,axis=0)] # currenty between 0-3m/s waterspeed
+cloudRad = np.geomspace(0.001,1.0,10,endpoint=True) # loud Radius from 1mm to 1m (this is not working yet, giving to high values above 1)
 # simulate differen turbidity 1000 p/cm3, 10000 p/cm3, 35000p/cm3
 # https://www.tandfonline.com/doi/abs/10.3402/tellusb.v35i5.14624
 #turbidty = (22,220,770) --> gilt für eine sphere von 0.0018m
-particleNoList    = np.linspace(2.0,770.0,10) # muss an weiter Hohlsphere angepasst werden ?
+particleNoList    = np.geomspace(2.0,770.0,10,endpoint=True) # muss an weiter Hohlsphere angepasst werden ?
 
-Movement = 'TranslaFast'
+Movement = 'all'
 
 if Movement == 'TranslaFast':
     ProtoMoveList = TranslaFastPM
 elif Movement == 'TranslaSlow':
     ProtoMoveList = TranslaSlowPM
+elif Movement == 'all':
+    ProtoMoveList = TranslaFastPM+TranslaSlowPM+RotationalPM
 else:
     ProtoMoveList = RotationalPM
 
-for PM in ProtoMoveList:    
+basePath = '/media/dataSSD/sealPartTra'
+traPath = os.path.join(basePath,'traFolder')
+
+pmC = 0
+metaDataList = list()
+for pm in ProtoMoveList:
+    pmC +=1    
     for pNo in particleNoList:
         for cRad in cloudRad:
             for curr in currents:
                     simObj = SEAL_SIM.SEAL_SIM('headless', spsInt=sps, cloudRadiusFloat=cRad, maxParticlesInt=pNo,                                    
                                                 durSecFloat=2/sps, diveTypeStr='uShape')    
-                    simObj.runSimulationSingleStep(step,pos,curr)    
-                    simObj.runTimeData.writeOutParticleTra('PM_'+str(step)+'_Current_'+str(curr)+'_CloudRad_'+str(cRad)+'_maxParticles_'+str(pNo))  
-                   
+                    simObj.runSimulationSingleStep(pm,pos,curr[1::])    
+                    fileName = 'PM_'+str(pmC)+'_Current_'+ float2str(curr[0])+'_CloudRad_'+float2str(cRad)+'_maxParticles_'+str(int(pNo))
+                    simObj.runTimeData.writeOutParticleTra( os.path.join(traPath,fileName))  
+                    metaDataList.append([fileName,pm,curr,cRad,pNo])
+
+
+metaData = pd.DataFrame(metaDataList,columns=['fileName','protoMov_mPs','current_mPs','cloudRad_m','numOfParticles'])
+metaData.index.name='fileNo'
+metaData.to_csv(os.path.join(basePath,'metaData') + '.csv')
+protoMov = pd.DataFrame(ProtoMoveList, columns=['thrust_mPs','slip_mPs','lift_mPs','yaw_radPs','pitch_radPs','roll_radPs'])
+protoMov.index.name='pmNo'
+protoMov.to_csv(os.path.join(basePath,'protoMov') + '.csv')
