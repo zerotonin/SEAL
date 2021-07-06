@@ -73,6 +73,7 @@ class runTimeData:
         self.max_particles          = 3660
         self.particleSizeRange      = (0.00002,0.00016)
         self.cloudRadius            = 0.00174
+        self.gridParticles          = False
 
     def setParameter(self, parameterName, parameterValue):
         ''' 
@@ -118,6 +119,8 @@ class runTimeData:
             self.particleSizeRange  = parameterValue
         elif parameterName == 'cloudRadius':
             self.cloudRadius  = parameterValue
+        elif parameterName == 'gridParticles':
+            self.gridParticles = parameterValue
         else:
             print('set unknown parameter'+str(parameterName))
 
@@ -162,6 +165,8 @@ class runTimeData:
             return self.particleSizeRange  
         elif parameterName == 'cloudRadius':
             return self.cloudRadius  
+        elif parameterName == 'gridParticles':
+            return self.gridParticles
         else:
             print('get unknown parameter'+str(parameterName))
     

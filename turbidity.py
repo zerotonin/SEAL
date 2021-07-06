@@ -260,7 +260,7 @@ class Cloud:
 
         # this part of the cloud is not used because the particles would drive right through the seal
         self.centralFreeSpace  = 1-(0.0199/self.maxVectorMagnitude) # normalised to sphere radius 0.0199 avoid devision by zero 
-        self.gridParticles = False
+        self.gridParticles = self.simObj.runTimeData.getParameter('gridParticles')
     
     def add_particles(self):
         """
