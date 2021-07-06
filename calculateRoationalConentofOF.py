@@ -2,6 +2,7 @@ import SEAL_SIM
 import pandas as pd
 import numpy as np
 from utilities import mathUtils
+from matplotlib import pyplot  as plt
 """
 """
 
@@ -45,30 +46,38 @@ particleNoList    = np.linspace(2.0,770.0,10) # muss an weiter Hohlsphere angepa
 
 
 
-Movement = 'TranslaFast'
+Movement = 'all'
 
 if Movement == 'TranslaFast':
     ProtoMoveList = TranslaFastPM
 elif Movement == 'TranslaSlow':
     ProtoMoveList = TranslaSlowPM
+elif Movement == 'all':
+    ProtoMoveList = TranslaFastPM+TranslaSlowPM+RotationalPM
 else:
     ProtoMoveList = RotationalPM
 
-for PM in ProtoMoveList:    
-    for pNo in particleNoList:
-        for cRad in cloudRad:
-            for curr in currents:
-                    simObj = SEAL_SIM.SEAL_SIM('headless', spsInt=sps, cloudRadiusFloat=cRad, maxParticlesInt=pNo,                                    
-                                                durSecFloat=2/sps, diveTypeStr='uShape')    
-                    simObj.runTimeData.setParameter('gridParticles', True)
-                    simObj.runSimulationSingleStep(step,pos,curr)
-                    
-                    simObj.runTimeData.writeOutParticleTra('PM_'+str(step)+'_Current_'+str(curr)+'_CloudRad_'+str(cRad)+'_maxParticles_'+str(pNo))  
-                   
+dataList = list()
+pmC=0
+for step in ProtoMoveList:    
+    for cRad in cloudRad:
+        for curr in currents:
+                simObj = SEAL_SIM.SEAL_SIM('headless', spsInt=sps, cloudRadiusFloat=cRad,                                     
+                                            durSecFloat=2/sps, diveTypeStr='uShape')    
+                simObj.runTimeData.setParameter('gridParticles', True)
+                simObj.runSimulationSingleStep(step,pos,curr)
+                fullPM = np.array(simObj.opticFlowAna.anaDataList[0][1]).sum()
 
+                simObj = SEAL_SIM.SEAL_SIM('headless', spsInt=sps, cloudRadiusFloat=cRad,                              
+                                            durSecFloat=2/sps, diveTypeStr='uShape')    
+                simObj.runTimeData.setParameter('gridParticles', True)
+                simObj.runSimulationSingleStep(step[0:3] + [0.0, 0.0, 0.0],pos,curr)
+                transPM = np.array(simObj.opticFlowAna.anaDataList[0][1]).sum()
+                rotPM = np.abs(fullPM-transPM)
+                OFindex = (transPM-rotPM)/fullPM
 
-simObj = SEAL_SIM.SEAL_SIM('headless', spsInt=sps, cloudRadiusFloat=1, maxParticlesInt=100,                                    
-                                                durSecFloat=2/sps, diveTypeStr='uShape')    
-simObj.runTimeData.setParameter('gridParticles', True)
-simObj.runSimulationSingleStep([1.8609,0.44391, -0.072173, -0.52564,  -0.0011278, 0.0],np.array([0.,0.,-30.0]),np.array([0.0,0.0,0.0]))    
-fullPM = np.array(simObj.opticFlowAna.anaDataList[0][1])
+                metaDataList.append([pmC,curr[0],cRad,fullPM,transPM,rotPM,OFindex,step])
+    pmC +=1
+dataList = pd.DataFrame(metaDataList,columns=['protoMov_No','current_mPs','cloudRad_m','OFmag_full','OFmag_trans','OFmag_rot','OFmag_index','protoMov_mPs'])
+dataList.to_csv('OF_content.csv',index = False)
+
