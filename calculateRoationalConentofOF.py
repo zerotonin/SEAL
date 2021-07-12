@@ -34,7 +34,7 @@ RotationalPM = ([[1.8268,  0.01529,  -0.15939, 2.1617,    0.0054881, 0.0],#yaw r
                  [-0.10417,0.0054149,-0.019695,0.0048984, 2.2828,    0.0]])#pitch up
 
 currents = [getCurrent(x) for x in np.insert(np.geomspace(0.01,3,9,endpoint=True),0,0.0,axis=0)] # currenty between 0-3m/s waterspeed
-cloudRad = np.geomspace(0.001,10.0,20,endpoint=True) # loud Radius from 1mm to 1m (this is not working yet, giving to high values above 1)
+cloudRad = np.geomspace(0.001,20.0,20,endpoint=True) # loud Radius from 1mm to 1m (this is not working yet, giving to high values above 1)
 # simulate differen turbidity 1000 p/cm3, 10000 p/cm3, 35000p/cm3
 # https://www.tandfonline.com/doi/abs/10.3402/tellusb.v35i5.14624
 #turbidty = (22,220,770) --> gilt für eine sphere von 0.0018m
@@ -52,27 +52,50 @@ else:
 
 dataList = list()
 pmC=0
-sps = 100 #100 samples per second
+#sps = 10000 #100 samples per second
 pos  = np.array([0.,0.,-30.0]) # in the water column
+curr = np.array([0.0,0.0,0.0,0.0])
+maxTransVel = np.max(np.abs(np.array(ProtoMoveList)[:,0:3]).flatten())
+maxRotVel = np.max(np.abs(np.array(ProtoMoveList)[:,3::]).flatten())
+
 for step in ProtoMoveList:    
     for cRad in cloudRad:
-        for curr in currents:
-                simObj = SEAL_SIM.SEAL_SIM('headless', spsInt=sps, cloudRadiusFloat=cRad,                                     
-                                            durSecFloat=2/sps, diveTypeStr='uShape')    
-                simObj.runTimeData.setParameter('gridParticles', True)
-                simObj.runSimulationSingleStep(step,pos,curr[1::])
-                fullPM = np.array(simObj.opticFlowAna.anaDataList[0][1]).sum()
+            # this ensures that we always travel half the clouds distance at max
+            maxDistance = cRad/2.0
+            maxTransTime = maxDistance/maxTransVel
+            maxRotTime   = np.pi/maxRotVel
+            if maxTransTime > maxRotTime:
+                sps = 1.0/maxRotTime
+            else:
+                sps = 1.0/maxTransTime
 
-                simObj = SEAL_SIM.SEAL_SIM('headless', spsInt=sps, cloudRadiusFloat=cRad,                              
-                                            durSecFloat=2/sps, diveTypeStr='uShape')    
-                simObj.runTimeData.setParameter('gridParticles', True)
-                simObj.runSimulationSingleStep(step[0:3] + [0.0, 0.0, 0.0],pos,curr[1::])
-                transPM = np.array(simObj.opticFlowAna.anaDataList[0][1]).sum()
-                rotPM = np.abs(fullPM-transPM)
-                OFindex = (transPM-rotPM)/fullPM
 
-                dataList.append([pmC,curr[0],cRad,fullPM,transPM,rotPM,OFindex,step])
+
+            simObj = SEAL_SIM.SEAL_SIM('headless', spsInt=sps, cloudRadiusFloat=cRad,                                     
+                                        durSecFloat=2/sps, diveTypeStr='uShape')    
+            simObj.runTimeData.setParameter('gridParticles', True)
+            simObj.runSimulationSingleStep(step,pos,curr[1::])
+            fullPM = np.array(simObj.opticFlowAna.anaDataList[0][1]).sum()
+
+            simObj = SEAL_SIM.SEAL_SIM('headless', spsInt=sps, cloudRadiusFloat=cRad,                              
+                                        durSecFloat=2/sps, diveTypeStr='uShape')    
+            simObj.runTimeData.setParameter('gridParticles', True)
+            simObj.runSimulationSingleStep(step[0:3] + [0.0, 0.0, 0.0],pos,curr[1::])
+            transPM = np.array(simObj.opticFlowAna.anaDataList[0][1]).sum()
+
+
+            simObj = SEAL_SIM.SEAL_SIM('headless', spsInt=sps, cloudRadiusFloat=cRad,                              
+                                        durSecFloat=2/sps, diveTypeStr='uShape')    
+            simObj.runTimeData.setParameter('gridParticles', True)
+            simObj.runSimulationSingleStep([0.0, 0.0, 0.0]+step[3::],pos,curr[1::])
+            rotPM = np.array(simObj.opticFlowAna.anaDataList[0][1]).sum()
+            
+            OFindexR = ((fullPM-rotPM)-rotPM)/((fullPM-rotPM)+rotPM)
+            OFindexT = (transPM-(fullPM-transPM))/(transPM+(fullPM-transPM))
+            OFindex  = (OFindexR+OFindexT)/2.0
+
+            dataList.append([pmC,curr[0],cRad,fullPM,transPM,rotPM,OFindex,OFindexR,OFindexT,step])
     pmC +=1
-dataDF = pd.DataFrame(dataList,columns=['protoMov_No','current_mPs','cloudRad_m','OFmag_full','OFmag_trans','OFmag_rot','OFmag_index','protoMov_mPs'])
+dataDF = pd.DataFrame(dataList,columns=['protoMov_No','current_mPs','cloudRad_m','OFmag_full','OFmag_trans','OFmag_rot','OFmag_index','OFmag_rotBasedIndex','OFmag_transBasedIndex','protoMov_mPs'])
 dataDF.to_csv('OF_content.csv',index = False)
 
