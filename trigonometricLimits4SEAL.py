@@ -167,9 +167,35 @@ We than show that  our physiological feasable combinations or well below critica
 
 we also want to show the critical phi to prove that under a given turbidity d and a given
 s of the seal critical phi is not reached as it is not performable seal.
-    
 
-
-
+phi = -2(pi/2-arctan2(s/d))
 
 '''
+bins =1000
+stepSizes = np.linspace(0,5.36,bins) # max swim speed https://www.adfg.alaska.gov/index.cfm?adfg=harborseal.printerfriendly
+distances = np.linspace(0.0001,80,bins) # max under water horizon is 80 m  Davies-Colley, R. J.; Smith, D. G. (1995). "Optically pure waters in Waikoropupu ('Pupu') Springs, Nelson, New Zealand" (PDF). New Zealand Journal of Marine and Freshwater Research. The Royal Society of New Zealand. 29 (2): 251–256. doi:10.1080/00288330.1995.9516658. Retrieved 19 October 2013.0028-8330/95/2902-0251
+critical_phi = np.zeros(shape=(bins,bins))
+stepC = 0
+for step in tqdm(stepSizes):
+    distanceC = 0
+    for distance in distances:
+        #print(stepC,distanceC)
+        critical_phi[stepC,distanceC] =  np.rad2deg(np.abs(-3*(np.pi/2-np.arctan2(distance,step))))          
+        distanceC +=1
+    stepC +=1 
+
+fig = plt.figure()
+ax = fig.add_subplot(1,1,1)
+# Plot both positive and negative values between +/- 1.2
+           
+c = ax.pcolor(distances,stepSizes,critical_phi, cmap='inferno')      
+# Add minorticks on the colorbar to make it easy to read the
+# values off the colorbar.
+cbar = fig.colorbar(c, ax=ax)
+cbar.minorticks_on()
+cbar.set_label('critical rotation velocity, deg*$s^{-1}$')
+ax.set_xscale("log")
+ax.set_xlabel('distance, m')
+ax.set_ylabel('translational speed, m*s$^{-1}$')
+ax.set_title(f'1:1 translational roation OF')
+plt.show()
