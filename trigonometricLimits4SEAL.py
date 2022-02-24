@@ -146,19 +146,20 @@ phi = rotational angle of viewer
 
 OFg = OFt+OFr              (0)
 OFr = -phi                 (1)
-OFt = 2(pi/2-arctan2(s/d)) (2)
+OFt = 2(pi/2-arctan2(d/(s/2))) 
+OFt = 2(pi/2-arctan2(2d/s))
 
 
-OFg = 2(pi/2-arctan2(s/d))-phi (3)
+OFg = 2(pi/2-arctan2(2d/s))-phi (3)
 
 if formula 3 results in zero the OF is 1:! mixture of rotation and translation
 
-0                 = 2(pi/2-arctan2(s/d))-phi
-0                 = pi-2arctan2(s/d) - phi   | +2 arctan2(s/d)
-2arctan2(s/d)     = pi -phi                  | :2
-arctan2(s/d)      = (pi-phi)/2               | tan
-s/d               = tan((pi-phi)/2)          | *d & /tan((pi-phi)/2)
-s/tan((pi-phi)/2) = d  (4)
+0                     = 2(pi/2-arctan2(2d/s))-phi
+0                     = pi-2arctan2(2d/s) - phi   | +2 arctan2(2d/s)
+2arctan2(2d/s)     = pi -phi                  | :2
+arctan2(2d/s)      = (pi-phi)/2               | tan
+2d/s               = tan((pi-phi)/2)          | *s/2 
+d                     = tan((pi-phi)/2) *s/2 (4)
 
 we can now vary s and phi respectivly to determine critical d (1:1 mixture)
 
@@ -168,19 +169,19 @@ We than show that  our physiological feasable combinations or well below critica
 we also want to show the critical phi to prove that under a given turbidity d and a given
 s of the seal critical phi is not reached as it is not performable seal.
 
-phi = -2(pi/2-arctan2(s/d))
+phi = -2(pi/2-arctan2(2d/s))
 
 '''
-bins =1000
+bins =100
 stepSizes = np.linspace(0,5.36,bins) # max swim speed https://www.adfg.alaska.gov/index.cfm?adfg=harborseal.printerfriendly
-distances = np.linspace(0.0001,80,bins) # max under water horizon is 80 m  Davies-Colley, R. J.; Smith, D. G. (1995). "Optically pure waters in Waikoropupu ('Pupu') Springs, Nelson, New Zealand" (PDF). New Zealand Journal of Marine and Freshwater Research. The Royal Society of New Zealand. 29 (2): 251–256. doi:10.1080/00288330.1995.9516658. Retrieved 19 October 2013.0028-8330/95/2902-0251
+distances = np.geomspace(0.0001,80,bins) # max under water horizon is 80 m  Davies-Colley, R. J.; Smith, D. G. (1995). "Optically pure waters in Waikoropupu ('Pupu') Springs, Nelson, New Zealand" (PDF). New Zealand Journal of Marine and Freshwater Research. The Royal Society of New Zealand. 29 (2): 251–256. doi:10.1080/00288330.1995.9516658. Retrieved 19 October 2013.0028-8330/95/2902-0251
 critical_phi = np.zeros(shape=(bins,bins))
 stepC = 0
 for step in tqdm(stepSizes):
     distanceC = 0
     for distance in distances:
         #print(stepC,distanceC)
-        critical_phi[stepC,distanceC] =  np.rad2deg(np.abs(-3*(np.pi/2-np.arctan2(distance,step))))          
+        critical_phi[stepC,distanceC] =  np.rad2deg(np.abs(-3*(np.pi/2-np.arctan2(2*distance,step))))          
         distanceC +=1
     stepC +=1 
 
