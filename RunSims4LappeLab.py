@@ -41,11 +41,13 @@ RotationalPM = ([[1.8268,  0.01529,  -0.15939, 2.1617,    0.0054881, 0.0],#yaw r
                  [-0.10417,0.0054149,-0.019695,0.0048984, 2.2828,    0.0]])#pitch up
 
 currents = [getCurrent(x) for x in np.insert(np.geomspace(0.01,3,9,endpoint=True),0,0.0,axis=0)] # currenty between 0-3m/s waterspeed
-cloudRad = np.geomspace(0.001,1.0,10,endpoint=True) # loud Radius from 1mm to 1m (this is not working yet, giving to high values above 1)
+#cloudRad = np.geomspace(0.1,0.1,1,endpoint=True)  # loud Radius from 1mm to 1m (this is not working yet, giving to high values above 1)
 # simulate differen turbidity 1000 p/cm3, 10000 p/cm3, 35000p/cm3
 # https://www.tandfonline.com/doi/abs/10.3402/tellusb.v35i5.14624
 #turbidty = (22,220,770) --> gilt für eine sphere von 0.0018m
-particleNoList    = np.geomspace(2.0,770.0,10,endpoint=True) # muss an weiter Hohlsphere angepasst werden ?
+cloudRad = np.array([0.1]) # run for distance of 10c,
+particleNoList    = np.linspace(2.0,770.0,10,endpoint=True) # muss an weiter Hohlsphere angepasst werden ?
+rotVelList = np.geomspace(0.001,0.6,10, endpoint = True)
 
 Movement = 'all'
 
@@ -72,8 +74,29 @@ for pm in ProtoMoveList:
                                                 durSecFloat=2/sps, diveTypeStr='uShape')    
                     simObj.runSimulationSingleStep(pm,pos,curr[1::])    
                     fileName = 'PM_'+str(pmC)+'_Current_'+ float2str(curr[0])+'_CloudRad_'+float2str(cRad)+'_maxParticles_'+str(int(pNo))
-                    simObj.runTimeData.writeOutParticleTra( os.path.join(traPath,fileName))  
-                    metaDataList.append([fileName,pm,curr,cRad,pNo])
+                    simObj.runTimeData.writeOutParticleTra( os.path.join(traPath,fileName))
+                    metaDataList.append([fileName,pm,curr,cRad,pNo])  
+pmC = 0 
+sps = 1    
+curr = np.array[0.0,0.0,0.0]
+for rotVel in rotVelList:
+    pm = np.array([1.0,0.0,0.0,rotVel,0.,0.])
+    simObj = SEAL_SIM.SEAL_SIM('headless', spsInt=sps, cloudRadiusFloat=1, maxParticlesInt=3660,                                    
+                                durSecFloat=2/sps, diveTypeStr='uShape')    
+    simObj.runSimulationSingleStep(pm,pos,curr[1::])    
+    fileName = 'PM_'+str(pmC)+'_Current_'+ float2str(curr[0])+'_CloudRad_'+float2str(1)+'_maxParticles_'+str(int(3660)+'rotVelocity'+str(rotVel))
+    simObj.runTimeData.writeOutParticleTra( os.path.join(traPath,fileName))  
+    metaDataList.append([fileName,pm,curr,rotVel,sps])
+
+pm = np.array([1.0,0.0,0.0,0.6,0.,0.])
+simObj = SEAL_SIM.SEAL_SIM('headless', spsInt=sps, cloudRadiusFloat=0.1, maxParticlesInt=3660,                                    
+                                durSecFloat=2/sps, diveTypeStr='uShape')    
+simObj.runSimulationSingleStep(pm,pos,curr[1::])    
+fileName = 'PM_'+str(pmC)+'_Current_'+ float2str(curr[0])+'_CloudRad_'+float2str(1)+'_maxParticles_'+str(int(3660)+'rotVelocity'+str(rotVel))
+simObj.runTimeData.writeOutParticleTra( os.path.join(traPath,fileName))  
+metaDataList.append([fileName,pm,curr,rotVel,sps])
+
+
 
 
 metaData = pd.DataFrame(metaDataList,columns=['fileName','protoMov_mPs','current_mPs','cloudRad_m','numOfParticles'])
