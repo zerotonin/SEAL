@@ -85,7 +85,7 @@ class opticFlowAnalysis:
 
     def plotOpticFlow(self, frame, subPlot=None, figure=None, showStartEnd = False, viewField = False, 
                       projectionType = 'polar', plotFigure = True, color='midnightblue', 
-                      sealHeading=True, Divergence = False):
+                      sealHeading=True, Divergence = False, step= 'PM'):
         """
         This function plotts a 2D optic flow field for a single sealStep, by calculating the 
         magnitute ot the movement vector from the oldPosition of the particle to the newPosition 
@@ -163,6 +163,7 @@ class opticFlowAnalysis:
 
         ax.set_xlabel('azimuth [deg]')
         ax.set_ylabel('elevation [deg]')
+        ax.set_title(f'thrust slip lift yaw pitch roll: '+ str(step))
         plt.grid(True)
         if Divergence == True:
             self.calculateDivergence(frame)
