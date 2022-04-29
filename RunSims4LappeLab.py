@@ -81,13 +81,14 @@ sps = 1
 curr = np.array[0.0,0.0,0.0]
 for rotVel in rotVelList:
     pm = np.array([1.0,0.0,0.0,rotVel,0.,0.])
-    simObj = SEAL_SIM.SEAL_SIM('headless', spsInt=sps, cloudRadiusFloat=1, maxParticlesInt=3660,                                    
+    simObj = SEAL_SIM.SEAL_SIM('headless', spsInt=sps, cloudRadiusFloat=10, maxParticlesInt=3660,                                    
                                 durSecFloat=2/sps, diveTypeStr='uShape')    
     simObj.runSimulationSingleStep(pm,pos,curr[1::])    
     fileName = 'PM_'+str(pmC)+'_Current_'+ float2str(curr[0])+'_CloudRad_'+float2str(1)+'_maxParticles_'+str(int(3660)+'rotVelocity'+str(rotVel))
     simObj.runTimeData.writeOutParticleTra( os.path.join(traPath,fileName))  
     metaDataList.append([fileName,pm,curr,rotVel,sps])
 
+sps = 100
 pm = np.array([1.0,0.0,0.0,0.6,0.,0.])
 simObj = SEAL_SIM.SEAL_SIM('headless', spsInt=sps, cloudRadiusFloat=0.1, maxParticlesInt=3660,                                    
                                 durSecFloat=2/sps, diveTypeStr='uShape')    
