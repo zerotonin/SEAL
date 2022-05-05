@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import pickle
 import yaml
+import scipy.io
 #import h5py
 class runTimeData:
     '''
@@ -302,3 +303,14 @@ class runTimeData:
         #particleVel2 = pd.DataFrame(self.simObj.opticFlowAna.partSphereList, columns=['startPosition', 'endPosition'])
         particleVel.to_csv(fileBaseName + '.csv')
         #particleVel2.to_csv(f'{fileBaseName}2.csv')
+    
+    def writeOutParticleMat(self,fileBaseName):
+        #short hand
+        particle_list = self.simObj.opticFlowAna.partCartList
+        before_list = list()
+        after_list = list()
+        for particle in particle_list:
+            before_list.append(particle[0])
+            after_list.append(particle[1])
+        partmat=np.dstack((np.vstack(before_list),np.vstack(after_list)))
+        scipy.io.savemat(fileBaseName+ '.mat', {'data': partmat})
