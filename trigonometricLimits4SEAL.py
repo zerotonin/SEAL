@@ -200,3 +200,7 @@ ax.set_xlabel('distance, m')
 ax.set_ylabel('translational speed, m*s$^{-1}$')
 ax.set_title(f'1:1 translational roation OF')
 plt.show()
+
+distance = 10
+step = 1
+np.rad2deg(np.abs(-3*(np.pi/2-np.arctan2(2*distance,step)))) 
