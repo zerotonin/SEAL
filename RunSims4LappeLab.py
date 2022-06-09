@@ -1,3 +1,4 @@
+from pickle import FALSE
 import SEAL_SIM,os
 import pandas as pd
 import numpy as np
@@ -103,31 +104,33 @@ for rotVel in rotVelList:
 #%% degree of freedom test
 traPath = os.path.join(basePath,'degreeOfFreedom')
 Path(traPath).mkdir(parents=True, exist_ok=True)
-sps = 100
-dof = np.array([[ 1.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-               [-1.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-               [ 0.0, 1.0, 0.0, 0.0, 0.0, 0.0],
-               [ 0.0,-1.0, 0.0, 0.0, 0.0, 0.0],
-               [ 0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
-               [ 0.0, 0.0,-1.0, 0.0, 0.0, 0.0],
-               [ 0.0, 0.0, 0.0, 1.0, 0.0, 0.0],
-               [ 0.0, 0.0, 0.0,-1.0, 0.0, 0.0],
-               [ 0.0, 0.0, 0.0, 0.0, 1.0, 0.0],
-               [ 0.0, 0.0, 0.0, 0.0,-1.0, 0.0],
-               [ 0.0, 0.0, 0.0, 0.0, 0.0, 1.0],
-               [ 0.0, 0.0, 0.0, 0.0, 0.0,-1.0]])
+sps = 10
+dof = np.array([[ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+                [ 1.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+                [-1.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+                [ 0.0, 1.0, 0.0, 0.0, 0.0, 0.0],
+                [ 0.0,-1.0, 0.0, 0.0, 0.0, 0.0],
+                [ 0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
+                [ 0.0, 0.0,-1.0, 0.0, 0.0, 0.0],
+                [ 0.0, 0.0, 0.0, 1.0, 0.0, 0.0],
+                [ 0.0, 0.0, 0.0,-1.0, 0.0, 0.0],
+                [ 0.0, 0.0, 0.0, 0.0, 1.0, 0.0],
+                [ 0.0, 0.0, 0.0, 0.0,-1.0, 0.0],
+                [ 0.0, 0.0, 0.0, 0.0, 0.0, 1.0],
+                [ 0.0, 0.0, 0.0, 0.0, 0.0,-1.0]])
 curr = np.array([0.0,0.0,0.0,0.0])
-dof_name = ['thrust','neg_thrust','slip','neg_slip','lift','neg_lift','yaw','neg_yaw','pitch','neg_pitch','roll','neg_roll']
+dof_name = ['no movement','thrust','neg_thrust','slip','neg_slip','lift','neg_lift','yaw','neg_yaw','pitch','neg_pitch','roll','neg_roll']
 c = 0
 for pm in dof:
-    simObj = SEAL_SIM.SEAL_SIM('headless', spsInt=sps, cloudRadiusFloat=10, maxParticlesInt=360,                                    
+    simObj = SEAL_SIM.SEAL_SIM('headless', spsInt=sps, cloudRadiusFloat=1, maxParticlesInt=800,                                    
                                 durSecFloat=2/sps, diveTypeStr='uShape')   
     simObj.runTimeData.gridParticles = True   
+    simObj.runTimeData.waterCurrent =(0.0,0.0,0.0)
     simObj.runSimulationSingleStep(pm,pos,curr[1::])    
-    fileName = dof_name[c] +'_CloudRad_'+float2str(1)+'_maxParticles_'+str(int(360))
-
-    simObj.runTimeData.writeOutParticleMat( os.path.join(traPath,fileName))  
-    metaDataList.append([fileName,pm,curr,np.sum(pm[3::]),sps])
+    fileName = dof_name[c] +'_CloudRad_'+float2str(10)+'_maxParticles_'+str(int(800))
+    simObj.opticFlowAna.plotOpticFlow(0)
+    #simObj.runTimeData.writeOutParticleMat( os.path.join(traPath,fileName))  
+    #metaDataList.append([fileName,pm,curr,np.sum(pm[3::]),sps])
     c+=1
 
 
