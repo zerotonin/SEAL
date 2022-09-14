@@ -19,3 +19,4 @@ uShapeDiveDownLift = uShapeDiveDown[:-1]/uShapeDiveDown[1:]
 vShapeDiveUp = np.genfromtxt ('vShapeDiveDepthPitch.csv', skip_header=26,usecols=(1), delimiter=",") #27-38
 uShapeDiveUpLift = uShapeDiveUp[:-1]/uShapeDiveUp[1:]
 
+#this is a test 
