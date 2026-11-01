@@ -1,0 +1,25 @@
+# sealsim: GPU environment (CUDA 12 driver on the node, e.g. Aoraki GPU partitions
+# or a local RTX 4070)
+#
+#   conda env create -f environment-gpu.yml
+#   conda activate sealsim-gpu
+#   pip install -e ".[dev,gpu]"
+#
+# CuPy ships its own CUDA runtime wheels; only the driver has to be present.
+name: sealsim-gpu
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - numpy>=1.24
+  - scipy>=1.10
+  - pandas>=2.0
+  - pyarrow>=12
+  - matplotlib>=3.7
+  - pyyaml>=6.0
+  - tqdm>=4.65
+  - rich>=13
+  - pip
+  - pip:
+      - cupy-cuda12x>=12
+      - -e .

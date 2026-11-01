@@ -1,0 +1,83 @@
+[build-system]
+requires = ["setuptools >= 68.0", "setuptools-scm >= 8"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sealsim"
+dynamic = ["version"]
+description = "SEnsory Aquatic odometry simuLator: optic flow from suspended particles for a swimming harbour seal"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+authors = [
+    {name = "Anne S. Oepen"},
+    {name = "Bart R. H. Geurten", email = "bart.geurten@otago.ac.nz"},
+]
+keywords = [
+    "optic-flow", "harbour-seal", "turbidity", "odometry", "agent-based-model",
+    "visual-ecology", "simulation",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+dependencies = [
+    "numpy >= 1.24",
+    "scipy >= 1.10",
+    "pandas >= 2.0",
+    "pyarrow >= 12",
+    "matplotlib >= 3.7",
+    "pyyaml >= 6.0",
+    "tqdm >= 4.65",
+    "rich >= 13.0",
+]
+
+[project.optional-dependencies]
+gpu = [
+    "cupy-cuda12x >= 12.0",
+]
+stats = [
+    "reRandomStats @ git+https://github.com/zerotonin/reRandomStats.git",
+]
+dev = [
+    "pytest >= 7.0",
+    "pytest-cov >= 4.0",
+    "ruff >= 0.4",
+    "ai.cs >= 0.1",       # only for the frozen legacy regression fixture
+]
+
+[project.scripts]
+sealsim = "sealsim.cli:main"
+
+[project.urls]
+Repository = "https://github.com/zerotonin/SEAL"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools_scm]
+fallback_version = "0.0.0"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+extend-exclude = ["_legacy"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["sealsim"]

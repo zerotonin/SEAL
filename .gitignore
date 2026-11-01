@@ -1,0 +1,32 @@
+# machine-specific settings (copy local_paths.template.json)
+local_paths.json
+
+# python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+src/sealsim/_version.py
+
+# docs
+docs/_build/
+
+# simulation outputs and logs
+results/
+logs/
+*.h5
+*.mat
+*.parquet
+!tests/fixtures/*.npz
+
+# editors and OS
+.vscode/
+.idea/
+.DS_Store

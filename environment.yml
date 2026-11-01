@@ -1,0 +1,27 @@
+# sealsim: workstation / CPU environment
+#
+#   conda env create -f environment.yml
+#   conda activate sealsim
+#   pip install -e ".[dev]"
+#
+# GPU nodes use environment-gpu.yml instead.
+name: sealsim
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - numpy>=1.24
+  - scipy>=1.10
+  - pandas>=2.0
+  - pyarrow>=12
+  - matplotlib>=3.7
+  - pyyaml>=6.0
+  - tqdm>=4.65
+  - rich>=13
+  - pytest>=7
+  - pytest-cov>=4
+  - ruff>=0.4
+  - pip
+  - pip:
+      - ai.cs            # legacy regression fixture only
+      - -e .
