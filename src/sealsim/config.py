@@ -31,8 +31,11 @@ PATH_KEYS: tuple[str, ...] = (
     "conda_env",
     "slurm_account",
     "slurm_partition",
+    "input_data",
 )
-PATH_LIKE_KEYS: frozenset[str] = frozenset({"data_root", "code_root", "conda_setup"})
+PATH_LIKE_KEYS: frozenset[str] = frozenset(
+    {"data_root", "code_root", "conda_setup", "input_data"}
+)
 
 
 class ConfigError(RuntimeError):

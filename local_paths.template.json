@@ -5,8 +5,9 @@
     "local": {
       "data_root": "<absolute path to your sealsim results directory, e.g. /path/to/sealsim_results>",
       "code_root": "<absolute path to this checkout>",
-      "conda_setup": "<absolute path to etc/profile.d/conda.sh, e.g. ~/anaconda3/etc/profile.d/conda.sh>",
-      "conda_env": "sealsim"
+      "conda_setup": "<absolute path to etc/profile.d/conda.sh inside your conda install>",
+      "conda_env": "sealsim",
+      "input_data": "<optional: directory holding prototypical_movements/ and dive_profiles/; default is data/ in this checkout>"
     },
     "hpc": {
       "data_root": "<cluster project directory for results, e.g. /projects/<group>/sealsim>",
