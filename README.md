@@ -35,7 +35,16 @@ sealsim step --velocity 1.8 0 0 2.2 0 0 --n-particles 5000
 sealsim step --pm 10 --current -0.6 0 0 --out results/demo --stem pm10_current
 # a 240 s U-dive at 100 Hz with flow readouts per step
 sealsim dive --shape u --duration 240 --flow --n-particles 2000 --out results/demo
+# a whole experiment grid (or one chunk of it, for a SLURM array), then one table
+sealsim sweep experiments/currents.yaml --out results/currents
+sealsim sweep experiments/currents.yaml --chunk 3 --n-chunks 20 --quiet
+sealsim collect results/currents --out results/currents_table
 ```
+
+Experiments are YAML files in `experiments/`: named vision presets, a grid of
+conditions and fixed settings. Job *i* is the same grid point on every machine and
+its seed is `base_seed + i`, so any run can be regenerated from the YAML alone.
+Without `--out`, results go to `<data_root>/<experiment name>` from `local_paths.json`.
 
 ```python
 import numpy as np
@@ -73,7 +82,8 @@ traced back to the run that produced it.
 
 ```
 src/sealsim/      constants, geometry, cloud, environment, agent, opticflow,
-                  dive, simulate, results, config, cli
+                  dive, simulate, sweep, results, config, cli
+experiments/      one YAML per sweep (densities, currents, depth, critical rotation)
 data/             prototypical movements, dive profiles, PROVENANCE.md
 tests/            pytest suite incl. analytic flow tests and the legacy regression fixture
 docs/             Sphinx (Napoleon, Furo)

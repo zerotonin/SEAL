@@ -28,6 +28,9 @@ Model
 .. automodule:: sealsim.simulate
    :members:
 
+.. automodule:: sealsim.sweep
+   :members:
+
 Input and output
 ----------------
 
