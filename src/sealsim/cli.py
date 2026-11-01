@@ -92,6 +92,15 @@ def build_parser() -> argparse.ArgumentParser:
     p_collect.add_argument("directory", type=Path)
     p_collect.add_argument("--out", type=Path, default=None,
                            help="output stem; writes <stem>.parquet and <stem>.csv")
+
+    p_fig = sub.add_parser("figures", help="draw manuscript figures from collected tables")
+    p_fig.add_argument("--which", nargs="+", default=["all"],
+                       help="figure keys, e.g. 2 3 4 S1 S2 S3, or all")
+    p_fig.add_argument("--results", type=Path, default=None,
+                       help="directory holding one folder per experiment; default data_root")
+    p_fig.add_argument("--tables", type=Path, default=None,
+                       help="directory with <experiment>.parquet; default <results>/tables")
+    p_fig.add_argument("--out", type=Path, default=None, help="default <results>/figures")
     return parser
 
 
@@ -132,6 +141,8 @@ def main(argv: list[str] | None = None) -> int:
         return _cmd_sweep(args)
     if args.command == "collect":
         return _cmd_collect(args)
+    if args.command == "figures":
+        return _cmd_figures(args)
     raise SystemExit(f"unknown command {args.command}")
 
 
@@ -252,6 +263,21 @@ def _cmd_collect(args: argparse.Namespace) -> int:
         table.to_parquet(args.out.with_suffix(".parquet"), index=False)
         table.to_csv(args.out.with_suffix(".csv"), index=False)
         console.print(f"wrote {args.out.with_suffix('.parquet').name} and .csv")
+    return 0
+
+
+def _cmd_figures(args: argparse.Namespace) -> int:
+    from sealsim.figures import FIGURES, make_figures
+
+    results = args.results or cfg.data_root()
+    tables = args.tables or results / "tables"
+    out = args.out or results / "figures"
+    which = list(FIGURES) if args.which == ["all"] else args.which
+    unknown = [w for w in which if w not in FIGURES]
+    if unknown:
+        raise SystemExit(f"unknown figure keys {unknown}; choose from {list(FIGURES)}")
+    for path in make_figures(which, results, tables, out):
+        console.print(f"wrote {path}")
     return 0
 
 
