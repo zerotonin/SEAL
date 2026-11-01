@@ -6,10 +6,12 @@ particles produce on the retina and asks whether turbid water can serve as an od
 
 [![tests](https://github.com/zerotonin/SEAL/actions/workflows/tests.yml/badge.svg)](https://github.com/zerotonin/SEAL/actions/workflows/tests.yml)
 [![docs](https://github.com/zerotonin/SEAL/actions/workflows/docs.yml/badge.svg)](https://github.com/zerotonin/SEAL/actions/workflows/docs.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+<!-- Zenodo badge: paste the concept-DOI badge here after the first release is archived -->
 
-> **Status (November 2026): under reconstruction.** The 2019 to 2022 research code is
-> frozen in `_legacy/` and pinned by a regression test. The new `sealsim` package is
-> being built sprint by sprint; see the lab-internal dev plan for the sequence.
+The 2019 to 2022 research code behind the MSc thesis of A. S. Oepen is frozen in
+`_legacy/` and pinned by a regression test; `sealsim` is its 2026 rewrite with the
+model corrections listed in `CHANGELOG.md`. Documentation: https://zerotonin.github.io/SEAL/
 
 ## Install
 
@@ -24,7 +26,7 @@ sealsim config                                  # shows what was resolved
 Every entry point refuses to run without `local_paths.json` or the matching
 `SEALSIM_*` environment variables. Keys: `data_root`, `code_root`, `conda_setup`,
 `conda_env`, and for the `hpc` profile `slurm_account`, `slurm_partition`.
-Optional: `input_data` points at a copy of the `data/` tables outside the checkout.
+Optional: `input_data` points at replacement input tables; by default the tables ship inside the package.
 
 ## Quickstart
 
@@ -138,10 +140,10 @@ submits; every computation runs on a compute node.
 src/sealsim/      constants, geometry, cloud, environment, agent, opticflow,
                   dive, simulate, sweep, results, backend, viz, stats,
                   figures, config, cli
+src/sealsim/data/ prototypical movements, dive profiles, PROVENANCE.md
 experiments/      one YAML per sweep (densities, currents, depth, critical rotation)
 slurm/            load_paths.sh, submit_sweep.sh, run_chunk.sbatch, collect.sh
 scripts/          benchmark_backend.py
-data/             prototypical movements, dive profiles, PROVENANCE.md
 tests/            pytest suite incl. analytic flow tests and the legacy regression fixture
 docs/             Sphinx (Napoleon, Furo)
 _legacy/          original flat scripts, untouched, plus their 2021-2022 outputs
@@ -152,16 +154,26 @@ _legacy/          original flat scripts, untouched, plus their 2021-2022 outputs
 The original simulator was written by Anne S. Oepen for her MSc thesis
 (Göttingen, January 2021, supervised by Bart R. H. Geurten and Frederike D. Hanke),
 with extensions by Bart R. H. Geurten in 2021 and 2022. The 2026 rewrite is by
-Bart R. H. Geurten. Input data and their sources are listed in `data/PROVENANCE.md`.
+Bart R. H. Geurten. Input data and their sources are listed in `src/sealsim/data/PROVENANCE.md`.
 
 ## Citation
 
-A `CITATION.cff` and Zenodo DOI will accompany the first tagged release of the
-rebuilt package. Until then cite the thesis:
+Cite the software through `CITATION.cff` (GitHub's "Cite this repository" button
+renders it; Zenodo archives every tagged release) and the thesis it grew from:
 
 Oepen, A. S. (2021). *Turbidity: burden or benefit? Optic flow based odometry in a
 semiaquatic species, the harbor seal (Phoca vitulina).* MSc thesis, Georg-August-Universität
 Göttingen.
+
+## Releasing
+
+```bash
+git tag -a v1.0.0 -m "v1.0.0: first release of the rebuilt package"
+git push origin v1.0.0        # release.yml runs the tests, builds, publishes the GitHub release
+```
+
+Bump `version` and `date-released` in `CITATION.cff` and add a `CHANGELOG.md` entry
+before tagging; Zenodo reads the metadata at tag time.
 
 ## Licence
 

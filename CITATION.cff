@@ -1,0 +1,42 @@
+cff-version: 1.2.0
+message: "If you use sealsim, please cite it as below."
+type: software
+title: "sealsim: SEnsory Aquatic odometry simuLator"
+abstract: >-
+  Agent-based simulation of the optic flow a swimming harbour seal (Phoca vitulina)
+  receives from suspended particles in turbid water. A six-degree-of-freedom seal
+  agent moves through a seed-stable particle cloud; the package computes great-circle
+  retinal flow and three odometry readouts (focus-of-expansion heading error,
+  depth-order rank correlation, translation-rotation index) over sweeps of particle
+  density, visual acuity, current and depth, on CPU or CUDA.
+version: "1.0.0"
+date-released: "2026-11-02"
+license: MIT
+repository-code: "https://github.com/zerotonin/SEAL"
+url: "https://zerotonin.github.io/SEAL/"
+authors:
+  - family-names: Oepen
+    given-names: Anne S.
+    affiliation: "Georg-August-Universitaet Goettingen, Germany"
+  - family-names: Geurten
+    given-names: Bart R. H.
+    orcid: "https://orcid.org/0000-0002-1816-3241"
+    affiliation: "Department of Zoology, University of Otago, Dunedin, New Zealand"
+    email: bart.geurten@otago.ac.nz
+keywords:
+  - optic flow
+  - harbour seal
+  - turbidity
+  - visual odometry
+  - agent-based model
+  - visual ecology
+references:
+  - type: thesis
+    authors:
+      - family-names: Oepen
+        given-names: Anne S.
+    title: "Turbidity: burden or benefit? Optic flow based odometry in a semiaquatic species, the harbor seal (Phoca vitulina)"
+    year: 2021
+    institution:
+      name: "Georg-August-Universitaet Goettingen"
+    notes: "MSc thesis, supervised by B. R. H. Geurten and F. D. Hanke"
