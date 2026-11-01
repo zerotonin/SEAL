@@ -1,0 +1,20 @@
+{
+  "_comment": "Copy this file to local_paths.json (git-ignored) and fill in the real values for each machine. Keys data_root, code_root and conda_setup may use ~ or be relative to the repo root. Delete profiles you do not use and add more freely. Resolution order: SEALSIM_<KEY> environment variable, then this file, then the default; see src/sealsim/config.py.",
+  "active_profile": "local",
+  "profiles": {
+    "local": {
+      "data_root": "<absolute path to your sealsim results directory, e.g. /path/to/sealsim_results>",
+      "code_root": "<absolute path to this checkout>",
+      "conda_setup": "<absolute path to etc/profile.d/conda.sh, e.g. ~/anaconda3/etc/profile.d/conda.sh>",
+      "conda_env": "sealsim"
+    },
+    "hpc": {
+      "data_root": "<cluster project directory for results, e.g. /projects/<group>/sealsim>",
+      "code_root": "<absolute path to the cluster checkout>",
+      "conda_setup": "<cluster path to etc/profile.d/conda.sh>",
+      "conda_env": "sealsim-gpu",
+      "slurm_account": "<your SLURM account>",
+      "slurm_partition": "<comma-separated GPU partitions your account may use>"
+    }
+  }
+}
