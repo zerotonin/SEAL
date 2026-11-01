@@ -51,7 +51,7 @@ def build_parser() -> argparse.ArgumentParser:
     motion = p_step.add_mutually_exclusive_group(required=True)
     motion.add_argument("--velocity", nargs=6, type=float, metavar=tuple(VELOCITY_COLUMNS),
                         help="m/s and rad/s in the body frame")
-    motion.add_argument("--pm", type=int, help="pm_id from data/prototypical_movements")
+    motion.add_argument("--pm", type=int, help="pm_id, see sealsim/data/prototypical_movements")
     p_step.add_argument("--dt", type=float, default=None,
                         help="step duration [s]; default: half-radius rule")
     p_step.add_argument("--depth", type=float, default=DEFAULT_SEAL_DEPTH_M)

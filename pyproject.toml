@@ -18,7 +18,7 @@ keywords = [
     "visual-ecology", "simulation",
 ]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
@@ -63,6 +63,9 @@ Repository = "https://github.com/zerotonin/SEAL"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+sealsim = ["data/*.md", "data/*/*.csv"]
 
 [tool.setuptools_scm]
 fallback_version = "0.0.0"

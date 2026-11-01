@@ -75,3 +75,13 @@ def test_pm5d_table_has_thirteen_movements():
     assert v[3] == pytest.approx(2.1617)
     with pytest.raises(KeyError):
         dive.pm5d_velocity(table, 99)
+
+
+def test_package_ships_the_input_tables():
+    from sealsim.dive import PACKAGE_DATA_DIR, default_data_dir
+
+    assert default_data_dir() == PACKAGE_DATA_DIR
+    names = {p.name for p in PACKAGE_DATA_DIR.rglob("*.csv")}
+    assert names == {"protoMov.csv", "distributionCS.csv", "transProbCS.csv", "pm5d_k13.csv",
+                     "uShapeDiveDepthPitch.csv", "vShapeDiveDepthPitch.csv"}
+    assert (PACKAGE_DATA_DIR / "PROVENANCE.md").is_file()

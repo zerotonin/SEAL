@@ -41,16 +41,18 @@ from sealsim.constants import (
 )
 from sealsim.geometry import body_to_world, rates_between
 
-
 # ┌────────────────────────────────────────────────────────────┐
 # │ Tables  « prototypical movements and their Markov chain »  │
 # └────────────────────────────────────────────────────────────┘
+PACKAGE_DATA_DIR = Path(__file__).resolve().parent / "data"
+
+
 def default_data_dir() -> Path:
-    """Input tables live in data/ at the repo root, or where SEALSIM_INPUT_DATA points."""
+    """Input tables ship inside the package; SEALSIM_INPUT_DATA or ``input_data`` overrides."""
     override = config.get("input_data", default=None)
     if override:
         return Path(override).expanduser()
-    return config.repo_root() / "data"
+    return PACKAGE_DATA_DIR
 
 
 @dataclass(frozen=True)

@@ -1,6 +1,6 @@
 # Data provenance
 
-Every file under `data/` with where it came from, who produced it, and what the package
+Every file under `sealsim/data/` (shipped inside the package) with where it came from, who produced it, and what the package
 uses it for. Simulation outputs never live here; they go to `data_root` from
 `local_paths.json`.
 
@@ -12,7 +12,9 @@ uses it for. Simulation outputs never live here; they go to `data_root` from
 | `distributionCS.csv` | 50 | cumulative start distribution of the 50 PMs | same run |
 | `transProbCS.csv` | 50 × 50 | cumulative transition matrix (row = current PM) | same run |
 | `pm5d_k13.csv` | 13 × 7 | the five-dimensional PMs used in every thesis and manuscript figure: thrust, slip, lift (m/s), yaw, pitch (rad/s), roll fixed at 0, plus a group label | z-scored k-means on 200 simulated dives (100 U, 100 V) at 1000 Hz; the original file `combi_C.csv` is not in the repo, so this table was reconstructed on 2 Nov 2026 from the vectors hard-coded in `_legacy/RunSims4LappeLab.py`, `_legacy/plotOFFigure.py` and `_legacy/calculateRoationalConentofOF.py` (identical in all three). Thesis Figs 5.1 to 5.3. Ask A. S. Oepen for the original |
-| `exampleC.csv` | 9 × 5 | centroids from an earlier k = 9 run | thesis p. 41 mentions k = 9; not used by any figure; kept for completeness |
+
+An earlier k = 9 centroid table (`exampleC.csv`, thesis p. 41) is not used by any figure
+and was moved to `_legacy/data/`.
 
 ## dive_profiles/
 
@@ -25,7 +27,7 @@ The per-phase means and standard deviations hard-coded in `_legacy/protoMov.py`
 (`diveShapeU`, `diveShapeV`) were derived from these two files; the rewrite recomputes
 them from the CSVs.
 
-## Literature constants (live in `src/sealsim/constants.py` from Sprint 1)
+## Literature constants (`sealsim/constants.py`)
 
 | Quantity | Value | Source |
 |---|---|---|

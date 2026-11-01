@@ -94,7 +94,7 @@ MAX_STEP_FRACTION_OF_RADIUS = 0.5
 MAX_STEP_ROTATION_RAD = np.pi
 
 # ┌────────────────────────────────────────────────────────────┐
-# │ Dive phases  « MINOSplus Fig. 16, digitised in data/dive_profiles » │
+# │ Dive phases  « MINOSplus Fig. 16, digitised, sealsim/data/dive_profiles » │
 # └────────────────────────────────────────────────────────────┘
 FLOOR_MARGIN_M = 0.5
 PHASE_TRANSITION_SIGMA_S = 0.4
