@@ -9,7 +9,8 @@
 # ║  (intrinsic Z, Y', X''). This keeps every sign in the data       ║
 # ║  tables and the thesis; in z-up axes it is Rz(-yaw) Ry(-pitch)   ║
 # ║  Rx(roll). Retinal coordinates: azimuth = atan2(y, x), positive  ║
-# ║  to the left; elevation = asin(z / r), positive up.              ║
+# ║  to the left; elevation = asin(z / r), positive up. Sphere       ║
+# ║  functions run on numpy or cupy arrays alike.                    ║
 # ╚══════════════════════════════════════════════════════════════════╝
 
 from __future__ import annotations
@@ -17,13 +18,14 @@ from __future__ import annotations
 import numpy as np
 from scipy.spatial.transform import Rotation
 
+from sealsim.backend import array_module_of
 from sealsim.constants import FloatArray
 
 EULER_SIGNS = np.array([-1.0, -1.0, 1.0])
 
 
 # ┌────────────────────────────────────────────────────────────┐
-# │ Orientation  « Euler angles, rotations and their rates »   │
+# │ Orientation  « Euler angles, rotations and their rates (CPU) » │
 # └────────────────────────────────────────────────────────────┘
 def body_to_world(euler: FloatArray) -> Rotation:
     """Rotation taking body-frame vectors to world axes; batched for (N, 3) input."""
@@ -58,45 +60,50 @@ def rates_between(euler0: FloatArray, euler1: FloatArray, dt: float) -> FloatArr
 
 
 # ┌────────────────────────────────────────────────────────────┐
-# │ Sphere  « directions on the retina »                       │
+# │ Sphere  « directions on the retina (numpy or cupy) »       │
 # └────────────────────────────────────────────────────────────┘
 def unit_vectors(xyz: FloatArray) -> FloatArray:
-    xyz = np.asarray(xyz, dtype=float)
-    norm = np.linalg.norm(xyz, axis=-1, keepdims=True)
+    xp = array_module_of(xyz)
+    xyz = xp.asarray(xyz, dtype=float)
+    norm = xp.linalg.norm(xyz, axis=-1, keepdims=True)
     with np.errstate(invalid="ignore", divide="ignore"):
-        return np.where(norm > 0, xyz / norm, 0.0)
+        return xp.where(norm > 0, xyz / norm, 0.0)
 
 
 def to_spherical(xyz: FloatArray) -> tuple[FloatArray, FloatArray, FloatArray]:
     """Cartesian to (distance, azimuth, elevation) in metres and radians."""
-    xyz = np.asarray(xyz, dtype=float)
-    r = np.linalg.norm(xyz, axis=-1)
-    az = np.arctan2(xyz[..., 1], xyz[..., 0])
+    xp = array_module_of(xyz)
+    xyz = xp.asarray(xyz, dtype=float)
+    r = xp.linalg.norm(xyz, axis=-1)
+    az = xp.arctan2(xyz[..., 1], xyz[..., 0])
     with np.errstate(invalid="ignore", divide="ignore"):
-        el = np.arcsin(np.clip(np.where(r > 0, xyz[..., 2] / r, 0.0), -1.0, 1.0))
+        el = xp.arcsin(xp.clip(xp.where(r > 0, xyz[..., 2] / r, 0.0), -1.0, 1.0))
     return r, az, el
 
 
 def spherical_to_unit(az: FloatArray, el: FloatArray) -> FloatArray:
-    az, el = np.asarray(az, dtype=float), np.asarray(el, dtype=float)
-    return np.stack([np.cos(el) * np.cos(az), np.cos(el) * np.sin(az), np.sin(el)], axis=-1)
+    xp = array_module_of(az, el)
+    az, el = xp.asarray(az, dtype=float), xp.asarray(el, dtype=float)
+    return xp.stack([xp.cos(el) * xp.cos(az), xp.cos(el) * xp.sin(az), xp.sin(el)], axis=-1)
 
 
 def tangent_basis(az: FloatArray, el: FloatArray) -> tuple[FloatArray, FloatArray]:
     """Local east (increasing azimuth) and north (increasing elevation) unit vectors."""
-    az, el = np.asarray(az, dtype=float), np.asarray(el, dtype=float)
-    zeros = np.zeros_like(az)
-    e_az = np.stack([-np.sin(az), np.cos(az), zeros], axis=-1)
-    e_el = np.stack([-np.sin(el) * np.cos(az), -np.sin(el) * np.sin(az), np.cos(el)], axis=-1)
+    xp = array_module_of(az, el)
+    az, el = xp.asarray(az, dtype=float), xp.asarray(el, dtype=float)
+    zeros = xp.zeros_like(az)
+    e_az = xp.stack([-xp.sin(az), xp.cos(az), zeros], axis=-1)
+    e_el = xp.stack([-xp.sin(el) * xp.cos(az), -xp.sin(el) * xp.sin(az), xp.cos(el)], axis=-1)
     return e_az, e_el
 
 
 def angle_between(a: FloatArray, b: FloatArray) -> FloatArray:
     """Great-circle angle between direction vectors, stable near 0 and pi."""
+    xp = array_module_of(a, b)
     ua, ub = unit_vectors(a), unit_vectors(b)
-    cross = np.linalg.norm(np.cross(ua, ub), axis=-1)
-    dot = np.einsum("...i,...i->...", ua, ub)
-    return np.arctan2(cross, dot)
+    cross = xp.linalg.norm(xp.cross(ua, ub), axis=-1)
+    dot = xp.einsum("...i,...i->...", ua, ub)
+    return xp.arctan2(cross, dot)
 
 
 def great_circle_flow(
@@ -109,15 +116,16 @@ def great_circle_flow(
         tangent:   unit tangent at u0 pointing towards u1, shape (N, 3).
         flow:      magnitude times tangent in the (azimuth, elevation) basis at u0, (N, 2).
     """
+    xp = array_module_of(u0, u1)
     u0, u1 = unit_vectors(u0), unit_vectors(u1)
     magnitude = angle_between(u0, u1)
-    along = np.einsum("...i,...i->...", u0, u1)[..., None]
+    along = xp.einsum("...i,...i->...", u0, u1)[..., None]
     tangent = unit_vectors(u1 - along * u0)
     _, az, el = to_spherical(u0)
     e_az, e_el = tangent_basis(az, el)
-    flow = magnitude[..., None] * np.stack(
-        [np.einsum("...i,...i->...", tangent, e_az),
-         np.einsum("...i,...i->...", tangent, e_el)],
+    flow = magnitude[..., None] * xp.stack(
+        [xp.einsum("...i,...i->...", tangent, e_az),
+         xp.einsum("...i,...i->...", tangent, e_el)],
         axis=-1,
     )
     return magnitude, tangent, flow

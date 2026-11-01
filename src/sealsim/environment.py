@@ -16,6 +16,7 @@ from typing import Protocol
 import numpy as np
 from scipy.interpolate import RegularGridInterpolator
 
+from sealsim.backend import array_module_of, to_backend, to_numpy
 from sealsim.constants import OCEAN_FLOOR_Z_M, OCEAN_SURFACE_Z_M, BoolArray, FloatArray, Vec3
 
 
@@ -31,8 +32,9 @@ class UniformCurrent:
     velocity: Vec3 = (0.0, 0.0, 0.0)
 
     def __call__(self, position: FloatArray) -> FloatArray:
-        position = np.asarray(position, dtype=float)
-        return np.broadcast_to(np.asarray(self.velocity, dtype=float), position.shape).copy()
+        xp = array_module_of(position)
+        velocity = xp.asarray(self.velocity, dtype=float)
+        return xp.broadcast_to(velocity, position.shape).copy()
 
     @property
     def speed(self) -> float:
@@ -59,7 +61,9 @@ class CornerCurrent:
         object.__setattr__(self, "_interp", interp)
 
     def __call__(self, position: FloatArray) -> FloatArray:
-        return self._interp(np.atleast_2d(np.asarray(position, dtype=float)))
+        """Interpolates on the CPU and returns on the caller's backend."""
+        values = self._interp(np.atleast_2d(to_numpy(position).astype(float)))
+        return to_backend(values, array_module_of(position))
 
 
 # ┌────────────────────────────────────────────────────────────┐
@@ -72,7 +76,7 @@ class Environment:
     current: CurrentField = field(default_factory=UniformCurrent)
 
     def in_water(self, z: FloatArray) -> BoolArray:
-        z = np.asarray(z, dtype=float)
+        z = array_module_of(z).asarray(z, dtype=float)
         return (z < self.surface_z) & (z > self.floor_z)
 
     def current_at(self, position: FloatArray) -> FloatArray:

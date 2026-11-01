@@ -7,8 +7,10 @@
 # ║  each sample. Three odometry readouts are computed on every run  ║
 # ║  (lab rule: run everything, decide later): the                   ║
 # ║  focus-of-expansion heading error, the Spearman correlation      ║
-# ║  between 1/ flow and distance, and the translational/rotational  ║
-# ║  flow index.                                                     ║
+# ║  between inverse flow magnitude and distance, and the            ║
+# ║  translational/rotational flow index. Works on numpy and cupy    ║
+# ║  fields; only the 3 x 3 eigenproblem of the focus estimate runs  ║
+# ║  on the CPU.                                                     ║
 # ╚══════════════════════════════════════════════════════════════════╝
 
 from __future__ import annotations
@@ -17,8 +19,8 @@ from dataclasses import dataclass
 
 import numpy as np
 from scipy.spatial.transform import Rotation
-from scipy.stats import spearmanr
 
+from sealsim.backend import array_module_of, to_backend, to_numpy
 from sealsim.constants import (
     AZIMUTH_LIMIT_DEG,
     ELEVATION_MAX_DEG,
@@ -55,21 +57,27 @@ def compute_flow(
     rot1: Rotation,
     valid: BoolArray,
 ) -> FlowField:
-    """Retinal flow from world-axis offsets before and after a step."""
-    pre_body = rot0.inv().apply(pre_world)
-    post_body = rot1.inv().apply(post_world)
+    """Retinal flow from world-axis offsets before and after a step.
+
+    Row vectors times the rotation matrix equal the inverse rotation applied to
+    column vectors, so world offsets go to the body frame as ``p @ R``.
+    """
+    xp = array_module_of(pre_world)
+    pre_body = pre_world @ to_backend(rot0.as_matrix(), xp)
+    post_body = post_world @ to_backend(rot1.as_matrix(), xp)
     r0, az, el = to_spherical(pre_body)
-    r1 = np.linalg.norm(post_body, axis=1)
+    r1 = xp.linalg.norm(post_body, axis=1)
     magnitude, tangent, flow = great_circle_flow(pre_body, post_body)
     return FlowField(
         azimuth=az, elevation=el, flow=flow, magnitude=magnitude, tangent=tangent,
         direction=unit_vectors(pre_body), distance=0.5 * (r0 + r1),
-        valid=np.asarray(valid, dtype=bool) & np.isfinite(magnitude),
+        valid=xp.asarray(valid, dtype=bool) & xp.isfinite(magnitude),
     )
 
 
 def fov_mask(azimuth: FloatArray, elevation: FloatArray) -> BoolArray:
-    az_ok = np.abs(azimuth) <= np.deg2rad(AZIMUTH_LIMIT_DEG.value)
+    xp = array_module_of(azimuth)
+    az_ok = xp.abs(azimuth) <= np.deg2rad(AZIMUTH_LIMIT_DEG.value)
     el_ok = (elevation >= np.deg2rad(ELEVATION_MIN_DEG.value)) & (
         elevation <= np.deg2rad(ELEVATION_MAX_DEG.value)
     )
@@ -79,7 +87,7 @@ def fov_mask(azimuth: FloatArray, elevation: FloatArray) -> BoolArray:
 # ┌────────────────────────────────────────────────────────────┐
 # │ Readouts  « odometry quality from one flow field »         │
 # └────────────────────────────────────────────────────────────┘
-def estimate_foe(field: FlowField, mask: BoolArray | None = None) -> FloatArray:
+def estimate_foe(field: FlowField, mask: BoolArray | None = None) -> np.ndarray:
     """Direction all flow vectors radiate from, by least squares on great circles.
 
     Each flow vector lies on the great circle through its particle and the focus
@@ -87,21 +95,23 @@ def estimate_foe(field: FlowField, mask: BoolArray | None = None) -> FloatArray:
     The focus is the eigenvector of sum(n_i n_i^T) with the smallest eigenvalue,
     signed so that flow points away from it. Returns nan for fewer than two vectors.
     """
+    xp = array_module_of(field.magnitude)
     mask = field.in_fov if mask is None else mask
     use = mask & (field.magnitude > 0)
-    if use.sum() < 2:
+    if int(use.sum()) < 2:
         return np.full(3, np.nan)
     u, t = field.direction[use], field.tangent[use]
-    normals = unit_vectors(np.cross(u, t))
-    _, vectors = np.linalg.eigh(normals.T @ normals)
+    normals = unit_vectors(xp.cross(u, t))
+    _, vectors = np.linalg.eigh(to_numpy(normals.T @ normals))
     foe = vectors[:, 0]
-    radial = foe - np.einsum("ij,j->i", u, foe)[:, None] * u
-    if np.einsum("ij,ij->", t, radial) > 0:
+    foe_x = to_backend(foe, xp)
+    radial = foe_x - xp.einsum("ij,j->i", u, foe_x)[:, None] * u
+    if float(xp.einsum("ij,ij->", t, radial)) > 0:
         foe = -foe
     return foe
 
 
-def foe_heading_error(foe: FloatArray, translation_body: FloatArray) -> float:
+def foe_heading_error(foe: np.ndarray, translation_body: FloatArray) -> float:
     """Angle between the estimated focus and the true direction of travel [rad]."""
     heading = np.asarray(translation_body, dtype=float)[:3]
     if not np.all(np.isfinite(foe)) or np.linalg.norm(heading) == 0:
@@ -109,14 +119,29 @@ def foe_heading_error(foe: FloatArray, translation_body: FloatArray) -> float:
     return float(angle_between(foe, heading))
 
 
+def rank_correlation(x: FloatArray, y: FloatArray) -> float:
+    """Spearman rho for continuous data (ties are not averaged; they have measure zero)."""
+    xp = array_module_of(x, y)
+    rx, ry = _ranks(x, xp), _ranks(y, xp)
+    rx, ry = rx - rx.mean(), ry - ry.mean()
+    denominator = xp.sqrt((rx**2).sum() * (ry**2).sum())
+    return float((rx * ry).sum() / denominator) if float(denominator) > 0 else float("nan")
+
+
+def _ranks(values: FloatArray, xp) -> FloatArray:
+    order = xp.argsort(values)
+    ranks = xp.empty(values.shape[0], dtype=float)
+    ranks[order] = xp.arange(values.shape[0], dtype=float)
+    return ranks
+
+
 def distance_rank_correlation(field: FlowField, mask: BoolArray | None = None) -> float:
     """Spearman rho between inverse flow magnitude and distance; 1 = perfect depth order."""
     mask = field.in_fov if mask is None else mask
     use = mask & (field.magnitude > 0)
-    if use.sum() < 3:
+    if int(use.sum()) < 3:
         return float("nan")
-    rho = spearmanr(1.0 / field.magnitude[use], field.distance[use]).statistic
-    return float(rho)
+    return rank_correlation(1.0 / field.magnitude[use], field.distance[use])
 
 
 def translation_rotation_index(translation_sum: float, rotation_sum: float) -> float:
@@ -148,14 +173,16 @@ def summarise(
     translation_sum: float = float("nan"),
     rotation_sum: float = float("nan"),
 ) -> FlowMetrics:
+    xp = array_module_of(field.magnitude)
     in_fov = field.in_fov
     magnitudes = field.magnitude[in_fov]
+    has_any = int(magnitudes.shape[0]) > 0
     return FlowMetrics(
-        n_particles=int(field.valid.size),
+        n_particles=int(field.valid.shape[0]),
         n_valid=int(field.valid.sum()),
         n_in_fov=int(in_fov.sum()),
-        mean_magnitude_rad=float(magnitudes.mean()) if magnitudes.size else float("nan"),
-        median_magnitude_rad=float(np.median(magnitudes)) if magnitudes.size else float("nan"),
+        mean_magnitude_rad=float(magnitudes.mean()) if has_any else float("nan"),
+        median_magnitude_rad=float(xp.median(magnitudes)) if has_any else float("nan"),
         foe_error_rad=foe_heading_error(estimate_foe(field), translation_body),
         spearman_rho=distance_rank_correlation(field),
         trans_rot_index=translation_rotation_index(translation_sum, rotation_sum),

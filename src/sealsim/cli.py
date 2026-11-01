@@ -20,6 +20,7 @@ from rich.table import Table
 
 from sealsim import __version__
 from sealsim import config as cfg
+from sealsim.backend import BACKENDS, default_backend
 from sealsim.cloud import CloudSpec
 from sealsim.constants import (
     DEFAULT_SAMPLE_RATE_HZ,
@@ -60,6 +61,7 @@ def build_parser() -> argparse.ArgumentParser:
     _add_environment_arguments(p_step)
     p_step.add_argument("--seed", type=int, default=0)
     p_step.add_argument("--no-decompose", action="store_true")
+    _add_backend_argument(p_step)
     p_step.add_argument("--out", type=Path, default=None, help="directory for parquet + yaml")
     p_step.add_argument("--stem", default="step")
 
@@ -71,6 +73,7 @@ def build_parser() -> argparse.ArgumentParser:
     _add_cloud_arguments(p_dive)
     _add_environment_arguments(p_dive)
     p_dive.add_argument("--seed", type=int, default=0)
+    _add_backend_argument(p_dive)
     p_dive.add_argument("--out", type=Path, default=None)
     p_dive.add_argument("--stem", default="dive")
 
@@ -83,6 +86,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_sweep.add_argument("--dry-run", action="store_true", help="list the jobs and stop")
     p_sweep.add_argument("--overwrite", action="store_true")
     p_sweep.add_argument("--quiet", action="store_true", help="log lines instead of a bar")
+    _add_backend_argument(p_sweep)
 
     p_collect = sub.add_parser("collect", help="gather run yamls into one table")
     p_collect.add_argument("directory", type=Path)
@@ -99,6 +103,11 @@ def _add_cloud_arguments(parser: argparse.ArgumentParser) -> None:
     count = group.add_mutually_exclusive_group()
     count.add_argument("--n-particles", type=int, default=None)
     count.add_argument("--density", type=float, default=None, help="particles per m^3")
+
+
+def _add_backend_argument(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument("--backend", choices=BACKENDS, default=default_backend(),
+                        help="array library; default from SEALSIM_BACKEND or numpy")
 
 
 def _add_environment_arguments(parser: argparse.ArgumentParser) -> None:
@@ -157,7 +166,7 @@ def _cmd_step(args: argparse.Namespace) -> int:
         velocity=tuple(float(v) for v in velocity),
         position=(0.0, 0.0, args.depth), euler=tuple(args.euler), dt=args.dt,
         cloud=_cloud_from_args(args), environment=_environment_from_args(args),
-        seed=args.seed, decompose=not args.no_decompose,
+        seed=args.seed, decompose=not args.no_decompose, backend=args.backend,
     )
     result = run_step(config)
     _print_metrics(result.metrics.as_dict(), f"step  dt = {result.dt:.4g} s, "
@@ -180,7 +189,8 @@ def _cmd_dive(args: argparse.Namespace) -> int:
     metrics = None
     if args.flow:
         steps = iter_dive_steps(trajectory, _cloud_from_args(args),
-                                _environment_from_args(args), seed=args.seed)
+                                _environment_from_args(args), seed=args.seed,
+                                backend=args.backend)
         rows = {i: m.as_dict() for i, m in tqdm(steps, total=trajectory.velocity_body.shape[0],
                                                   desc="flow per step")}
         metrics = pd.DataFrame.from_dict(rows, orient="index")
@@ -195,6 +205,7 @@ def _cmd_dive(args: argparse.Namespace) -> int:
 
 def _cmd_sweep(args: argparse.Namespace) -> int:
     import logging
+    from dataclasses import replace
 
     from tqdm import tqdm
 
@@ -206,7 +217,8 @@ def _cmd_sweep(args: argparse.Namespace) -> int:
     out_dir = args.out or (cfg.data_root() / experiment.name)
     jobs = sweep.chunk_indices(experiment.n_jobs, args.chunk, args.n_chunks)
     console.print(f"{experiment.name}: {experiment.n_jobs} jobs, chunk {args.chunk + 1} of "
-                  f"{args.n_chunks} runs jobs {jobs.start}..{jobs.stop - 1} into {out_dir}")
+                  f"{args.n_chunks} runs jobs {jobs.start}..{jobs.stop - 1} into {out_dir} "
+                  f"on {args.backend}")
     if args.dry_run:
         for i in jobs:
             console.print(f"  {sweep.job_stem(experiment, i)}  {experiment.condition(i)}")
@@ -219,7 +231,9 @@ def _cmd_sweep(args: argparse.Namespace) -> int:
         if (out_dir / f"{stem}.yaml").exists() and not args.overwrite:
             continue
         condition = experiment.condition(i)
-        result = run_step(sweep.build_step_config(condition, experiment, pm_table))
+        config = replace(sweep.build_step_config(condition, experiment, pm_table),
+                         backend=args.backend)
+        result = run_step(config)
         results.save_step(result, out_dir, stem,
                           extra={"experiment": experiment.name, "condition": condition})
         if args.quiet and (n_done % 50 == 0 or n_done == len(jobs)):

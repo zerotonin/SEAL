@@ -6,7 +6,7 @@
 # ║  (current - seal velocity) dt, step the agent, compute the flow  ║
 # ║  and its readouts. A step is run three times from the same       ║
 # ║  cloud (full, translation only, rotation only) for the flow      ║
-# ║  index.                                                          ║
+# ║  index. The backend field of StepConfig picks numpy or cupy.     ║
 # ╚══════════════════════════════════════════════════════════════════╝
 
 from __future__ import annotations
@@ -17,6 +17,7 @@ from typing import Iterator
 import numpy as np
 
 from sealsim.agent import SealState, advance, rotation_part, translation_part, world_velocity
+from sealsim.backend import get_array_module, to_backend
 from sealsim.cloud import CloudSpec, ParticleCloud, advect_cloud, build_cloud, visible_at
 from sealsim.constants import (
     DEFAULT_SEAL_DEPTH_M,
@@ -44,6 +45,7 @@ class StepConfig:
     environment: Environment = field(default_factory=Environment)
     seed: int = 0
     decompose: bool = True
+    backend: str = "numpy"
 
 
 def step_duration(cfg: StepConfig) -> float:
@@ -79,7 +81,7 @@ class StepResult:
 
 def run_step(cfg: StepConfig) -> StepResult:
     rng = np.random.default_rng(cfg.seed)
-    cloud = build_cloud(cfg.cloud, rng)
+    cloud = build_cloud(cfg.cloud, rng, get_array_module(cfg.backend))
     dt = step_duration(cfg)
     state = SealState.at(cfg.position, cfg.euler)
     velocity = np.asarray(cfg.velocity, dtype=float)
@@ -109,15 +111,18 @@ def advance_cloud(
     dt: float,
 ) -> tuple[FlowField, SealState]:
     """Move cloud and seal by one step; return the flow seen and the new pose."""
-    absolute = state.position + cloud.position
-    displacement = (env.current_at(absolute) - world_velocity(state, velocity)) * dt
+    xp = cloud.xp
+    absolute = to_backend(state.position, xp) + cloud.position
+    seal_velocity = to_backend(world_velocity(state, velocity), xp)
+    displacement = (env.current_at(absolute) - seal_velocity) * dt
     step = advect_cloud(cloud, displacement)
     after = advance(state, velocity, dt)
+    absolute_after = to_backend(after.position, xp) + step.post
     valid = (
         visible_at(cloud, step.pre)
         & visible_at(cloud, step.post)
         & env.in_water(absolute[:, 2])
-        & env.in_water((after.position + step.post)[:, 2])
+        & env.in_water(absolute_after[:, 2])
         & ~step.exited
     )
     return compute_flow(step.pre, step.post, state.rotation(), after.rotation(), valid), after
@@ -131,10 +136,11 @@ def iter_dive_steps(
     cloud_spec: CloudSpec,
     env: Environment,
     seed: int = 0,
+    backend: str = "numpy",
 ) -> Iterator[tuple[int, FlowMetrics]]:
     """Yield (sample index, metrics) per step; the caller adds progress reporting."""
     rng = np.random.default_rng(seed)
-    cloud = build_cloud(cloud_spec, rng)
+    cloud = build_cloud(cloud_spec, rng, get_array_module(backend))
     dt = 1.0 / trajectory.sample_rate
     for i in range(trajectory.velocity_body.shape[0]):
         state = SealState(trajectory.position[i], trajectory.euler[i])

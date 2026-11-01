@@ -20,6 +20,7 @@ import pandas as pd
 import yaml
 
 from sealsim import __version__
+from sealsim.backend import to_numpy
 from sealsim.dive import DiveTrajectory
 from sealsim.opticflow import FlowField
 from sealsim.simulate import StepResult
@@ -29,18 +30,19 @@ from sealsim.simulate import StepResult
 # │ Step  « one flow field and its readouts »                  │
 # └────────────────────────────────────────────────────────────┘
 def field_to_frame(field: FlowField, diameter: np.ndarray | None = None) -> pd.DataFrame:
+    flow = to_numpy(field.flow)
     frame = pd.DataFrame({
-        "azimuth_rad": field.azimuth,
-        "elevation_rad": field.elevation,
-        "flow_azimuth_rad": field.flow[:, 0],
-        "flow_elevation_rad": field.flow[:, 1],
-        "magnitude_rad": field.magnitude,
-        "distance_m": field.distance,
-        "valid": field.valid,
-        "in_fov": field.in_fov,
+        "azimuth_rad": to_numpy(field.azimuth),
+        "elevation_rad": to_numpy(field.elevation),
+        "flow_azimuth_rad": flow[:, 0],
+        "flow_elevation_rad": flow[:, 1],
+        "magnitude_rad": to_numpy(field.magnitude),
+        "distance_m": to_numpy(field.distance),
+        "valid": to_numpy(field.valid),
+        "in_fov": to_numpy(field.in_fov),
     })
     if diameter is not None:
-        frame["diameter_m"] = diameter
+        frame["diameter_m"] = to_numpy(diameter)
     return frame
 
 
@@ -50,8 +52,8 @@ def save_step(
     out_dir.mkdir(parents=True, exist_ok=True)
     frame = field_to_frame(result.field)
     for name, component in result.components.items():
-        frame[f"{name}_magnitude_rad"] = component.magnitude
-        frame[f"{name}_in_fov"] = component.in_fov
+        frame[f"{name}_magnitude_rad"] = to_numpy(component.magnitude)
+        frame[f"{name}_in_fov"] = to_numpy(component.in_fov)
     parquet = out_dir / f"{stem}.parquet"
     frame.to_parquet(parquet, index=False)
     meta = {
@@ -59,6 +61,7 @@ def save_step(
         **_provenance(),
         "config": to_plain(result.config),
         "dt_s": result.dt,
+        "backend": result.config.backend,
         "cloud_radius_m": result.config.cloud.radius_m,
         "n_particles": result.config.cloud.count(),
         "seal_before": {"position": result.before.position.tolist(),

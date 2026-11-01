@@ -5,18 +5,20 @@
 # ║  The cloud is a ball of radius R = d_max around the seal, where  ║
 # ║  d_i = a_i / tan(acuity) is the distance at which a grain of     ║
 # ║  diameter a_i still subtends the acuity angle. Positions are     ║
-# ║  offsets from the seal in world axes, shape (N, 3). A particle   ║
-# ║  that leaves the ball re-enters at the point reflection of its   ║
-# ║  pre-step position, which maps the exit lens onto the entry      ║
-# ║  lens exactly and keeps the density uniform.                     ║
+# ║  offsets from the seal in world axes, shape (N, 3), on numpy or  ║
+# ║  cupy. A particle that leaves the ball re-enters at the point    ║
+# ║  reflection of its pre-step position, which maps the exit lens   ║
+# ║  onto the entry lens exactly and keeps the density uniform.      ║
 # ╚══════════════════════════════════════════════════════════════════╝
 
 from __future__ import annotations
 
 from dataclasses import dataclass, replace
+from types import ModuleType
 
 import numpy as np
 
+from sealsim.backend import array_module_of, to_backend
 from sealsim.constants import (
     ACUITY_SINGLE_TARGET,
     GRAIN_DENSITY,
@@ -86,6 +88,10 @@ class ParticleCloud:
     def n(self) -> int:
         return int(self.position.shape[0])
 
+    @property
+    def xp(self) -> ModuleType:
+        return array_module_of(self.position)
+
     def copy(self) -> ParticleCloud:
         return ParticleCloud(
             self.position.copy(), self.diameter.copy(),
@@ -110,22 +116,26 @@ def sample_uniform_ball(n: int, radius: float, rng: np.random.Generator) -> Floa
     return direction * r
 
 
-def build_cloud(spec: CloudSpec, rng: np.random.Generator) -> ParticleCloud:
+def build_cloud(
+    spec: CloudSpec, rng: np.random.Generator, xp: ModuleType = np
+) -> ParticleCloud:
+    """Sample on the CPU for seed stability, then move to the requested backend."""
     n = spec.count()
     diameter = rng.uniform(*spec.diameter_range_m, size=n)
     return ParticleCloud(
-        position=sample_uniform_ball(n, spec.radius_m, rng),
-        diameter=diameter,
-        visibility_distance=np.asarray(visibility_distance(diameter, spec.acuity_deg)),
+        position=to_backend(sample_uniform_ball(n, spec.radius_m, rng), xp),
+        diameter=to_backend(diameter, xp),
+        visibility_distance=to_backend(visibility_distance(diameter, spec.acuity_deg), xp),
         radius=spec.radius_m,
     )
 
 
 def advect_cloud(cloud: ParticleCloud, displacement: FloatArray) -> CloudStep:
     """Shift all particles, respawn those that left, update the cloud in place."""
+    xp = cloud.xp
     pre = cloud.position.copy()
-    post = pre + np.asarray(displacement, dtype=float)
-    exited = np.linalg.norm(post, axis=1) > cloud.radius
+    post = pre + to_backend(displacement, xp)
+    exited = xp.linalg.norm(post, axis=1) > cloud.radius
     cloud.position = post.copy()
     cloud.position[exited] = -pre[exited]
     return CloudStep(pre=pre, post=post, exited=exited)
@@ -133,4 +143,5 @@ def advect_cloud(cloud: ParticleCloud, displacement: FloatArray) -> CloudStep:
 
 def visible_at(cloud: ParticleCloud, positions: FloatArray) -> BoolArray:
     """Within each particle's own visibility distance."""
-    return np.linalg.norm(positions, axis=1) <= cloud.visibility_distance
+    xp = cloud.xp
+    return xp.linalg.norm(positions, axis=1) <= cloud.visibility_distance
