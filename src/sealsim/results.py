@@ -44,7 +44,9 @@ def field_to_frame(field: FlowField, diameter: np.ndarray | None = None) -> pd.D
     return frame
 
 
-def save_step(result: StepResult, out_dir: Path, stem: str) -> tuple[Path, Path]:
+def save_step(
+    result: StepResult, out_dir: Path, stem: str, extra: dict[str, Any] | None = None
+) -> tuple[Path, Path]:
     out_dir.mkdir(parents=True, exist_ok=True)
     frame = field_to_frame(result.field)
     for name, component in result.components.items():
@@ -64,6 +66,7 @@ def save_step(result: StepResult, out_dir: Path, stem: str) -> tuple[Path, Path]
         "seal_after": {"position": result.after.position.tolist(),
                        "euler": result.after.euler.tolist()},
         "metrics": result.metrics.as_dict(),
+        **to_plain(extra or {}),
     }
     return parquet, write_yaml(meta, out_dir / f"{stem}.yaml")
 
