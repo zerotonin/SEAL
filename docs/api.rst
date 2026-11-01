@@ -40,6 +40,15 @@ Input and output
 .. automodule:: sealsim.backend
    :members:
 
+.. automodule:: sealsim.viz
+   :members:
+
+.. automodule:: sealsim.stats
+   :members:
+
+.. automodule:: sealsim.figures
+   :members:
+
 .. automodule:: sealsim.config
    :members:
 

@@ -65,6 +65,21 @@ Every step writes a parquet table (one row per particle) and a yaml file with th
 full configuration, seed, package version and readouts, so a figure can always be
 traced back to the run that produced it.
 
+## Figures and statistics
+
+```bash
+pip install -e ".[stats]"            # reRandomStats, for the pairwise tests
+sealsim figures                      # all: 2 3 4 S1 S2 S3 -> <data_root>/figures
+sealsim figures --which 3 S2
+```
+
+Every figure is written as SVG with editable text, as PNG and with a CSV of the
+numbers plotted. Where groups are compared, a `*_stats_*.csv` holds the pairwise
+Fisher resampling tests (median difference, 10 000 draws, Benjamini-Hochberg).
+Flow panels are retinal cutouts in degrees with equal axes; dense fields are
+thinned to 800 arrows and the title says so. The full-sphere Hammer globes are
+supplementary. Colours follow Wong (2011).
+
 ## GPU and HPC runs
 
 The array code runs on numpy or on [CuPy](https://cupy.dev); pick with `--backend
@@ -121,7 +136,8 @@ submits; every computation runs on a compute node.
 
 ```
 src/sealsim/      constants, geometry, cloud, environment, agent, opticflow,
-                  dive, simulate, sweep, results, backend, config, cli
+                  dive, simulate, sweep, results, backend, viz, stats,
+                  figures, config, cli
 experiments/      one YAML per sweep (densities, currents, depth, critical rotation)
 slurm/            load_paths.sh, submit_sweep.sh, run_chunk.sbatch, collect.sh
 scripts/          benchmark_backend.py
