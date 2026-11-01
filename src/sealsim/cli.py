@@ -73,6 +73,21 @@ def build_parser() -> argparse.ArgumentParser:
     p_dive.add_argument("--seed", type=int, default=0)
     p_dive.add_argument("--out", type=Path, default=None)
     p_dive.add_argument("--stem", default="dive")
+
+    p_sweep = sub.add_parser("sweep", help="run an experiment grid, or one chunk of it")
+    p_sweep.add_argument("experiment", type=Path, help="YAML file in experiments/")
+    p_sweep.add_argument("--out", type=Path, default=None,
+                         help="output directory; default <data_root>/<experiment name>")
+    p_sweep.add_argument("--chunk", type=int, default=0, help="array task index")
+    p_sweep.add_argument("--n-chunks", type=int, default=1)
+    p_sweep.add_argument("--dry-run", action="store_true", help="list the jobs and stop")
+    p_sweep.add_argument("--overwrite", action="store_true")
+    p_sweep.add_argument("--quiet", action="store_true", help="log lines instead of a bar")
+
+    p_collect = sub.add_parser("collect", help="gather run yamls into one table")
+    p_collect.add_argument("directory", type=Path)
+    p_collect.add_argument("--out", type=Path, default=None,
+                           help="output stem; writes <stem>.parquet and <stem>.csv")
     return parser
 
 
@@ -104,6 +119,10 @@ def main(argv: list[str] | None = None) -> int:
         return _cmd_step(args)
     if args.command == "dive":
         return _cmd_dive(args)
+    if args.command == "sweep":
+        return _cmd_sweep(args)
+    if args.command == "collect":
+        return _cmd_collect(args)
     raise SystemExit(f"unknown command {args.command}")
 
 
@@ -171,6 +190,54 @@ def _cmd_dive(args: argparse.Namespace) -> int:
         extra = {"seed": args.seed, "cloud": results.to_plain(_cloud_from_args(args))}
         parquet, meta = results.save_dive(trajectory, metrics, args.out, args.stem, extra)
         console.print(f"wrote {parquet.name} and {meta.name} to {args.out}")
+    return 0
+
+
+def _cmd_sweep(args: argparse.Namespace) -> int:
+    import logging
+
+    from tqdm import tqdm
+
+    from sealsim import results, sweep
+    from sealsim.dive import load_pm5d
+    from sealsim.simulate import run_step
+
+    experiment = sweep.load_experiment(args.experiment)
+    out_dir = args.out or (cfg.data_root() / experiment.name)
+    jobs = sweep.chunk_indices(experiment.n_jobs, args.chunk, args.n_chunks)
+    console.print(f"{experiment.name}: {experiment.n_jobs} jobs, chunk {args.chunk + 1} of "
+                  f"{args.n_chunks} runs jobs {jobs.start}..{jobs.stop - 1} into {out_dir}")
+    if args.dry_run:
+        for i in jobs:
+            console.print(f"  {sweep.job_stem(experiment, i)}  {experiment.condition(i)}")
+        return 0
+    pm_table = load_pm5d()
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
+    iterator = jobs if args.quiet else tqdm(jobs, desc=experiment.name, unit="job")
+    for n_done, i in enumerate(iterator, start=1):
+        stem = sweep.job_stem(experiment, i)
+        if (out_dir / f"{stem}.yaml").exists() and not args.overwrite:
+            continue
+        condition = experiment.condition(i)
+        result = run_step(sweep.build_step_config(condition, experiment, pm_table))
+        results.save_step(result, out_dir, stem,
+                          extra={"experiment": experiment.name, "condition": condition})
+        if args.quiet and (n_done % 50 == 0 or n_done == len(jobs)):
+            logging.info("%s: %d of %d jobs in this chunk done", experiment.name, n_done,
+                         len(jobs))
+    return 0
+
+
+def _cmd_collect(args: argparse.Namespace) -> int:
+    from sealsim.results import collect_metadata
+
+    table = collect_metadata(args.directory)
+    console.print(f"{len(table)} runs, {table.shape[1]} columns")
+    if args.out:
+        args.out.parent.mkdir(parents=True, exist_ok=True)
+        table.to_parquet(args.out.with_suffix(".parquet"), index=False)
+        table.to_csv(args.out.with_suffix(".csv"), index=False)
+        console.print(f"wrote {args.out.with_suffix('.parquet').name} and .csv")
     return 0
 
 
