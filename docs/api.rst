@@ -37,6 +37,9 @@ Input and output
 .. automodule:: sealsim.results
    :members:
 
+.. automodule:: sealsim.backend
+   :members:
+
 .. automodule:: sealsim.config
    :members:
 

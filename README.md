@@ -65,6 +65,45 @@ Every step writes a parquet table (one row per particle) and a yaml file with th
 full configuration, seed, package version and readouts, so a figure can always be
 traced back to the run that produced it.
 
+## GPU and HPC runs
+
+The array code runs on numpy or on [CuPy](https://cupy.dev); pick with `--backend
+numpy|cupy|auto` or `SEALSIM_BACKEND`. A seed means the same particles on both
+backends because the cloud is sampled on the CPU and moved to the device.
+
+```bash
+pip install -e ".[gpu]"                      # cupy-cuda12x, needs an NVIDIA driver
+sealsim step --pm 10 --n-particles 200000 --backend cupy
+python scripts/benchmark_backend.py          # prints the table below for this machine
+```
+
+One three-run step (full, translation only, rotation only) on a 20-core workstation:
+
+| particles | numpy [ms] | cupy [ms] |
+|---|---|---|
+| 1,000 | 2.9 | to be measured on a GPU node |
+| 10,000 | 17.9 | |
+| 100,000 | 240 | |
+| 1,000,000 | 1860 | |
+
+The paper's single-step sweeps (`experiments/*.yaml`, 4200 jobs, at most 32 000
+particles each) finish in about two minutes on one CPU core. The GPU path is for
+clouds above 10^5 particles, for example 5.5 arcmin acuity with millimetre grains
+(1.25 m radius), and for long dives.
+
+On a SLURM cluster the `hpc` profile of `local_paths.json` supplies account,
+partition, conda and data root; nothing cluster-specific is in the repository.
+
+```bash
+source slurm/load_paths.sh                   # hpc profile -> SEALSIM_* and SBATCH_*
+slurm/submit_sweep.sh experiments/currents.yaml 20     # job array of 20 chunks, 1 GPU each
+squeue --me
+slurm/collect.sh currents                    # short batch job -> <data_root>/tables/currents
+```
+
+Array tasks log timestamped lines instead of progress bars. The login node only
+submits; every computation runs on a compute node.
+
 ## Conventions
 
 * Body frame: x forward (thrust), y left (slip), z up (lift). World frame z up, depth
@@ -82,8 +121,10 @@ traced back to the run that produced it.
 
 ```
 src/sealsim/      constants, geometry, cloud, environment, agent, opticflow,
-                  dive, simulate, sweep, results, config, cli
+                  dive, simulate, sweep, results, backend, config, cli
 experiments/      one YAML per sweep (densities, currents, depth, critical rotation)
+slurm/            load_paths.sh, submit_sweep.sh, run_chunk.sbatch, collect.sh
+scripts/          benchmark_backend.py
 data/             prototypical movements, dive profiles, PROVENANCE.md
 tests/            pytest suite incl. analytic flow tests and the legacy regression fixture
 docs/             Sphinx (Napoleon, Furo)
