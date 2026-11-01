@@ -1,0 +1,11 @@
+name: smoke
+description: Four tiny jobs to check an installation or a SLURM submission end to end.
+vision:
+  north_sea: {acuity_deg: 0.27, diameter_range_m: [0.0005, 0.002]}
+grid:
+  pm_id: [2, 10]
+  current_speed_mps: [0.0, 0.153]
+fixed:
+  vision: north_sea
+  n_particles: 500
+  base_seed: 0

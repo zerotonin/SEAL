@@ -1,0 +1,16 @@
+name: pm_radius_density
+description: >
+  Thesis Table 3.2 and manuscript Fig. 2 and 3 redone with corrected visibility.
+  All 13 five-dimensional prototypical movements, both vision presets and a
+  logarithmic grid of particle number densities (D1, D2), still water at 30 m.
+vision:
+  north_sea: {acuity_deg: 0.27, diameter_range_m: [0.0005, 0.002]}
+  thesis: {acuity_deg: 0.0916667, diameter_range_m: [0.00002, 0.00016]}
+grid:
+  pm_id: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+  vision: [north_sea, thesis]
+  number_density_per_m3: [300, 1000, 3000, 10000, 30000, 100000]
+  replicate: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+fixed:
+  depth_m: -30.0
+  base_seed: 1000

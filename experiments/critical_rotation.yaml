@@ -1,0 +1,18 @@
+name: critical_rotation
+description: >
+  Where does rotational flow overtake translational flow? Forward thrust at
+  1.5 m/s combined with yaw rates from 0 to 900 deg/s; the trans/rot index
+  crosses zero near omega_crit = v / d for an object abeam. Saccades of
+  harbour seals run at 100 to 300 deg/s.
+vision:
+  north_sea: {acuity_deg: 0.27, diameter_range_m: [0.0005, 0.002]}
+  thesis: {acuity_deg: 0.0916667, diameter_range_m: [0.00002, 0.00016]}
+grid:
+  vision: [north_sea, thesis]
+  yaw_rate_degps: [0, 25, 50, 100, 150, 200, 250, 300, 400, 500, 600, 750, 900]
+  number_density_per_m3: [1000, 10000]
+  replicate: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+fixed:
+  thrust_mps: 1.5
+  depth_m: -30.0
+  base_seed: 4000

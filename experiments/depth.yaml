@@ -1,0 +1,16 @@
+name: depth
+description: >
+  Does the surface or the floor clip the cloud enough to matter? Fast forward
+  translation and yaw right at depths from just below the surface to just
+  above the 70 m floor.
+vision:
+  north_sea: {acuity_deg: 0.27, diameter_range_m: [0.0005, 0.002]}
+  thesis: {acuity_deg: 0.0916667, diameter_range_m: [0.00002, 0.00016]}
+grid:
+  pm_id: [2, 10]
+  vision: [north_sea, thesis]
+  depth_m: [-0.2, -0.5, -1.0, -5.0, -30.0, -69.0, -69.5, -69.8]
+  replicate: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+fixed:
+  number_density_per_m3: 10000
+  base_seed: 3000
