@@ -21,7 +21,9 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.viewcode",
     "sphinx.ext.mathjax",
+    "myst_parser",
 ]
+myst_enable_extensions = ["dollarmath"]
 autodoc_mock_imports = ["cupy"]
 napoleon_google_docstring = True
 napoleon_numpy_docstring = False
