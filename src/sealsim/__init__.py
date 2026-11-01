@@ -17,4 +17,11 @@ try:
 except PackageNotFoundError:  # editable checkout without metadata
     __version__ = "0.0.0"
 
-__all__ = ["__version__"]
+from sealsim.cloud import CloudSpec  # noqa: E402
+from sealsim.environment import Environment, UniformCurrent  # noqa: E402
+from sealsim.simulate import StepConfig, StepResult, run_step  # noqa: E402
+
+__all__ = [
+    "CloudSpec", "Environment", "StepConfig", "StepResult", "UniformCurrent",
+    "__version__", "run_step",
+]
