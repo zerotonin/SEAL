@@ -22,7 +22,7 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.mathjax",
 ]
-autodoc_mock_imports = ["cupy", "matplotlib", "pyarrow", "rich", "tqdm"]
+autodoc_mock_imports = ["cupy"]
 napoleon_google_docstring = True
 napoleon_numpy_docstring = False
 

@@ -1,7 +1,37 @@
 API
 ===
 
-.. automodule:: sealsim
+Model
+-----
+
+.. automodule:: sealsim.constants
+   :members:
+
+.. automodule:: sealsim.geometry
+   :members:
+
+.. automodule:: sealsim.cloud
+   :members:
+
+.. automodule:: sealsim.environment
+   :members:
+
+.. automodule:: sealsim.agent
+   :members:
+
+.. automodule:: sealsim.opticflow
+   :members:
+
+.. automodule:: sealsim.dive
+   :members:
+
+.. automodule:: sealsim.simulate
+   :members:
+
+Input and output
+----------------
+
+.. automodule:: sealsim.results
    :members:
 
 .. automodule:: sealsim.config
