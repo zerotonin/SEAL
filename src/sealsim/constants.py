@@ -67,6 +67,55 @@ SPM_MASS_CONCENTRATION_G_PER_M3: dict[str, tuple[float, float]] = {
 SPM_SOURCE = "lab data note on North Sea suspended particulate matter (Kiarra), 2026"
 
 # ┌────────────────────────────────────────────────────────────┐
+# │ Suspended matter classes  « sizes from the literature »    │
+# └────────────────────────────────────────────────────────────┘
+@dataclass(frozen=True)
+class GrainClass:
+    """A named grain-size distribution with its source."""
+
+    name: str
+    kind: str                      # "uniform", "lognormal" or "junge"
+    params: tuple[float, ...]      # uniform: (low, high); lognormal: (median, gsd);
+    source: str                    # junge: (low, high, slope)
+
+
+GRAIN_CLASSES: tuple[GrainClass, ...] = (
+    GrainClass("sand", "uniform", (0.5e-3, 2.0e-3),
+               "North Sea sand fraction; lab decision D1"),
+    GrainClass("silt", "uniform", (20e-6, 160e-6),
+               "Bunke et al. (2019) Front Mar Sci, SW Baltic silt"),
+    GrainClass("flocs", "lognormal", (180e-6, 1.8),
+               "Chen and Eisma (1995): mean aggregate size 125 to 257 um, "
+               "shallow North Sea and Elbe estuary; geometric SD assumed"),
+    GrainClass("marine snow", "lognormal", (0.7e-3, 1.8),
+               "Moeller et al. (2012) MEPS 468: VPR size spectra 0.2 to 7 mm, "
+               "peak abundance at 0.5 mm, Bornholm Basin; geometric SD assumed"),
+    GrainClass("Junge spectrum", "junge", (20e-6, 2.0e-3, 4.0),
+               "number spectrum dN/dd ~ d^-4, the usual coastal slope; "
+               "cut at silt and sand limits"),
+)
+
+# ┌────────────────────────────────────────────────────────────┐
+# │ Contrast and body  « horizon and bow flow »                │
+# └────────────────────────────────────────────────────────────┘
+CONTRAST_INHERENT = Quantity(
+    1.0, "", "inherent Weber contrast of a grain against the water background; upper bound",
+    (0.3, 1.0),
+)
+CONTRAST_THRESHOLD = Quantity(
+    0.1, "",
+    "order of magnitude of the harbour seal contrast threshold for a single target; "
+    "Sandow et al. (2026) report coarser acuity at Weber contrast 0.34; to be confirmed",
+    (0.03, 0.34),
+)
+HEAD_RADIUS = Quantity(
+    0.09, "m", "adult harbour seal head, half of about 0.18 m width; approximate", (0.07, 0.11)
+)
+BODY_RADIUS = Quantity(
+    0.16, "m", "adult harbour seal trunk, girth about 1 m; approximate", (0.12, 0.20)
+)
+
+# ┌────────────────────────────────────────────────────────────┐
 # │ Water  « currents and the water column »                   │
 # └────────────────────────────────────────────────────────────┘
 CURRENT_SPEEDS_M_PER_S: dict[str, Quantity] = {
