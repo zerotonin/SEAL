@@ -19,6 +19,8 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import yaml
+from scipy.optimize import minimize_scalar
 
 from sealsim import stats, viz
 from sealsim.dive import default_data_dir, load_pm5d
@@ -284,29 +286,85 @@ def figure_s1_globes(results_dir: Path, tables_dir: Path, out_dir: Path) -> list
     return viz.save_figure(fig, "figS1_globes", out_dir, pd.concat(rows, ignore_index=True))
 
 
-def figure_s2_critical_rotation(results_dir: Path, tables_dir: Path,
-                                out_dir: Path) -> list[Path]:
+def figure_5_critical_rotation(results_dir: Path, tables_dir: Path,
+                               out_dir: Path) -> list[Path]:
+    """A: index against yaw rate per preset. B: the same against Omega R / v."""
     viz.apply_style()
     table = load_table(tables_dir, "critical_rotation")
-    fig, ax = plt.subplots(figsize=(viz.SINGLE_COLUMN_IN, 0.8 * viz.SINGLE_COLUMN_IN))
-    summary = viz.plot_trend(ax, table, "condition.yaw_rate_degps", "metrics.trans_rot_index",
-                             "condition.vision", viz.COLOURS, viz.LABELS)
     thrust = float(table["condition.thrust_mps"].iloc[0])
-    for vision, radius in table.groupby("condition.vision")["cloud_radius_m"].first().items():
-        omega_crit = np.rad2deg(thrust / radius)
-        ax.axvline(omega_crit, color=viz.COLOURS.get(vision, "grey"), linestyle=":", lw=1)
-    ax.axhline(0.0, color="black", lw=0.6)
+    table["omega_R_over_v"] = (np.deg2rad(table["condition.yaw_rate_degps"])
+                               * table["cloud_radius_m"] / thrust)
+    fig, (ax_a, ax_b) = plt.subplots(1, 2, figsize=(viz.DOUBLE_COLUMN_IN,
+                                                    0.42 * viz.DOUBLE_COLUMN_IN))
+    summary_a = viz.plot_trend(ax_a, table, "condition.yaw_rate_degps",
+                               "metrics.trans_rot_index", "condition.vision", viz.COLOURS,
+                               viz.LABELS)
     low, high = observed_rotation_rates_degps()
-    ax.axvspan(low, high, color=viz.COLOURS["neutral"], alpha=0.15, lw=0,
-               label="rotational PMs")
-    ax.set_xlabel("yaw rate [°/s] at 1.5 m/s thrust")
-    ax.set_ylabel(viz.LABELS["trans_rot_index"])
-    ax.legend(frameon=False)
+    ax_a.axvspan(low, high, color=viz.COLOURS["neutral"], alpha=0.15, lw=0,
+                 label="rotational PMs")
+    ax_a.set_xlabel(f"yaw rate [°/s] at {thrust:g} m/s thrust")
+    ax_a.legend(frameon=False)
+    summary_b = viz.plot_trend(ax_b, table, "omega_R_over_v", "metrics.trans_rot_index",
+                               "condition.vision", viz.COLOURS, viz.LABELS)
+    for vision, group in table.groupby("condition.vision"):
+        a_min, a_max = _pair(group["config.cloud.diameter_range_m"].iloc[0])
+        ax_b.axvline(critical_ratio(a_min, a_max), color=viz.COLOURS.get(vision, "grey"),
+                     linestyle=":", lw=1)
+    fitted = fit_critical_ratio(summary_b)
+    grid = np.linspace(0.0, summary_b["omega_R_over_v"].max(), 200)
+    curve_label = (r"$(\mathcal{N}_c-\mathcal{N})/(\mathcal{N}_c+\mathcal{N})$, "
+                   rf"$\mathcal{{N}}_c$ = {fitted:.2f}")
+    (curve,) = ax_b.plot(grid, index_curve(grid, fitted), color="black", lw=1,
+                         label=curve_label)
+    ax_b.legend(handles=[curve], frameon=False, loc="lower left")
+    ax_b.set_xlabel(r"$\Omega\,R\,/\,v$")
+    for ax, label in ((ax_a, "A"), (ax_b, "B")):
+        ax.axhline(0.0, color="black", lw=0.6)
+        ax.set_ylabel(viz.LABELS["trans_rot_index"])
+        viz.panel_label(ax, label)
     fig.tight_layout()
-    return viz.save_figure(fig, "figS2_critical_rotation", out_dir, summary)
+    theory = pd.DataFrame({"omega_R_over_v": grid, "median": index_curve(grid, fitted),
+                           "panel": "B_theory", "fitted_critical_ratio": fitted})
+    data = pd.concat([summary_a.assign(panel="A"), summary_b.assign(panel="B"), theory],
+                     ignore_index=True)
+    return viz.save_figure(fig, "fig5_critical_rotation", out_dir, data)
 
 
-def figure_s3_depth(results_dir: Path, tables_dir: Path, out_dir: Path) -> list[Path]:
+def _pair(value) -> tuple[float, float]:
+    """A two-element range as stored in the collected table (list, array or its string)."""
+    if isinstance(value, str):
+        value = yaml.safe_load(value)
+    low, high = (float(v) for v in np.ravel(np.asarray(value, dtype=float))[:2])
+    return low, high
+
+
+def index_curve(ratio: np.ndarray, critical: float) -> np.ndarray:
+    """Translation-rotation index predicted for rotation number ``ratio``."""
+    return (critical - ratio) / (critical + ratio)
+
+
+def fit_critical_ratio(summary: pd.DataFrame) -> float:
+    """Least-squares critical rotation number of the index curve through the medians."""
+    x = summary["omega_R_over_v"].to_numpy(float)
+    y = summary["median"].to_numpy(float)
+    cost = lambda nc: float(np.mean((index_curve(x, nc) - y) ** 2))  # noqa: E731
+    return float(minimize_scalar(cost, bounds=(0.5, 10.0), method="bounded").x)
+
+
+def critical_ratio(a_min: float, a_max: float) -> float:
+    """Predicted Omega_crit R / v for grains uniform in [a_min, a_max].
+
+    With each grain visible out to d = a / tan(acuity), uniform positions in the ball
+    of radius R = d_max, and flow summed over the visible grains, the translational and
+    rotational sums are equal when Omega = (3/2) v E[d^2] / E[d^3].
+    """
+    q = a_min / a_max
+    e_d2 = (1 - q**3) / (3 * (1 - q))
+    e_d3 = (1 - q**4) / (4 * (1 - q))
+    return 1.5 * e_d2 / e_d3
+
+
+def figure_s2_depth(results_dir: Path, tables_dir: Path, out_dir: Path) -> list[Path]:
     viz.apply_style()
     table = load_table(tables_dir, "depth")
     main = table[table["condition.vision"] == MAIN_VISION]
@@ -321,7 +379,7 @@ def figure_s3_depth(results_dir: Path, tables_dir: Path, out_dir: Path) -> list[
         parts.append(summary.assign(readout=key))
     axes[0].legend(frameon=False)
     fig.tight_layout()
-    return viz.save_figure(fig, "figS3_depth", out_dir, pd.concat(parts, ignore_index=True))
+    return viz.save_figure(fig, "figS2_depth", out_dir, pd.concat(parts, ignore_index=True))
 
 
 def observed_rotation_rates_degps() -> tuple[float, float]:
@@ -334,16 +392,23 @@ def observed_rotation_rates_degps() -> tuple[float, float]:
 
 
 FIGURES = {
-    "2": figure_2, "3": figure_3, "4": figure_4,
-    "S1": figure_s1_globes, "S2": figure_s2_critical_rotation, "S3": figure_s3_depth,
+    "2": figure_2, "3": figure_3, "4": figure_4, "5": figure_5_critical_rotation,
+    "S1": figure_s1_globes, "S2": figure_s2_depth,
 }
+
+
+def all_figures() -> dict:
+    """Sweep-based figures plus the robustness figures, which import this module."""
+    from sealsim.figures_robustness import FIGURES as ROBUSTNESS
+    return {**FIGURES, **ROBUSTNESS}
 
 
 def make_figures(which: list[str], results_dir: Path, tables_dir: Path,
                  out_dir: Path) -> list[Path]:
     paths: list[Path] = []
+    figures = all_figures()
     for key in which:
-        paths += FIGURES[key](results_dir, tables_dir, out_dir)
+        paths += figures[key](results_dir, tables_dir, out_dir)
     return paths
 
 

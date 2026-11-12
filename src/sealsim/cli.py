@@ -95,7 +95,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     p_fig = sub.add_parser("figures", help="draw manuscript figures from collected tables")
     p_fig.add_argument("--which", nargs="+", default=["all"],
-                       help="figure keys, e.g. 2 3 4 S1 S2 S3, or all")
+                       help="figure keys, e.g. 2 3 4 5 7 8 S1 S2, or all")
     p_fig.add_argument("--results", type=Path, default=None,
                        help="directory holding one folder per experiment; default data_root")
     p_fig.add_argument("--tables", type=Path, default=None,
@@ -267,15 +267,16 @@ def _cmd_collect(args: argparse.Namespace) -> int:
 
 
 def _cmd_figures(args: argparse.Namespace) -> int:
-    from sealsim.figures import FIGURES, make_figures
+    from sealsim.figures import all_figures, make_figures
 
     results = args.results or cfg.data_root()
     tables = args.tables or results / "tables"
     out = args.out or results / "figures"
-    which = list(FIGURES) if args.which == ["all"] else args.which
-    unknown = [w for w in which if w not in FIGURES]
+    figures = all_figures()
+    which = list(figures) if args.which == ["all"] else args.which
+    unknown = [w for w in which if w not in figures]
     if unknown:
-        raise SystemExit(f"unknown figure keys {unknown}; choose from {list(FIGURES)}")
+        raise SystemExit(f"unknown figure keys {unknown}; choose from {list(figures)}")
     for path in make_figures(which, results, tables, out):
         console.print(f"wrote {path}")
     return 0
