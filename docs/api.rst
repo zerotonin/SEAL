@@ -31,6 +31,15 @@ Model
 .. automodule:: sealsim.sweep
    :members:
 
+Theory and robustness
+---------------------
+
+.. automodule:: sealsim.corollaries
+   :members:
+
+.. automodule:: sealsim.robustness
+   :members:
+
 Input and output
 ----------------
 
@@ -47,6 +56,9 @@ Input and output
    :members:
 
 .. automodule:: sealsim.figures
+   :members:
+
+.. automodule:: sealsim.figures_robustness
    :members:
 
 .. automodule:: sealsim.config

@@ -71,8 +71,9 @@ traced back to the run that produced it.
 
 ```bash
 pip install -e ".[stats]"            # reRandomStats, for the pairwise tests
-sealsim figures                      # all: 2 3 4 S1 S2 S3 -> <data_root>/figures
-sealsim figures --which 3 S2
+sealsim figures                      # all: 2 3 4 5 7 8 S1 S2 -> <data_root>/figures
+sealsim figures --which 3 5
+sealsim figures --which 7 8          # corollary and robustness figures; no sweep tables needed
 ```
 
 Every figure is written as SVG with editable text, as PNG and with a CSV of the
@@ -131,6 +132,9 @@ submits; every computation runs on a compute node.
 * A particle of diameter *a* is visible out to *d = a / tan(acuity)*; the cloud radius
   is the reach of the largest grain. Particles are uniform in volume and re-enter by
   point reflection when they leave, which keeps the density exact.
+* The translation-rotation index compares a translation-only and a rotation-only run
+  of the same cloud. A current moves the scene, so it counts as translation; the
+  rotation-only run sees still water.
 * A step lasts at most as long as it takes to travel half the cloud radius or to
   rotate by pi, unless `dt` is given.
 

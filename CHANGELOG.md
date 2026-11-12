@@ -3,6 +3,20 @@
 All notable changes to sealsim. The format follows Keep a Changelog; versions follow
 semantic versioning and are tagged `vX.Y.Z`.
 
+## [Unreleased]
+
+### Added
+- `corollaries`: the law for any grain-size distribution (Sauter mean diameter),
+  under a contrast horizon, in its time form and as a speed estimator; samplers for
+  uniform, log-normal and Junge size spectra.
+- `robustness`: translation-rotation index per azimuth band (step and instantaneous),
+  bow-flow bias from a dipole potential flow around the head, Cramer-Rao bound on
+  heading for an ideal decomposer with additive or Weber noise, FOE template observer.
+- `figures_robustness`: manuscript Figures 7 (suspended matter, horizon, speed) and
+  8 (bands, bow flow, observers); `sealsim figures --which 7 8`.
+- Constants: literature grain classes, contrast and body-size quantities with sources.
+- Tests for both new modules (11).
+
 ## [1.0.0] - 2026-11-02
 
 First release of the rebuilt package.
