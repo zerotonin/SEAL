@@ -11,7 +11,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from typing import Iterator
 
 import numpy as np
@@ -28,7 +28,7 @@ from sealsim.constants import (
     Vec6,
 )
 from sealsim.dive import DiveTrajectory
-from sealsim.environment import Environment
+from sealsim.environment import Environment, UniformCurrent
 from sealsim.opticflow import FlowField, FlowMetrics, compute_flow, summarise
 
 
@@ -91,7 +91,7 @@ def run_step(cfg: StepConfig) -> StepResult:
     if cfg.decompose:
         trans_field, _ = advance_cloud(cloud.copy(), cfg.environment, state,
                                        translation_part(velocity), dt)
-        rot_field, _ = advance_cloud(cloud.copy(), cfg.environment, state,
+        rot_field, _ = advance_cloud(cloud.copy(), still_water(cfg.environment), state,
                                      rotation_part(velocity), dt)
         components = {"translation": trans_field, "rotation": rot_field}
     field_full, after = advance_cloud(cloud, cfg.environment, state, velocity, dt)
@@ -101,6 +101,15 @@ def run_step(cfg: StepConfig) -> StepResult:
         rot_sum = float(rot_field.magnitude[common].sum())
     metrics = summarise(field_full, velocity, trans_sum, rot_sum)
     return StepResult(cfg, dt, state, after, field_full, metrics, components)
+
+
+def still_water(env: Environment) -> Environment:
+    """The same water column without its current.
+
+    Seen from the seal, a current is a translation of the scene, so its flow belongs
+    to the translational sum. The rotation-only run therefore switches it off.
+    """
+    return replace(env, current=UniformCurrent())
 
 
 def advance_cloud(
